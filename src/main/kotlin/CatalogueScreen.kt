@@ -38,7 +38,8 @@ internal class CatalogueScreen() : BorderPane(){
         //Creating columns
         //Creating columns
         val fileNameCol = TableColumn<String, String>("File Name")
-        fileNameCol.setCellValueFactory(PropertyValueFactory<String, String>("fileName"))
+        fileNameCol.cellValueFactory = PropertyValueFactory<String, String>("fileName")
+        table.items = data
     }
 
 }
