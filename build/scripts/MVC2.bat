@@ -71,7 +71,7 @@ set CLASSPATH=%APP_HOME%\lib\MVC2-1.0-SNAPSHOT.jar;%APP_HOME%\lib\kotlin-stdlib-
 
 
 @rem Execute MVC2
-"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %MV_C2_OPTS%  -classpath "%CLASSPATH%" MVC2 %*
+"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %MV_C2_OPTS%  -classpath "%CLASSPATH%" ApplicationStart %*
 
 :end
 @rem End local scope for the variables with windows NT shell

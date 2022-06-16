@@ -201,7 +201,7 @@ fi
 
 set -- \
         -classpath "$CLASSPATH" \
-        MVC2 \
+        ApplicationStart \
         "$@"
 
 # Use "xargs" to parse quoted args.

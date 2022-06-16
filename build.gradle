@@ -16,7 +16,7 @@ dependencies {
 }
 
 application {
-    mainClassName = 'MVC2'
+    mainClassName = 'ApplicationStart'
 }
 
 javafx {
