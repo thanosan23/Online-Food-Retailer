@@ -23,3 +23,13 @@ javafx {
     version = "17.0.2"
     modules = ['javafx.controls', 'javafx.fxml', 'javafx.graphics', 'javafx.media']
 }
+
+android {
+    defaultConfig {
+        applicationId = "com.ofn.cs446project"
+        minSdk = 23
+        targetSdk = 24
+        versionCode = 1
+        versionName = "1.0"
+    }
+}
