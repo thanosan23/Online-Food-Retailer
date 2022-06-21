@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -23,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -138,7 +140,8 @@ fun TableScreen() {
     Modifier
       .fillMaxSize()
       .padding(16.dp)
-      .background(Color.White)) {
+      .background(Color.White),
+  horizontalAlignment = Alignment.CenterHorizontally) {
     // Here is the header
     item {
       Row(Modifier.background(Color.Gray)) {
@@ -149,20 +152,19 @@ fun TableScreen() {
     // Here are all the lines of your table.
     items(tableData) {
       val (id, text) = it
-      Row(
-        horizontalArrangement = Arrangement.End
-      ) {
-      ListItem(
 
+        Divider()
+      ListItem(
+        Modifier.offset(100.dp, 0.0.dp),
         text = { Text(text) },
         icon = {
           Icon(
             Icons.Filled.Create,
             contentDescription = null
           )
-        }
+        },
+
       )
-    }
     }
     }
   }
