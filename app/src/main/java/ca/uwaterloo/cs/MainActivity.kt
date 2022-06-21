@@ -1,6 +1,9 @@
 package ca.uwaterloo.cs
 
+import android.content.Context
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.widget.ImageView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.*
@@ -24,8 +27,11 @@ import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.HorizontalAlignmentLine
+import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -34,6 +40,8 @@ import androidx.compose.ui.unit.Dp
 import ca.uwaterloo.cs.ui.theme.InstagramOrange
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import coil.compose.AsyncImage
+import coil.compose.rememberImagePainter
+import java.io.File
 import kotlin.concurrent.thread
 
 class MainActivity : ComponentActivity() {
@@ -72,7 +80,6 @@ fun StoryAvatar(imageUrl:String){
 fun MainContent() {
   Box(
     Modifier
-      .fillMaxSize()
       .background(MaterialTheme.colors.background),
   ) {
    val clickedDoggo = remember {mutableStateOf<String?>(null)}
@@ -126,7 +133,6 @@ fun RowScope.TableCell(
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TableScreen() {
   // Just a fake data... a Pair of Int and String
@@ -139,8 +145,7 @@ fun TableScreen() {
   // The LazyColumn will be our table. Notice the use of the weights below
   LazyColumn(
     Modifier
-      .fillMaxSize()
-      .padding(16.dp)
+      .padding(50.dp)
       .background(Color.White),
   horizontalAlignment = Alignment.CenterHorizontally) {
     // Here is the header
@@ -158,9 +163,10 @@ fun TableScreen() {
       Row(
         Modifier.padding(20.dp),
         verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-          Icons.Filled.Home,
-          contentDescription = null
+        Image(
+          painter = painterResource(id = R.drawable.ic_pumpkin),
+          contentDescription = null,
+          modifier = Modifier.width(100.dp).height(100.dp)
         )
         Spacer(Modifier.width(30.dp))
         Text("Alfred Sisley",
