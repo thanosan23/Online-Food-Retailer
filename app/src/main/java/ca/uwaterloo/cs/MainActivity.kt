@@ -7,6 +7,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
@@ -23,6 +25,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import ca.uwaterloo.cs.ui.theme.InstagramOrange
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
@@ -69,32 +74,88 @@ fun MainContent() {
       .background(MaterialTheme.colors.background),
   ) {
    val clickedDoggo = remember {mutableStateOf<String?>(null)}
+    TableScreen()
+  }
+}
 
-    Column {
-      Text (
-        modifier = Modifier.padding(16.dp),
-        text = "Instagram",
-        fontSize = 20.sp,
-        fontWeight = FontWeight.Medium
-      )
-      Row (
-        Modifier
-          .horizontalScroll(rememberScrollState())
-          .padding(horizontal = 16.dp, vertical = 16.dp)
-      ){
-        val doggos = remember {mutableStateOf(emptyList<String>())}
-          LaunchedEffect(Unit){
-            thread {
-              val presenter = InstagramHomePresenter()
-              doggos.value = presenter.fetchDogImages()
-            }
-          }
-
-        for (doggo in doggos.value){
-          StoryAvatar(
-            imageUrl = doggo
-          )
+@Composable
+fun InstagramPart(){
+  Column {
+    Text (
+      modifier = Modifier.padding(16.dp),
+      text = "Instagram",
+      fontSize = 20.sp,
+      fontWeight = FontWeight.Medium
+    )
+    Row (
+      Modifier
+        .horizontalScroll(rememberScrollState())
+        .padding(horizontal = 16.dp, vertical = 16.dp)
+    ){
+      val doggos = remember {mutableStateOf(emptyList<String>())}
+      LaunchedEffect(Unit){
+        thread {
+          val presenter = InstagramHomePresenter()
+          doggos.value = presenter.fetchDogImages()
         }
+      }
+
+      for (doggo in doggos.value){
+        StoryAvatar(
+          imageUrl = doggo
+        )
+      }
+    }
+  }
+}
+
+@Composable
+fun RowScope.TableCell(
+  text: String,
+  weight: FontWeight
+) {
+  Text(
+    text = text,
+    Modifier
+      .border(1.dp, Color.Black)
+      .padding(8.dp),
+    fontFamily = FontFamily.SansSerif,
+    fontWeight = weight
+    )
+}
+
+@Composable
+fun TableScreen() {
+  // Just a fake data... a Pair of Int and String
+  val tableData = (1..25).mapIndexed { index, item ->
+    index to "Item $index"
+  }
+  // Each cell of a column must have the same weight.
+  val column1Weight = .3f // 30%
+  val column2Weight = .7f // 70%
+  // The LazyColumn will be our table. Notice the use of the weights below
+  LazyColumn(
+    Modifier
+      .fillMaxSize()
+      .padding(16.dp)
+      .background(Color.White)) {
+    // Here is the header
+    item {
+      Row(Modifier.background(Color.Gray)) {
+        TableCell(text = "Column 1", weight = FontWeight.Light)
+        TableCell(text = "Column 2", weight = FontWeight.Light)
+      }
+    }
+    // Here are all the lines of your table.
+    items(tableData) {
+      val (id, text) = it
+      Row(
+        Modifier
+          .background(Color.White)
+          .fillMaxWidth()
+      ) {
+        TableCell(text = id.toString(), weight = FontWeight.Light)
+        TableCell(text = text, weight = FontWeight.Light)
       }
     }
   }
