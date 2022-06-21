@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -153,18 +154,18 @@ fun TableScreen() {
     items(tableData) {
       val (id, text) = it
 
-        Divider()
-      ListItem(
-        Modifier.offset(100.dp, 0.0.dp),
-        text = { Text(text) },
-        icon = {
-          Icon(
-            Icons.Filled.Create,
-            contentDescription = null
-          )
-        },
-
-      )
+      Divider()
+      Row(
+        Modifier.padding(20.dp),
+        verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+          Icons.Filled.Home,
+          contentDescription = null
+        )
+        Spacer(Modifier.width(30.dp))
+        Text("Alfred Sisley",
+        )
+      }
     }
     }
   }
