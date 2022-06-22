@@ -19,6 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
+import java.io.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +47,9 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun TableScreen() {
         // Just a fake data... a Pair of Int and String
-        val tableData = mockData()
+        // TODO: REMOVE / UPGRADE MOCK DATA GENERATION IN FINAL PRODUCT
+        generateMockData()
+        val tableData = readData()
         // Each cell of a column must have the same weight.
         val column1Weight = .3f // 30%
         val column2Weight = .7f // 70%
@@ -73,6 +76,7 @@ class MainActivity : ComponentActivity() {
                         .clickable { editItem(it.second) },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Intent.ACTION_PICK
                     Image(
                         painter = painterResource(id = R.drawable.ic_pumpkin),
                         contentDescription = null,
@@ -119,16 +123,42 @@ class MainActivity : ComponentActivity() {
         startActivity(intent)
     }
 
-    private fun mockData(amount: Int = 7): List<Pair<Int, ProductInformation>> {
-        return (1..amount).mapIndexed { index, _ ->
-            index to ProductInformation(
-                index,
-                "apple ${index + 1}",
-                "apple ${index + 1} description",
-                100 * index + 1,
-                10 * index + 1,
-                arrayListOf("img ${index + 1}", "img ${index + 1}", "img ${index + 1}")
-            )
+    private fun generateMockData(amount: Int = 7) {
+        val context = this.baseContext
+        val dir = File("${context.filesDir}/out")
+        if (dir.exists()) {
+            dir.deleteRecursively()
         }
+        dir.mkdir()
+        (1..amount).forEach { value ->
+            ProductInformation(
+                value,
+                "apple $value",
+                "apple $value description",
+                100 * value + 1,
+                10 * value + 1L
+                // arrayListOf(decoded, decoded)
+            ).exportData(context)
+        }
+    }
+
+    private fun readData(): List<Pair<Int, ProductInformation>> {
+        // TODO: platform compatibility
+        // TODO: load from platform
+        val context = this.baseContext
+        val dir = File("${context.filesDir}/out")
+        if (!dir.exists()) {
+            return emptyList()
+        }
+        val list = ArrayList<Pair<Int, ProductInformation>>()
+        for (saveFile in dir.list()) {
+            val fileIS = FileInputStream("${context.filesDir}/out/" + saveFile)
+            val inStream = ObjectInputStream(fileIS)
+            val productInformation = inStream.readObject() as ProductInformation
+            list.add(Pair(productInformation.id, productInformation))
+            inStream.close()
+            fileIS.close()
+        }
+        return list
     }
 }
