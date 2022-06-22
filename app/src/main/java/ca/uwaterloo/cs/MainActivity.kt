@@ -1,6 +1,5 @@
 package ca.uwaterloo.cs
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -48,6 +47,8 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun TableScreen() {
         // Just a fake data... a Pair of Int and String
+        // TODO: REMOVE / UPGRADE MOCK DATA GENERATION IN FINAL PRODUCT
+        generateMockData()
         val tableData = readData()
         // Each cell of a column must have the same weight.
         val column1Weight = .3f // 30%
@@ -59,7 +60,6 @@ class MainActivity : ComponentActivity() {
                 .padding(20.dp)
                 .background(Color.White)
                 .border(BorderStroke(3.dp, Color.InstagramPurple))
-                .fillMaxSize(1f)
                 .heightIn(0.dp, 640.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -135,8 +135,8 @@ class MainActivity : ComponentActivity() {
                 "apple $value",
                 "apple $value description",
                 100 * value + 1,
-                10 * value + 1L,
-                arrayListOf("img $value", "img $value", "img $value")
+                10 * value + 1L
+                // arrayListOf(decoded, decoded)
             ).exportData(context)
         }
     }
