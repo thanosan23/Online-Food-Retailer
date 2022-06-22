@@ -13,7 +13,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -57,11 +59,11 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainContent() {
-  Box(
+  Column(
     Modifier
       .background(MaterialTheme.colors.background)
-      .padding(10.dp),
-    contentAlignment = Alignment.TopCenter
+      .padding(20.dp),
+    horizontalAlignment = Alignment.CenterHorizontally
   ) {
     TableScreen()
   }
@@ -70,7 +72,7 @@ fun MainContent() {
 @Composable
 fun TableScreen() {
   // Just a fake data... a Pair of Int and String
-  val tableData = (1..25).mapIndexed { index, item ->
+  val tableData = (1..5).mapIndexed { index, item ->
     index to "Item $index"
   }
   // Each cell of a column must have the same weight.
@@ -80,28 +82,41 @@ fun TableScreen() {
   Text("CATOLGUE")
   LazyColumn(
     Modifier
-      .padding(30.dp)
+      .padding(20.dp)
       .background(Color.White)
-      .border(BorderStroke(3.dp, Color.InstagramPurple)),
+      .border(BorderStroke(3.dp, Color.InstagramPurple))
+      .heightIn(0.dp, 640.dp),
   horizontalAlignment = Alignment.CenterHorizontally) {
     // Here are all the lines of your table.
-    items(tableData) {
-      val (id, text) = it
-
-      Divider(Modifier.border(BorderStroke(20.dp, Color.InstagramPurple)))
-      Row(
-        Modifier.padding(20.dp),
-        verticalAlignment = Alignment.CenterVertically) {
-        Image(
-          painter = painterResource(id = R.drawable.ic_pumpkin),
-          contentDescription = null,
-          modifier = Modifier.width(100.dp).height(100.dp)
-        )
-        Spacer(Modifier.width(30.dp))
-        Text("Alfred Sisley",
-        )
+      items(tableData) {
+        Divider(Modifier.border(BorderStroke(20.dp, Color.InstagramPurple)))
+        Row(
+          Modifier.padding(20.dp),
+          verticalAlignment = Alignment.CenterVertically) {
+          Image(
+            painter = painterResource(id = R.drawable.ic_pumpkin),
+            contentDescription = null,
+            modifier = Modifier
+              .width(100.dp)
+              .height(100.dp)
+          )
+          Spacer(Modifier.width(30.dp))
+          Text("Alfred Sisley",
+          )
+        }
       }
     }
+    Row(
+    ){
+      Button(onClick = {
+        println("hey")
+        }
+      ){
+        Icon(
+          Icons.Filled.Add,
+          contentDescription = null
+        )
+      }
     }
   }
 
