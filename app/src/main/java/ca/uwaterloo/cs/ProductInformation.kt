@@ -18,8 +18,7 @@ data class ProductInformation(
     fun exportData(context: Context) {
         // TODO: platform compatibility
         // TODO: save to platform
-        println(context.filesDir)
-        println("${context.filesDir}/out.txt")
+        println("${context.filesDir}/out")
         val dir = File("${context.filesDir}/out")
         if (!dir.exists()) {
             dir.mkdir()
@@ -36,6 +35,14 @@ data class ProductInformation(
         outStream.writeObject(this)
         outStream.close()
         fileOS.close()
+    }
+
+    fun deleteData(context: Context) {
+        val file = File("${context.filesDir}/out", "$id.txt")
+        if (file.exists())
+        {
+            file.delete()
+        }
     }
 }
 // TODO: FIX images to image array

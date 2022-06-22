@@ -1,6 +1,9 @@
 package ca.uwaterloo.cs
 
+import android.R
+import android.app.AlertDialog
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -19,6 +22,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import ca.uwaterloo.cs.form.*
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
+
 
 class ProductForm : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,6 +110,11 @@ class ProductForm : ComponentActivity() {
             }) {
                 Text("Cancel")
             }
+            Button(onClick = {
+                deleteProduct(data)
+            }) {
+                Text("Delete")
+            }
         }
     }
 
@@ -143,5 +152,19 @@ class ProductForm : ComponentActivity() {
         data.images.addAll(newImages)
         data.exportData(this.baseContext)
         this.finish()
+    }
+
+    private fun deleteProduct(data: ProductInformation) {
+        AlertDialog.Builder(this)
+            .setTitle("Delete Product")
+            .setMessage("Are you sure you want to delete this product? This operation is irreversible.")
+            .setIcon(R.drawable.ic_dialog_alert)
+            .setPositiveButton(
+                R.string.yes
+            ) { _, _ ->
+                data.deleteData(this.baseContext)
+                this.finish()
+            }
+            .setNegativeButton(R.string.no, null).show()
     }
 }

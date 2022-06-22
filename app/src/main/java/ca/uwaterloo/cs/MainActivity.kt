@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun TableScreen() {
         // Just a fake data... a Pair of Int and String
-        val tableData = mockData()
+        val tableData = readData()
         // Each cell of a column must have the same weight.
         val column1Weight = .3f // 30%
         val column2Weight = .7f // 70%
@@ -59,6 +59,7 @@ class MainActivity : ComponentActivity() {
                 .padding(20.dp)
                 .background(Color.White)
                 .border(BorderStroke(3.dp, Color.InstagramPurple))
+                .fillMaxSize(1f)
                 .heightIn(0.dp, 640.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -121,16 +122,22 @@ class MainActivity : ComponentActivity() {
         startActivity(intent)
     }
 
-    private fun mockData(amount: Int = 7): List<Pair<Int, ProductInformation>> {
-        return (1..amount).mapIndexed { index, _ ->
-            index to ProductInformation(
-                index,
-                "apple ${index + 1}",
-                "apple ${index + 1} description",
-                100 * index + 1,
-                10 * index + 1L,
-                arrayListOf("img ${index + 1}", "img ${index + 1}", "img ${index + 1}")
-            )
+    private fun generateMockData(amount: Int = 7) {
+        val context = this.baseContext
+        val dir = File("${context.filesDir}/out")
+        if (dir.exists()) {
+            dir.deleteRecursively()
+        }
+        dir.mkdir()
+        (1..amount).forEach { value ->
+            ProductInformation(
+                value,
+                "apple $value",
+                "apple $value description",
+                100 * value + 1,
+                10 * value + 1L,
+                arrayListOf("img $value", "img $value", "img $value")
+            ).exportData(context)
         }
     }
 
@@ -138,15 +145,13 @@ class MainActivity : ComponentActivity() {
         // TODO: platform compatibility
         // TODO: load from platform
         val context = this.baseContext
-        println(context.filesDir)
-        println("${context.filesDir}/out.txt")
         val dir = File("${context.filesDir}/out")
         if (!dir.exists()) {
             return emptyList()
         }
         val list = ArrayList<Pair<Int, ProductInformation>>()
         for (saveFile in dir.list()) {
-            val fileIS = FileInputStream(saveFile)
+            val fileIS = FileInputStream("${context.filesDir}/out/" + saveFile)
             val inStream = ObjectInputStream(fileIS)
             val productInformation = inStream.readObject() as ProductInformation
             list.add(Pair(productInformation.id, productInformation))
