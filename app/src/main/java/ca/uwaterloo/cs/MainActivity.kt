@@ -32,16 +32,24 @@ class MainActivity : ComponentActivity() {
     }
 
 
+//    @Composable
+//    fun MainContent() {
+//        Column(
+//            Modifier
+//                .background(MaterialTheme.colors.background)
+//                .padding(20.dp),
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            TableScreen()
+//        }
+//    }
+
     @Composable
     fun MainContent() {
-        Column(
-            Modifier
-                .background(MaterialTheme.colors.background)
-                .padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            TableScreen()
-        }
+        Scaffold(
+            content = { TableScreen() },
+            bottomBar = { NavigationBar() }
+        )
     }
 
     @Composable
@@ -110,6 +118,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
 
     private fun editItem(data: ProductInformation) {
         val intent = Intent(this, ProductForm::class.java).apply {
