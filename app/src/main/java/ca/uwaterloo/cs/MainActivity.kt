@@ -1,7 +1,9 @@
 package ca.uwaterloo.cs
 
-import android.content.Intent
+import android.content.Context
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.widget.ImageView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.*

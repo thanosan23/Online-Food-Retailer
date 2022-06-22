@@ -4,6 +4,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+.gradle/*
 local.properties
 
 ### IntelliJ IDEA ###
@@ -12,6 +13,7 @@ local.properties
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
+.idea/*
 *.iws
 *.iml
 *.ipr
