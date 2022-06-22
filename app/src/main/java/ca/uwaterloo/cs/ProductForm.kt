@@ -1,5 +1,6 @@
 package ca.uwaterloo.cs
 
+import android.icu.number.NumberFormatter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -7,7 +8,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -24,7 +24,7 @@ class ProductForm : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        var data = intent.getSerializableExtra("EXTRA_DATA") as? ProductInformation
+        val data = intent.getSerializableExtra("EXTRA_DATA") as? ProductInformation
         println("RECEIVED:")
         println(data)
         println("END")
@@ -37,7 +37,7 @@ class ProductForm : ComponentActivity() {
                         .fillMaxWidth()
                         .background(MaterialTheme.colors.background)
                         .padding(20.dp),
-                    ) {
+                ) {
                     Text(if (data == null) "ADD PRODUCT" else "EDIT PRODUCT")
                     ShowProductForm(data ?: ProductInformation())
                 }
@@ -78,7 +78,8 @@ class ProductForm : ComponentActivity() {
                         prompt = "Enter amount available",
                         label = "Product Amount",
                         validators = listOf(Required()),
-                        inputType = KeyboardType.Number
+                        inputType = KeyboardType.Number,
+                        formatter = NumberTransformation()
                     ),
                     Field(
                         name = "Price",
@@ -90,7 +91,7 @@ class ProductForm : ComponentActivity() {
                     ),
                 )
             )
-            formImages(images)
+            FormImages(images)
             Button(onClick = {
                 if (state.validate()) {
                     saveProduct(data, state.getData(), images)
@@ -107,7 +108,7 @@ class ProductForm : ComponentActivity() {
     }
 
     @Composable
-    fun formImages(images: ArrayList<String>) {
+    fun FormImages(images: ArrayList<String>) {
         Row(
             modifier = Modifier
                 .horizontalScroll(rememberScrollState())
@@ -115,7 +116,12 @@ class ProductForm : ComponentActivity() {
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             for (img in images) {
-                Box(Modifier.background(Color.Cyan)) {
+                Box(
+                    Modifier
+                        .background(Color.Cyan)
+                        .aspectRatio(1f)
+                )
+                {
                     Text(img)
                 }
             }
