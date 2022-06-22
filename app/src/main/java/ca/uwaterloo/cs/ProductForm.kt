@@ -1,6 +1,5 @@
 package ca.uwaterloo.cs
 
-import android.icu.number.NumberFormatter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -52,7 +52,9 @@ class ProductForm : ComponentActivity() {
 
         Column(
             Modifier
+                .verticalScroll(rememberScrollState())
                 .padding(20.dp),
+
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Form(
@@ -74,7 +76,7 @@ class ProductForm : ComponentActivity() {
                     ),
                     Field(
                         name = "Amount",
-                        initValue = if (data.amount == 0) "" else data.amount.toString(),
+                        initValue = if (data.amount == 0L) "" else data.amount.toString(),
                         prompt = "Enter amount available",
                         label = "Product Amount",
                         validators = listOf(Required()),
@@ -87,7 +89,7 @@ class ProductForm : ComponentActivity() {
                         prompt = "Enter price",
                         label = "Product Price",
                         validators = listOf(Required(), NonZero()),
-                        inputType = KeyboardType.Number
+                        inputType = KeyboardType.Number,
                     ),
                 )
             )
@@ -135,11 +137,11 @@ class ProductForm : ComponentActivity() {
     ) {
         data.name = newData["Name"]!!
         data.description = newData["Description"]!!
-        data.price = newData["Price"]!!.toInt()
-        data.amount = newData["Amount"]!!.toInt()
+        data.price = (newData["Price"]!!.toDouble() * 100).toInt()
+        data.amount = newData["Amount"]!!.toLong()
         data.images.clear()
         data.images.addAll(newImages)
-        data.exportData()
+        data.exportData(this.baseContext)
         this.finish()
     }
 }

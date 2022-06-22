@@ -1,5 +1,6 @@
 package ca.uwaterloo.cs
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -19,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
+import java.io.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -126,9 +128,31 @@ class MainActivity : ComponentActivity() {
                 "apple ${index + 1}",
                 "apple ${index + 1} description",
                 100 * index + 1,
-                10 * index + 1,
+                10 * index + 1L,
                 arrayListOf("img ${index + 1}", "img ${index + 1}", "img ${index + 1}")
             )
         }
+    }
+
+    private fun readData(): List<Pair<Int, ProductInformation>> {
+        // TODO: platform compatibility
+        // TODO: load from platform
+        val context = this.baseContext
+        println(context.filesDir)
+        println("${context.filesDir}/out.txt")
+        val dir = File("${context.filesDir}/out")
+        if (!dir.exists()) {
+            return emptyList()
+        }
+        val list = ArrayList<Pair<Int, ProductInformation>>()
+        for (saveFile in dir.list()) {
+            val fileIS = FileInputStream(saveFile)
+            val inStream = ObjectInputStream(fileIS)
+            val productInformation = inStream.readObject() as ProductInformation
+            list.add(Pair(productInformation.id, productInformation))
+            inStream.close()
+            fileIS.close()
+        }
+        return list
     }
 }

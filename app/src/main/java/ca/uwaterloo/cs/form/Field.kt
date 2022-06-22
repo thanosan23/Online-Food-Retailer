@@ -124,6 +124,8 @@ class NumberTransformation : VisualTransformation {
     }
 }
 
+// TODO: price transformation
+
 class NoTransformation : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
         return TransformedText(text, OffsetMapping.Identity)
