@@ -72,14 +72,14 @@ fun MainContent() {
 @Composable
 fun TableScreen() {
   // Just a fake data... a Pair of Int and String
-  val tableData = (1..5).mapIndexed { index, item ->
+  val tableData = (1..7).mapIndexed { index, item ->
     index to "Item $index"
   }
   // Each cell of a column must have the same weight.
   val column1Weight = .3f // 30%
   val column2Weight = .7f // 70%
   // The LazyColumn will be our table. Notice the use of the weights below
-  Text("CATOLGUE")
+  Text("CATALOGUE")
   LazyColumn(
     Modifier
       .padding(20.dp)
@@ -89,9 +89,12 @@ fun TableScreen() {
   horizontalAlignment = Alignment.CenterHorizontally) {
     // Here are all the lines of your table.
       items(tableData) {
-        Divider(Modifier.border(BorderStroke(20.dp, Color.InstagramPurple)))
+        Divider(Modifier
+                  .border(BorderStroke(20.dp, Color.InstagramPurple)))
         Row(
-          Modifier.padding(20.dp),
+          Modifier.
+          padding(0.dp)
+            .height(IntrinsicSize.Min),
           verticalAlignment = Alignment.CenterVertically) {
           Image(
             painter = painterResource(id = R.drawable.ic_pumpkin),
@@ -99,6 +102,13 @@ fun TableScreen() {
             modifier = Modifier
               .width(100.dp)
               .height(100.dp)
+          )
+          Spacer(Modifier.width(30.dp))
+          Divider(
+            Modifier
+              .fillMaxHeight()
+              .width(3.dp)
+              .border(BorderStroke(5.dp, Color.InstagramPurple))
           )
           Spacer(Modifier.width(30.dp))
           Text("Alfred Sisley",
