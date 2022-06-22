@@ -76,6 +76,7 @@ class MainActivity : ComponentActivity() {
                         .clickable { editItem(it.second) },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Intent.ACTION_PICK
                     Image(
                         painter = painterResource(id = R.drawable.ic_pumpkin),
                         contentDescription = null,

@@ -139,6 +139,7 @@ class ProductForm : ComponentActivity() {
         val imgRow = Row(
             modifier = Modifier
                 .horizontalScroll(rememberScrollState())
+                .height(100.dp)
                 .padding(horizontal = 16.dp, vertical = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
@@ -146,7 +147,8 @@ class ProductForm : ComponentActivity() {
             Box(
                 Modifier
                     .background(Color.Cyan)
-                    .size(40.dp)
+                    .width(100.dp)
+                    .height(100.dp)
                     .aspectRatio(1f)
             )
             {
@@ -170,7 +172,8 @@ class ProductForm : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .background(Color.Cyan)
-                    .size(40.dp)
+                    .width(100.dp)
+                    .height(100.dp)
                     .aspectRatio(1f),
                 contentAlignment = Alignment.Center
             )
