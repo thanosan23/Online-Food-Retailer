@@ -72,7 +72,7 @@ class Field(
                     true
                 }
                 is NonZero -> {
-                    if (text.toInt() == 0) {
+                    if (text.toDouble() <= 0.0) {
                         showError(it.message)
                         return@map false
                     }
@@ -83,31 +83,40 @@ class Field(
     }
 }
 
-class NoTransformation : VisualTransformation {
+class NumberTransformation : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
         if (text.isEmpty() || text.length <= 4) {
             return TransformedText(text, OffsetMapping.Identity)
         } else {
             val sb = StringBuilder()
-            var counter = 0
+            var counter = -1
             for (ch in text.text.reversed()) {
-                sb.append(ch)
                 counter++
                 if (counter == 3) {
                     sb.append(',')
                     counter = 0
                 }
+                sb.append(ch)
+
             }
 
             val formattedText = sb.reverse().toString()
 
             val offsetMapping = object : OffsetMapping {
                 override fun originalToTransformed(offset: Int): Int {
-                    return offset + offset / 3 + offset % 3
+                    println("originalToTransformed")
+                    println (offset)
+                    val tr = offset + (offset - 1) / 3
+                    println(tr)
+                    return tr
                 }
 
                 override fun transformedToOriginal(offset: Int): Int {
-                    return offset / 4 * 3 + offset % 4
+                    println("transformedToOriginal")
+                    println (offset)
+                    val tr = offset / 4 * 3 + offset % 4
+                    println(tr)
+                    return tr
                 }
             }
             return TransformedText(AnnotatedString(formattedText), offsetMapping)
@@ -115,7 +124,7 @@ class NoTransformation : VisualTransformation {
     }
 }
 
-class NumberTransformation : VisualTransformation {
+class NoTransformation : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
         return TransformedText(text, OffsetMapping.Identity)
     }
