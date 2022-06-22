@@ -1,15 +1,11 @@
 package ca.uwaterloo.cs
 
-import android.Manifest
 import android.R
 import android.app.AlertDialog
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
@@ -17,17 +13,15 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import ca.uwaterloo.cs.form.*
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import coil.compose.rememberImagePainter
@@ -59,7 +53,6 @@ class ProductForm : ComponentActivity() {
                 }
             }
         }
-        requestCameraPermission()
         outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
@@ -135,55 +128,64 @@ class ProductForm : ComponentActivity() {
 
     @Composable
     fun FormImages(images: ArrayList<String>) {
-        val context = this.baseContext
-        val imgRow = Row(
-            modifier = Modifier
-                .horizontalScroll(rememberScrollState())
-                .height(100.dp)
-                .padding(horizontal = 16.dp, vertical = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            //for (img in images) {
-            Box(
-                Modifier
-                    .background(Color.Cyan)
-                    .width(100.dp)
-                    .height(100.dp)
-                    .aspectRatio(1f)
-            )
-            {
-                if (shouldShowPhoto.value) {
-                    Image(
-                        painter = rememberImagePainter(photoUri),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize()
+        var shouldShowPhoto by remember { mutableStateOf(images.isNotEmpty()) }
+        var shouldShowCamera by remember { mutableStateOf(images.isEmpty()) }
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(rememberScrollState())
+                    .height(200.dp)
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                if (shouldShowPhoto) {
+                    Column(
+                        Modifier
+                            .background(Color.Cyan)
+                            .width(200.dp)
+                            .height(200.dp)
+                            .aspectRatio(1f)
                     )
+                    {
+                        Image(
+                            painter = rememberImagePainter(images[0].toUri()),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .fillMaxSize(1f)
+                        )
+                    }
                 }
-                Button(onClick = {
-                    // images.remove(img)
-                }) {
-                    Icon(
-                        Icons.Filled.Delete,
-                        contentDescription = "Delete image"
+                if (shouldShowCamera) {
+                    Box(
+                        modifier = Modifier
+                            .background(Color.Cyan)
+                            .width(200.dp)
+                            .height(200.dp)
+                            .aspectRatio(1f),
+                        contentAlignment = Alignment.Center
                     )
+                    {
+                        CameraView(
+                            outputDirectory = outputDirectory,
+                            executor = cameraExecutor,
+                            onImageCaptured = { uri ->
+                                images.add(uri.toString())
+                                shouldShowPhoto = true
+                                shouldShowCamera = false
+                            },
+                            onError = { Log.e("kilo", "View error:", it) }
+                        )
+                    }
                 }
             }
-            //}
-            Box(
-                modifier = Modifier
-                    .background(Color.Cyan)
-                    .width(100.dp)
-                    .height(100.dp)
-                    .aspectRatio(1f),
-                contentAlignment = Alignment.Center
-            )
-            {
-                CameraView(
-                    outputDirectory = outputDirectory,
-                    executor = cameraExecutor,
-                    onImageCaptured = ::handleImageCapture,
-                    onError = { Log.e("kilo", "View error:", it) }
-                )
+            Button(
+                onClick = {
+                    images.remove(images[0])
+                    shouldShowPhoto = false
+                    shouldShowCamera = true
+                },
+            ) {
+                Text("Change Image")
             }
         }
     }
@@ -217,46 +219,8 @@ class ProductForm : ComponentActivity() {
             .setNegativeButton(R.string.no, null).show()
     }
 
-    private fun requestCameraPermission() {
-        when {
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                Log.i("kilo", "Permission previously granted")
-                shouldShowCamera.value = true
-            }
-
-            ActivityCompat.shouldShowRequestPermissionRationale(
-                this,
-                Manifest.permission.CAMERA
-            ) -> Log.i("kilo", "Show camera permissions dialog")
-
-            else -> requestPermissionLauncher.launch(Manifest.permission.CAMERA)
-        }
-    }
-
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            Log.i("kilo", "Permission granted")
-            shouldShowCamera.value = true
-        } else {
-            Log.i("kilo", "Permission denied")
-        }
-    }
-
     private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
-    private var shouldShowCamera: MutableState<Boolean> = mutableStateOf(false)
-
-    private fun handleImageCapture(uri: Uri) {
-        Log.i("kilo", "Image captured: $uri")
-        photoUri = uri
-        shouldShowPhoto.value = true
-        shouldShowCamera.value = false
-    }
 
     private fun getOutputDirectory(): File {
         val mediaDir = externalMediaDirs.firstOrNull()?.let {
@@ -270,8 +234,5 @@ class ProductForm : ComponentActivity() {
         super.onDestroy()
         cameraExecutor.shutdown()
     }
-
-    private lateinit var photoUri: Uri
-    private var shouldShowPhoto: MutableState<Boolean> = mutableStateOf(false)
 }
 
