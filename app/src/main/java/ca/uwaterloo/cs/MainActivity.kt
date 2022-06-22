@@ -56,36 +56,54 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun StoryAvatar(imageUrl:String){
+fun MainContent() {
   Box(
-    modifier = Modifier
-      .padding(end = 8.dp)
-      .border(
-        width = 2.dp,
-        brush = Brush.verticalGradient(listOf(Color.InstagramOrange, Color.InstagramPurple)),
-        shape = CircleShape
-      )
-      .padding(6.dp)
-      .size(60.dp)
-      .clip(CircleShape)
-      .background(Color.LightGray)
-  ){
-    AsyncImage(model = imageUrl,
-      contentDescription = null,
-      contentScale = ContentScale.Crop)
+    Modifier
+      .background(MaterialTheme.colors.background)
+      .padding(10.dp),
+    contentAlignment = Alignment.TopCenter
+  ) {
+    TableScreen()
   }
 }
 
 @Composable
-fun MainContent() {
-  Box(
-    Modifier
-      .background(MaterialTheme.colors.background),
-  ) {
-   val clickedDoggo = remember {mutableStateOf<String?>(null)}
-    TableScreen()
+fun TableScreen() {
+  // Just a fake data... a Pair of Int and String
+  val tableData = (1..25).mapIndexed { index, item ->
+    index to "Item $index"
   }
-}
+  // Each cell of a column must have the same weight.
+  val column1Weight = .3f // 30%
+  val column2Weight = .7f // 70%
+  // The LazyColumn will be our table. Notice the use of the weights below
+  Text("CATOLGUE")
+  LazyColumn(
+    Modifier
+      .padding(30.dp)
+      .background(Color.White)
+      .border(BorderStroke(3.dp, Color.InstagramPurple)),
+  horizontalAlignment = Alignment.CenterHorizontally) {
+    // Here are all the lines of your table.
+    items(tableData) {
+      val (id, text) = it
+
+      Divider(Modifier.border(BorderStroke(20.dp, Color.InstagramPurple)))
+      Row(
+        Modifier.padding(20.dp),
+        verticalAlignment = Alignment.CenterVertically) {
+        Image(
+          painter = painterResource(id = R.drawable.ic_pumpkin),
+          contentDescription = null,
+          modifier = Modifier.width(100.dp).height(100.dp)
+        )
+        Spacer(Modifier.width(30.dp))
+        Text("Alfred Sisley",
+        )
+      }
+    }
+    }
+  }
 
 @Composable
 fun InstagramPart(){
@@ -119,60 +137,22 @@ fun InstagramPart(){
 }
 
 @Composable
-fun RowScope.TableCell(
-  text: String,
-  weight: FontWeight
-) {
-  Text(
-    text = text,
-    Modifier
-      .border(1.dp, Color.Black)
-      .padding(8.dp),
-    fontFamily = FontFamily.SansSerif,
-    fontWeight = weight
-    )
+fun StoryAvatar(imageUrl:String){
+  Box(
+    modifier = Modifier
+      .padding(end = 8.dp)
+      .border(
+        width = 2.dp,
+        brush = Brush.verticalGradient(listOf(Color.InstagramOrange, Color.InstagramPurple)),
+        shape = CircleShape
+      )
+      .padding(6.dp)
+      .size(60.dp)
+      .clip(CircleShape)
+      .background(Color.LightGray)
+  ){
+    AsyncImage(model = imageUrl,
+      contentDescription = null,
+      contentScale = ContentScale.Crop)
+  }
 }
-
-@Composable
-fun TableScreen() {
-  // Just a fake data... a Pair of Int and String
-  val tableData = (1..25).mapIndexed { index, item ->
-    index to "Item $index"
-  }
-  // Each cell of a column must have the same weight.
-  val column1Weight = .3f // 30%
-  val column2Weight = .7f // 70%
-  // The LazyColumn will be our table. Notice the use of the weights below
-  LazyColumn(
-    Modifier
-      .padding(50.dp)
-      .background(Color.White),
-  horizontalAlignment = Alignment.CenterHorizontally) {
-    // Here is the header
-    item {
-      Row(Modifier.background(Color.Gray)) {
-        TableCell(text = "Column 1", weight = FontWeight.Light)
-        TableCell(text = "Column 2", weight = FontWeight.Light)
-      }
-    }
-    // Here are all the lines of your table.
-    items(tableData) {
-      val (id, text) = it
-
-      Divider()
-      Row(
-        Modifier.padding(20.dp),
-        verticalAlignment = Alignment.CenterVertically) {
-        Image(
-          painter = painterResource(id = R.drawable.ic_pumpkin),
-          contentDescription = null,
-          modifier = Modifier.width(100.dp).height(100.dp)
-        )
-        Spacer(Modifier.width(30.dp))
-        Text("Alfred Sisley",
-        )
-      }
-    }
-    }
-  }
-
