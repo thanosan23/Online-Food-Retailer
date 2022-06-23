@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -41,20 +42,38 @@ class ProductForm : ComponentActivity() {
 
         setContent {
             OnlineFoodRetailTheme {
-                Column(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colors.background)
-                        .padding(20.dp),
-                ) {
-                    Text(if (data == null) "ADD PRODUCT" else "EDIT PRODUCT")
-                    ShowProductForm(data ?: ProductInformation())
-                }
+//                Column(
+//                    modifier = Modifier
+//                        .fillMaxHeight()
+//                        .fillMaxWidth()
+//                        .background(MaterialTheme.colors.background)
+//                        .padding(20.dp),
+//                ) {
+//                    Text(if (data == null) "ADD PRODUCT" else "EDIT PRODUCT")
+//                    ShowProductForm(data ?: ProductInformation())
+//                }
+                Scaffold(
+                    content = { FullProductForm(data ?: ProductInformation() ) },
+                    bottomBar = { NavigationBar() }
+                )
             }
         }
         outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
+    }
+
+    @Composable
+    fun FullProductForm(data: ProductInformation) {
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth()
+                .background(MaterialTheme.colors.background)
+                .padding(20.dp),
+        ) {
+            Text(if (data == null) "ADD PRODUCT" else "EDIT PRODUCT")
+            ShowProductForm(data ?: ProductInformation())
+        }
     }
 
     @Composable
