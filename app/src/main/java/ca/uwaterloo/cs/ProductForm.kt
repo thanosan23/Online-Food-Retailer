@@ -175,6 +175,8 @@ class ProductForm : ComponentActivity() {
                     }
                 }
                 if (shouldShowCamera) {
+                    // TODO: REQUEST CAMERA PERMISSION
+                    // TODO: CHANGE PICTURE INTAKE METHOD
                     Box(
                         modifier = Modifier
                             .background(Color.Cyan)
