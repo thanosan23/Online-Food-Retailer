@@ -1,5 +1,6 @@
 package ca.uwaterloo.cs
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,6 +12,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +50,7 @@ class MainActivity : ComponentActivity() {
 //        }
 //    }
 
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     @Composable
     fun MainContent() {
         Scaffold(
@@ -53,21 +60,42 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
+    fun TopApp(){
+        TopAppBar(
+        ) {
+            Text(text = "hey")
+        }
+    }
+
+    @Composable
     fun TableScreen() {
+        CenterAlignedTopAppBar(
+            title = { Text("Catalogue", color = Color.White) },
+            navigationIcon = {
+                IconButton(onClick = {
+                    addItem()
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = "Catalogue",
+                        tint = Color.White
+                    )
+                }
+            },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
+        )
         // Just a fake data... a Pair of Int and String
         // TODO: REMOVE / UPGRADE MOCK DATA GENERATION IN FINAL PRODUCT
         generateMockData()
         val tableData = readData()
         // Each cell of a column must have the same weight.
-        val column1Weight = .3f // 30%
-        val column2Weight = .7f // 70%
         // The LazyColumn will be our table. Notice the use of the weights below
-        Text("CATALOGUE")
+        Spacer(Modifier.height(70.dp))
         LazyColumn(
             Modifier
-                .padding(20.dp)
+                .padding(61.dp)
                 .background(Color.White)
-                .border(BorderStroke(3.dp, Color.InstagramPurple))
+                .border(BorderStroke(5.dp, Color.InstagramPurple))
                 .heightIn(0.dp, 640.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -75,46 +103,23 @@ class MainActivity : ComponentActivity() {
             items(tableData, key = { it }) {
                 Divider(
                     Modifier
-                        .border(BorderStroke(20.dp, Color.InstagramPurple))
+                        .border(BorderStroke(0.dp, Color.InstagramPurple))
                 )
                 Row(
                     Modifier
-                        .padding(0.dp)
                         .height(IntrinsicSize.Min)
                         .clickable { editItem(it.second) },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Intent.ACTION_PICK
                     Image(
-                        painter = painterResource(id = R.drawable.ic_pumpkin),
+                        painter = painterResource(id = R.drawable.apple_fruit),
                         contentDescription = null,
                         modifier = Modifier
-                            .width(100.dp)
-                            .height(100.dp)
-                    )
-                    Spacer(Modifier.width(30.dp))
-                    Divider(
-                        Modifier
-                            .fillMaxHeight()
-                            .width(3.dp)
-                            .border(BorderStroke(5.dp, Color.InstagramPurple))
-                    )
-                    Spacer(Modifier.width(30.dp))
-                    Text(
-                        it.second.name
+                            .width(200.dp)
+                            .height(200.dp)
                     )
                 }
-            }
-        }
-        Row {
-            Button(onClick = {
-                addItem()
-            }
-            ) {
-                Icon(
-                    Icons.Filled.Add,
-                    contentDescription = null
-                )
             }
         }
     }

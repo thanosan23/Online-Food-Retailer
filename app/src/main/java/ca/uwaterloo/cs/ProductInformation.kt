@@ -15,6 +15,9 @@ data class ProductInformation(
     var amount: Long = 0,
     val images: ArrayList<String> = arrayListOf()
 ) : Serializable {
+    init {
+        images.add("ic_pumpking.png")
+    }
 
     fun exportData(context: Context) {
         // TODO: platform compatibility
