@@ -1,11 +1,14 @@
 package ca.uwaterloo.cs
 
+import android.Manifest
 import android.R
 import android.app.AlertDialog
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
@@ -22,6 +25,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import ca.uwaterloo.cs.form.*
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
@@ -42,28 +47,16 @@ class ProductForm : ComponentActivity() {
 
         setContent {
             OnlineFoodRetailTheme {
-//                Column(
-//                    modifier = Modifier
-//                        .fillMaxHeight()
-//                        .fillMaxWidth()
-//                        .background(MaterialTheme.colors.background)
-//                        .padding(20.dp),
-//                ) {
-//                    Text(if (data == null) "ADD PRODUCT" else "EDIT PRODUCT")
-//                    ShowProductForm(data ?: ProductInformation())
-//                }
                 Scaffold(
-                    content = { FullProductForm(data ?: ProductInformation() ) },
+                    content = { FullProductForm(data) },
                     bottomBar = { NavigationBar() }
                 )
             }
         }
-        outputDirectory = getOutputDirectory()
-        cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
     @Composable
-    fun FullProductForm(data: ProductInformation) {
+    fun FullProductForm(data: ProductInformation?) {
         Column(
             modifier = Modifier
                 .fillMaxHeight()
@@ -186,16 +179,6 @@ class ProductForm : ComponentActivity() {
                         contentAlignment = Alignment.Center
                     )
                     {
-                        CameraView(
-                            outputDirectory = outputDirectory,
-                            executor = cameraExecutor,
-                            onImageCaptured = { uri ->
-                                images.add(uri.toString())
-                                shouldShowPhoto = true
-                                shouldShowCamera = false
-                            },
-                            onError = { Log.e("kilo", "View error:", it) }
-                        )
                     }
                 }
             }
@@ -240,20 +223,26 @@ class ProductForm : ComponentActivity() {
             .setNegativeButton(R.string.no, null).show()
     }
 
-    private lateinit var outputDirectory: File
-    private lateinit var cameraExecutor: ExecutorService
+    private fun requestCameraPermission() {
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                Log.i("kilo", "Permission previously granted")
+            }
 
-    private fun getOutputDirectory(): File {
-        val mediaDir = externalMediaDirs.firstOrNull()?.let {
-            File(it, "OnlineFoodRetailer").apply { mkdirs() }
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.CAMERA
+            ) -> Log.i("kilo", "Show camera permissions dialog")
+
+            else -> requestPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
-
-        return if ((mediaDir != null) && mediaDir.exists()) mediaDir else filesDir
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        cameraExecutor.shutdown()
-    }
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { }
 }
 
