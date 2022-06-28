@@ -111,8 +111,8 @@ class MainActivity : ComponentActivity() {
                         painter = painterResource(id = R.drawable.apple_fruit),
                         contentDescription = null,
                         modifier = Modifier
-                            .width(200.dp)
-                            .height(200.dp)
+                            .fillMaxHeight()
+                            .fillMaxWidth()
                     )
                 }
             }
