@@ -134,7 +134,9 @@ private fun generateMockData(amount: Int = 7, context: Context) {
             "apple $value description",
             100 * value + 1,
             10 * value + 1L,
-            ""
+            "",
+            platform1 = false,
+            platform2 = false
         ).exportData(context)
     }
 }
@@ -148,12 +150,14 @@ private fun readData(context: Context): List<Pair<Int, ProductInformation>> {
     }
     val list = ArrayList<Pair<Int, ProductInformation>>()
     for (saveFile in dir.walk()) {
-        val fileIS = FileInputStream("${context.filesDir}/out/" + saveFile)
-        val inStream = ObjectInputStream(fileIS)
-        val productInformation = inStream.readObject() as ProductInformation
-        list.add(Pair(productInformation.id, productInformation))
-        inStream.close()
-        fileIS.close()
+        if (saveFile.isFile && saveFile.canRead() && saveFile.name.contains("Product-")) {
+            val fileIS = FileInputStream(saveFile)
+            val inStream = ObjectInputStream(fileIS)
+            val productInformation = inStream.readObject() as ProductInformation
+            list.add(Pair(productInformation.id, productInformation))
+            inStream.close()
+            fileIS.close()
+        }
     }
     return list
 }

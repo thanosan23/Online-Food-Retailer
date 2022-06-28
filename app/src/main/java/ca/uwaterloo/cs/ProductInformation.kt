@@ -38,7 +38,7 @@ data class ProductInformation(
         if (!dir.exists()) {
             dir.mkdir()
         }
-        val file = File(dir, "$id.txt")
+        val file = File(dir, "Product-$id.txt")
         println(file.absolutePath)
         if (file.exists())
         {
