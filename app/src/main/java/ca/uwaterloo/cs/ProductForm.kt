@@ -372,14 +372,13 @@ private fun saveProduct(
     newImage: String,
     context: Context
 ) {
-    println("NEW IMAGES")
-    println(newImage)
-    println("END")
     data.name = newData["Name"]!!
     data.description = newData["Description"]!!
     data.price = (newData["Price"]!!.toDouble() * 100).toInt()
     data.amount = newData["Amount"]!!.toLong()
     data.image = newImage
+    data.platform1 = newData["platform1"].toBoolean()
+    data.platform2 = newData["platform2"].toBoolean()
     data.exportData(context)
 }
 

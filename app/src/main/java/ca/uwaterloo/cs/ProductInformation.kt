@@ -33,13 +33,11 @@ data class ProductInformation(
     fun exportData(context: Context) {
         // TODO: platform compatibility
         // TODO: save to platform
-        println("${context.filesDir}/out")
         val dir = File("${context.filesDir}/out")
         if (!dir.exists()) {
             dir.mkdir()
         }
         val file = File(dir, "Product-$id.txt")
-        println(file.absolutePath)
         if (file.exists())
         {
             file.delete()
