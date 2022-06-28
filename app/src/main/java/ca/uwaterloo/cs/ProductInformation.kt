@@ -14,7 +14,9 @@ data class ProductInformation(
     var description: String = "",
     var price: Int = 0,
     var amount: Long = 0,
-    var image: String = ""
+    var image: String = "",
+    var platform1: Boolean = false,
+    var platform2: Boolean = false
 ) : Serializable, Parcelable {
 
     constructor(parcel: Parcel) : this(
@@ -24,6 +26,8 @@ data class ProductInformation(
         parcel.readInt(),
         parcel.readLong(),
         parcel.readString() ?: "",
+        parcel.readBoolean(),
+        parcel.readBoolean()
     )
 
     fun exportData(context: Context) {
@@ -63,6 +67,8 @@ data class ProductInformation(
         parcel.writeInt(price)
         parcel.writeLong(amount)
         parcel.writeString(image)
+        parcel.writeBoolean(platform1)
+        parcel.writeBoolean(platform2)
     }
 
     override fun describeContents(): Int {
@@ -79,5 +85,6 @@ data class ProductInformation(
         }
     }
 }
+
 // TODO: FIX images to image array
 // TODO: load data

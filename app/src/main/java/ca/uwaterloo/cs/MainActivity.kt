@@ -1,13 +1,10 @@
 package ca.uwaterloo.cs
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -57,14 +54,6 @@ fun MainContent(nav: DestinationsNavigator) {
         content = { TableScreen(nav) },
         bottomBar = { NavigationBar() }
     )
-}
-
-@Composable
-fun TopApp() {
-    TopAppBar(
-    ) {
-        Text(text = "hey")
-    }
 }
 
 @Composable
@@ -144,8 +133,8 @@ private fun generateMockData(amount: Int = 7, context: Context) {
             "apple $value",
             "apple $value description",
             100 * value + 1,
-            10 * value + 1L
-            // arrayListOf(decoded, decoded)
+            10 * value + 1L,
+            ""
         ).exportData(context)
     }
 }
@@ -158,7 +147,7 @@ private fun readData(context: Context): List<Pair<Int, ProductInformation>> {
         return emptyList()
     }
     val list = ArrayList<Pair<Int, ProductInformation>>()
-    for (saveFile in dir.list()) {
+    for (saveFile in dir.walk()) {
         val fileIS = FileInputStream("${context.filesDir}/out/" + saveFile)
         val inStream = ObjectInputStream(fileIS)
         val productInformation = inStream.readObject() as ProductInformation
@@ -167,12 +156,4 @@ private fun readData(context: Context): List<Pair<Int, ProductInformation>> {
         fileIS.close()
     }
     return list
-}
-
-@Composable
-private fun requestPermissions(context: Context) {
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) {}
-    permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
 }
