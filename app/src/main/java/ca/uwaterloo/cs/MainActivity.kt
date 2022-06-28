@@ -70,14 +70,6 @@ class MainActivity : ComponentActivity() {
 
 
     @Composable
-    fun TopApp(){
-        TopAppBar(
-        ) {
-            Text(text = "hey")
-        }
-    }
-
-    @Composable
     fun TableScreen() {
         CenterAlignedTopAppBar(
             title = { Text("Catalogue", color = Color.White) },
@@ -125,8 +117,8 @@ class MainActivity : ComponentActivity() {
                         painter = painterResource(id = R.drawable.apple_fruit),
                         contentDescription = null,
                         modifier = Modifier
-                            .width(200.dp)
-                            .height(200.dp)
+                            .fillMaxHeight()
+                            .fillMaxWidth()
                     )
                 }
             }
