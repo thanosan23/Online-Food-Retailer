@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -17,6 +18,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -63,12 +66,17 @@ class ProductForm : ComponentActivity() {
 
     @Composable
     fun FullProductForm(data: ProductInformation) {
+        val focusManager = LocalFocusManager.current
         Column(
             modifier = Modifier
                 .fillMaxHeight()
                 .fillMaxWidth()
                 .background(MaterialTheme.colors.background)
-                .padding(20.dp),
+                .padding(20.dp)
+                .pointerInput(Unit){detectTapGestures(onTap = {
+                    focusManager.clearFocus()
+                })}
+            ,
         ) {
             Text(if (data == null) "ADD PRODUCT" else "EDIT PRODUCT")
             ShowProductForm(data ?: ProductInformation())
@@ -84,7 +92,9 @@ class ProductForm : ComponentActivity() {
         Column(
             Modifier
                 .verticalScroll(rememberScrollState())
-                .padding(20.dp),
+                .padding(20.dp)
+            ,
+
         ) {
             platformState.platformsUI.PlatformsDropDown()
             Column(
