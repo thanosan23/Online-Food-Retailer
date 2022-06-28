@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.form.*
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import coil.compose.rememberImagePainter
@@ -25,7 +26,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @Destination
 @Composable
-fun CreateProductForm(navigator: DestinationsNavigator, data: ProductInformation?) {
+fun ProductForm(navigator: DestinationsNavigator, data: ProductInformation?) {
     OnlineFoodRetailTheme {
         Scaffold(
             content = { FullProductForm(navigator, data) },
@@ -49,7 +50,7 @@ fun FullProductForm(navigator: DestinationsNavigator, data: ProductInformation?)
 }
 
 @Composable
-fun ShowProductForm(navigator: DestinationsNavigator, data: ProductInformation) {
+fun ShowProductForm(nav: DestinationsNavigator, data: ProductInformation) {
     val state by remember { mutableStateOf(FormState()) }
     val images = ArrayList<String>(data.images)
     val context = LocalContext.current
@@ -101,17 +102,19 @@ fun ShowProductForm(navigator: DestinationsNavigator, data: ProductInformation) 
         Button(onClick = {
             if (state.validate()) {
                 saveProduct(data, state.getData(), images, context)
+                nav.navigate(MainContentDestination)
             }
         }) {
             Text("Submit")
         }
         Button(onClick = {
-        // TODO: nav
+            nav.navigate(MainContentDestination)
         }) {
             Text("Cancel")
         }
         Button(onClick = {
             deleteProduct(data, context)
+            nav.navigate(MainContentDestination)
         }) {
             Text("Delete")
         }

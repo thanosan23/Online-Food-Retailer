@@ -21,9 +21,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
+import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import java.io.File
 import java.io.FileInputStream
 import java.io.ObjectInputStream
@@ -33,7 +36,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             OnlineFoodRetailTheme {
-                MainContent()
+                DestinationsNavHost(navGraph = NavGraphs.root)
             }
         }
     }
@@ -43,9 +46,9 @@ class MainActivity : ComponentActivity() {
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Destination(start = true)
 @Composable
-fun MainContent() {
+fun MainContent(nav: DestinationsNavigator) {
     Scaffold(
-        content = { TableScreen() },
+        content = { TableScreen(nav) },
         bottomBar = { NavigationBar() }
     )
 }
@@ -59,13 +62,13 @@ fun TopApp() {
 }
 
 @Composable
-fun TableScreen() {
+fun TableScreen(nav: DestinationsNavigator) {
     val context = LocalContext.current
     CenterAlignedTopAppBar(
         title = { Text("Catalogue", color = Color.White) },
         navigationIcon = {
             IconButton(onClick = {
-                addItem()
+                addItem(nav)
             }) {
                 Icon(
                     imageVector = Icons.Filled.Add,
@@ -100,7 +103,7 @@ fun TableScreen() {
             Row(
                 Modifier
                     .height(IntrinsicSize.Min)
-                    .clickable { editItem(it.second) },
+                    .clickable { editItem(nav, it.second) },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
@@ -116,12 +119,12 @@ fun TableScreen() {
 }
 
 
-private fun editItem(data: ProductInformation) {
-
+private fun editItem(nav: DestinationsNavigator, data: ProductInformation) {
+    nav.navigate(ProductFormDestination (data))
 }
 
-private fun addItem() {
-
+private fun addItem(nav: DestinationsNavigator) {
+    nav.navigate(ProductFormDestination ())
 }
 
 private fun generateMockData(amount: Int = 7, context: Context) {
