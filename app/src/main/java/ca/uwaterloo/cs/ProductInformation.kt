@@ -14,7 +14,7 @@ data class ProductInformation(
     var description: String = "",
     var price: Int = 0,
     var amount: Long = 0,
-    val images: ArrayList<String> = arrayListOf()
+    var image: String = ""
 ) : Serializable, Parcelable {
 
     constructor(parcel: Parcel) : this(
@@ -23,7 +23,7 @@ data class ProductInformation(
         parcel.readString() ?: "",
         parcel.readInt(),
         parcel.readLong(),
-        parcel.createStringArrayList() ?: arrayListOf<String>()
+        parcel.readString() ?: "",
     )
 
     fun exportData(context: Context) {
@@ -62,6 +62,7 @@ data class ProductInformation(
         parcel.writeString(description)
         parcel.writeInt(price)
         parcel.writeLong(amount)
+        parcel.writeString(image)
     }
 
     override fun describeContents(): Int {

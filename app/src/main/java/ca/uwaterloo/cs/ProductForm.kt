@@ -3,11 +3,9 @@ package ca.uwaterloo.cs
 import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,8 +18,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -31,10 +27,12 @@ import androidx.core.net.toUri
 import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.form.*
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
+import coil.compose.rememberImagePainter
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import java.io.File
 import java.text.SimpleDateFormat
+import java.util.*
 
 
 @Destination
@@ -62,8 +60,50 @@ fun ProductForm(navigator: DestinationsNavigator, data: ProductInformation?) {
 @Composable
 fun ShowProductForm(nav: DestinationsNavigator, data: ProductInformation) {
     val state by remember { mutableStateOf(FormState()) }
-    val images = ArrayList(data.images)
+    var image by remember { mutableStateOf(data.image) }
     val context = LocalContext.current
+    var fileUri: Uri? = null
+    var isCameraSelected = false
+    var isGallerySelected = false
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            image = ""
+            image = fileUri!!.toString()
+        }
+    }
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        image = ""
+        image = uri.toString()
+        if (uri != null) {
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+            } catch (e: Exception) {
+                println("Exception: " + e.message)
+            }
+        }
+    }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            if (isCameraSelected) {
+                fileUri = createImageFile(context)
+                cameraLauncher.launch(fileUri)
+            } else if (isGallerySelected) {
+                galleryLauncher.launch("image/*")
+            }
+        } else {
+            Toast.makeText(context, "Permission Denied!", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     Column(
         Modifier
@@ -108,10 +148,136 @@ fun ShowProductForm(nav: DestinationsNavigator, data: ProductInformation) {
                 ),
             )
         )
-        FormImages(images)
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(rememberScrollState())
+                    .height(200.dp)
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                if (image != "") {
+                    Column(
+                        Modifier
+                            .width(200.dp)
+                            .height(200.dp)
+                            .aspectRatio(1f)
+                    )
+                    {
+                        Box(
+                            modifier = Modifier
+                                // .background(Color.InstagramPurple) // TODO: REMOVE DEBUG BACKGROUNDS
+                                .width(200.dp)
+                                .height(200.dp)
+                                .aspectRatio(1f),
+                            contentAlignment = Alignment.Center
+                        )
+                        {
+                            /*
+                            imageUri?.let {
+                                val btm = if (Build.VERSION.SDK_INT < 28) {
+                                    MediaStore.Images.Media.getBitmap(context.contentResolver, it)
+                                } else {
+                                    val source = ImageDecoder.createSource(context.contentResolver, it)
+                                    ImageDecoder.decodeBitmap(source)
+                                }
+                                Image(
+                                    bitmap = btm.asImageBitmap(),
+                                    contentDescription = "Image",
+                                    alignment = Alignment.TopCenter,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .fillMaxHeight(0.45f)
+                                        .padding(top = 10.dp),
+                                    contentScale = ContentScale.Fit
+                                )
+                            }
+
+                             */
+                            Image(
+                                painter = rememberImagePainter(image.toUri()),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .fillMaxSize(1f)
+                            )
+                        }
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier
+                            // .background(Color.InstagramPurple) // TODO: REMOVE DEBUG BACKGROUNDS
+                            .width(200.dp)
+                            .height(200.dp)
+                            .aspectRatio(1f),
+                        contentAlignment = Alignment.Center
+                    )
+                    {
+                        IconButton(
+                            modifier = Modifier.fillMaxSize(1f),
+                            onClick = {
+                                val options =
+                                    arrayOf<CharSequence>(
+                                        "Take Photo",
+                                        "Choose from Gallery",
+                                        "Cancel"
+                                    )
+                                val builder = AlertDialog.Builder(context)
+                                builder.setTitle("Add Photo")
+                                builder.setItems(options) { dialog, item ->
+                                    if (options[item] == "Take Photo") {
+                                        when (PackageManager.PERMISSION_GRANTED) {
+                                            ContextCompat.checkSelfPermission(
+                                                context, Manifest.permission.CAMERA
+                                            ) -> {
+                                                fileUri = createImageFile(context)
+                                                cameraLauncher.launch(fileUri)
+                                            }
+                                            else -> {
+                                                isCameraSelected = true
+                                                permissionLauncher.launch(Manifest.permission.CAMERA)
+                                            }
+                                        }
+                                    } else if (options[item] == "Choose from Gallery") {
+                                        when (PackageManager.PERMISSION_GRANTED) {
+                                            ContextCompat.checkSelfPermission(
+                                                context, Manifest.permission.READ_EXTERNAL_STORAGE
+                                            ) -> {
+                                                galleryLauncher.launch("image/*")
+                                            }
+                                            else -> {
+                                                isCameraSelected = false
+                                                permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                                            }
+                                        }
+                                    } else if (options[item] == "Cancel") {
+                                        dialog.dismiss()
+                                    }
+                                }
+                                builder.show()
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.PhotoCamera,
+                                contentDescription = "Catalogue",
+                                tint = Color.Black,
+                                modifier = Modifier.fillMaxSize(0.65f)
+                            )
+                        }
+                    }
+                }
+            }
+            Button(
+                enabled = image != "",
+                onClick = {
+                    image = ""
+                },
+            ) {
+                Text("Change Image")
+            }
+        }
         Button(onClick = {
             if (state.validate()) {
-                saveProduct(data, state.getData(), images, context)
+                saveProduct(data, state.getData(), image, context)
                 nav.navigate(MainContentDestination)
             }
         }) {
@@ -131,192 +297,9 @@ fun ShowProductForm(nav: DestinationsNavigator, data: ProductInformation) {
     }
 }
 
-@Composable
-fun FormImages(images: ArrayList<String>) {
-    var shouldShowPhoto by remember { mutableStateOf(images.isNotEmpty()) }
-    println("SHOULD SHOW: $shouldShowPhoto")
-    println(images.getOrNull(0))
-    var imageUri by remember {
-        mutableStateOf(images.getOrNull(0)?.toUri())
-    }
-    val context = LocalContext.current
-    var fileUri: Uri? = null
-    var isCameraSelected = false
-
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture()
-    ) { success ->
-        if (success) {
-            imageUri = fileUri!!
-            images.add(fileUri.toString())
-            println("Images")
-            for (img in images) {
-                println(img)
-            }
-            println("end")
-            shouldShowPhoto = true
-        }
-    }
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        imageUri = uri
-        if (uri != null) {
-            images.add(uri.toString())
-            println("Images")
-            for (img in images) {
-                println(img)
-            }
-            println("end")
-            shouldShowPhoto = true
-        }
-    }
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            if (isCameraSelected) {
-                fileUri = createImageFile(context)
-                cameraLauncher.launch(fileUri)
-            } else {
-                galleryLauncher.launch("image/*")
-            }
-        } else {
-            Toast.makeText(context, "Permission Denied!", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Row(
-            modifier = Modifier
-                .horizontalScroll(rememberScrollState())
-                .height(200.dp)
-                .padding(horizontal = 16.dp, vertical = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            if (imageUri != null) {
-                Column(
-                    Modifier
-                        .background(Color.Cyan) // TODO: delete
-                        .width(200.dp)
-                        .height(200.dp)
-                        .aspectRatio(1f)
-                )
-                {
-                    Box(
-                        modifier = Modifier
-                            // .background(Color.InstagramPurple) // TODO: REMOVE DEBUG BACKGROUNDS
-                            .width(200.dp)
-                            .height(200.dp)
-                            .aspectRatio(1f),
-                        contentAlignment = Alignment.Center
-                    )
-                    {
-                        imageUri?.let {
-                            val btm = if (Build.VERSION.SDK_INT < 28) {
-                                MediaStore.Images.Media.getBitmap(context.contentResolver, it)
-                            } else {
-                                val source = ImageDecoder.createSource(context.contentResolver, it)
-                                ImageDecoder.decodeBitmap(source)
-                            }
-                            Image(
-                                bitmap = btm.asImageBitmap(),
-                                contentDescription = "Image",
-                                alignment = Alignment.TopCenter,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .fillMaxHeight(0.45f)
-                                    .padding(top = 10.dp),
-                                contentScale = ContentScale.Fit
-                            )
-                        }
-                        /*
-                        Image(
-                            painter = rememberImagePainter(images[0].toUri()),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .fillMaxSize(1f)
-                        )
-
-                         */
-                    }
-                }
-            }
-            // TODO: REQUEST CAMERA PERMISSION
-            Box(
-                modifier = Modifier
-                    // .background(Color.InstagramPurple) // TODO: REMOVE DEBUG BACKGROUNDS
-                    .width(200.dp)
-                    .height(200.dp)
-                    .aspectRatio(1f),
-                contentAlignment = Alignment.Center
-            )
-            {
-                IconButton(
-                    modifier = Modifier.fillMaxSize(1f),
-                    onClick = {
-                        val options =
-                            arrayOf<CharSequence>("Take Photo", "Choose from Gallery", "Cancel")
-                        val builder = AlertDialog.Builder(context)
-                        builder.setTitle("Add Photo")
-                        builder.setItems(options) { dialog, item ->
-                            if (options[item] == "Take Photo") {
-                                when (PackageManager.PERMISSION_GRANTED) {
-                                    ContextCompat.checkSelfPermission(
-                                        context, Manifest.permission.CAMERA
-                                    ) -> {
-                                        fileUri = createImageFile(context)
-                                        cameraLauncher.launch(fileUri)
-                                    }
-                                    else -> {
-                                        isCameraSelected = true
-                                        permissionLauncher.launch(Manifest.permission.CAMERA)
-                                    }
-                                }
-                            } else if (options[item] == "Choose from Gallery") {
-                                when (PackageManager.PERMISSION_GRANTED) {
-                                    ContextCompat.checkSelfPermission(
-                                        context, Manifest.permission.READ_EXTERNAL_STORAGE
-                                    ) -> {
-                                        galleryLauncher.launch("image/*")
-                                    }
-                                    else -> {
-                                        isCameraSelected = false
-                                        permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-                                    }
-                                }
-                            } else if (options[item] == "Cancel") {
-                                dialog.dismiss()
-                            }
-                        }
-                        builder.show()
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.PhotoCamera,
-                        contentDescription = "Catalogue",
-                        tint = Color.Black,
-                        modifier = Modifier.fillMaxSize(0.65f)
-                    )
-                }
-            }
-        }
-        Button(
-            enabled = shouldShowPhoto,
-            onClick = {
-                images.clear()
-                imageUri = null
-                shouldShowPhoto = false
-            },
-        ) {
-            Text("Change Image")
-        }
-    }
-}
-
 private fun createImageFile(context: Context): Uri {
-    val timeStamp = SimpleDateFormat.getDateTimeInstance()
-    val file = File(context.filesDir, "JPEG_test.jpg")
+    val timeStamp = SimpleDateFormat.getDateTimeInstance().format(Date())
+    val file = File(context.filesDir, "JPEG_$timeStamp.jpg")
     return FileProvider.getUriForFile(
         context,
         context.applicationContext.packageName + ".provider",
@@ -327,20 +310,17 @@ private fun createImageFile(context: Context): Uri {
 private fun saveProduct(
     data: ProductInformation,
     newData: Map<String, String>,
-    newImages: ArrayList<String>,
+    newImage: String,
     context: Context
 ) {
     println("NEW IMAGES")
-    for (str in newImages) {
-        println(str)
-    }
+    println(newImage)
     println("END")
     data.name = newData["Name"]!!
     data.description = newData["Description"]!!
     data.price = (newData["Price"]!!.toDouble() * 100).toInt()
     data.amount = newData["Amount"]!!.toLong()
-    data.images.clear()
-    data.images.addAll(newImages)
+    data.image = newImage
     data.exportData(context)
 }
 
