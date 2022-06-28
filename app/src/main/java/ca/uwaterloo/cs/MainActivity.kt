@@ -1,14 +1,10 @@
 package ca.uwaterloo.cs
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Intent
-import android.content.pm.PackageManager
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,175 +18,146 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
-import java.io.*
+import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import java.io.File
+import java.io.FileInputStream
+import java.io.ObjectInputStream
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             OnlineFoodRetailTheme {
-                MainContent()
+                val context = LocalContext.current
+                generateMockData(context = context)
+                DestinationsNavHost(navGraph = NavGraphs.root)
             }
         }
     }
 
+}
 
-//    @Composable
-//    fun MainContent() {
-//        Column(
-//            Modifier
-//                .background(MaterialTheme.colors.background)
-//                .padding(20.dp),
-//            horizontalAlignment = Alignment.CenterHorizontally
-//        ) {
-//            TableScreen()
-//        }
-//    }
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@Destination(start = true)
+@Composable
+fun MainContent(nav: DestinationsNavigator) {
+    Scaffold(
+        content = { TableScreen(nav) },
+        bottomBar = { NavigationBar() }
+    )
+}
 
-
-    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-    @Composable
-    fun MainContent() {
-        Scaffold(
-            content = { TableScreen() },
-            bottomBar = { NavigationBar() }
-        )
-    }
-
-
-    @Composable
-    fun TableScreen() {
-        CenterAlignedTopAppBar(
-            title = { Text("Catalogue", color = Color.White) },
-            navigationIcon = {
-                IconButton(onClick = {
-                    addItem()
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = "Catalogue",
-                        tint = Color.White
-                    )
-                }
-            },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
-        )
-        // Just a fake data... a Pair of Int and String
-        // TODO: REMOVE / UPGRADE MOCK DATA GENERATION IN FINAL PRODUCT
-        generateMockData()
-        val tableData = readData()
-        // Each cell of a column must have the same weight.
-        // The LazyColumn will be our table. Notice the use of the weights below
-        Spacer(Modifier.height(70.dp))
-        LazyColumn(
-            Modifier
-                .padding(61.dp)
-                .background(Color.White)
-                .border(BorderStroke(5.dp, Color.InstagramPurple))
-                .heightIn(0.dp, 640.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Here are all the lines of your table.
-            items(tableData, key = { it }) {
-                Divider(
-                    Modifier
-                        .border(BorderStroke(0.dp, Color.InstagramPurple))
+@Composable
+fun TableScreen(nav: DestinationsNavigator) {
+    val context = LocalContext.current
+    CenterAlignedTopAppBar(
+        title = { Text("Catalogue", color = Color.White) },
+        navigationIcon = {
+            IconButton(onClick = {
+                addItem(nav)
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Catalogue",
+                    tint = Color.White
                 )
-                Row(
-                    Modifier
-                        .height(IntrinsicSize.Min)
-                        .clickable { editItem(it.second) },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.apple_fruit),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .fillMaxWidth()
-                    )
-                }
+            }
+        },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
+    )
+    // Just a fake data... a Pair of Int and String
+    // TODO: REMOVE / UPGRADE MOCK DATA GENERATION IN FINAL PRODUCT
+    val tableData = readData(context)
+    // Each cell of a column must have the same weight.
+    // The LazyColumn will be our table. Notice the use of the weights below
+    Spacer(Modifier.height(70.dp))
+    LazyColumn(
+        Modifier
+            .padding(61.dp)
+            .background(Color.White)
+            .border(BorderStroke(5.dp, Color.InstagramPurple))
+            .heightIn(0.dp, 640.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Here are all the lines of your table.
+        items(tableData, key = { it }) {
+            Divider(
+                Modifier
+                    .border(BorderStroke(0.dp, Color.InstagramPurple))
+            )
+            Row(
+                Modifier
+                    .height(IntrinsicSize.Min)
+                    .clickable { editItem(nav, it.second) },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.apple_fruit),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .width(200.dp)
+                        .height(200.dp)
+                )
             }
         }
     }
+}
 
 
-    private fun editItem(data: ProductInformation) {
-        val intent = Intent(this, ProductForm::class.java).apply {
-            putExtra("EXTRA_DATA", data)
-        }
-        startActivity(intent)
+private fun editItem(nav: DestinationsNavigator, data: ProductInformation) {
+    nav.navigate(ProductFormDestination(data))
+}
+
+private fun addItem(nav: DestinationsNavigator) {
+    nav.navigate(ProductFormDestination())
+}
+
+private fun generateMockData(amount: Int = 7, context: Context) {
+    val dir = File("${context.filesDir}/out")
+    if (dir.exists()) {
+        dir.deleteRecursively()
     }
-
-    private fun addItem() {
-        val intent = Intent(this, ProductForm::class.java)
-        startActivity(intent)
+    dir.mkdir()
+    (1..amount).forEach { value ->
+        ProductInformation(
+            value,
+            "apple $value",
+            "apple $value description",
+            100 * value + 1,
+            10 * value + 1L,
+            "",
+            platform1 = false,
+            platform2 = false
+        ).exportData(context)
     }
+}
 
-    private fun generateMockData(amount: Int = 7) {
-        val context = this.baseContext
-        val dir = File("${context.filesDir}/out")
-        if (dir.exists()) {
-            dir.deleteRecursively()
-        }
-        dir.mkdir()
-        (1..amount).forEach { value ->
-            ProductInformation(
-                value,
-                "apple $value",
-                "apple $value description",
-                100 * value + 1,
-                10 * value + 1L
-                // arrayListOf(decoded, decoded)
-            ).exportData(context)
-        }
+private fun readData(context: Context): List<Pair<Int, ProductInformation>> {
+    // TODO: platform compatibility
+    // TODO: load from platform
+    val dir = File("${context.filesDir}/out")
+    if (!dir.exists()) {
+        return emptyList()
     }
-
-    private fun readData(): List<Pair<Int, ProductInformation>> {
-        // TODO: platform compatibility
-        // TODO: load from platform
-        val context = this.baseContext
-        val dir = File("${context.filesDir}/out")
-        if (!dir.exists()) {
-            return emptyList()
-        }
-        val list = ArrayList<Pair<Int, ProductInformation>>()
-        for (saveFile in dir.list()) {
-            val fileIS = FileInputStream("${context.filesDir}/out/" + saveFile)
+    val list = ArrayList<Pair<Int, ProductInformation>>()
+    for (saveFile in dir.walk()) {
+        if (saveFile.isFile && saveFile.canRead() && saveFile.name.contains("Product-")) {
+            val fileIS = FileInputStream(saveFile)
             val inStream = ObjectInputStream(fileIS)
             val productInformation = inStream.readObject() as ProductInformation
             list.add(Pair(productInformation.id, productInformation))
             inStream.close()
             fileIS.close()
         }
-        return list
     }
-
-    private fun requestCameraPermission() {
-        when {
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                Log.i("kilo", "Permission previously granted")
-            }
-
-            ActivityCompat.shouldShowRequestPermissionRationale(
-                this,
-                Manifest.permission.CAMERA
-            ) -> Log.i("kilo", "Show camera permissions dialog")
-
-            else -> requestPermissionLauncher.launch(Manifest.permission.CAMERA)
-        }
-    }
-
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { }
+    return list
 }

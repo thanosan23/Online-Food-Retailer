@@ -1,7 +1,8 @@
 package ca.uwaterloo.cs
 
 import android.content.Context
-import android.graphics.Bitmap
+import android.os.Parcel
+import android.os.Parcelable
 import java.io.File
 import java.io.FileOutputStream
 import java.io.ObjectOutputStream
@@ -13,25 +14,30 @@ data class ProductInformation(
     var description: String = "",
     var price: Int = 0,
     var amount: Long = 0,
-    val images: ArrayList<String> = arrayListOf(),
-    var plaform1: Boolean = false,
-    var plaform2: Boolean = false
+    var image: String = "",
+    var platform1: Boolean = false,
+    var platform2: Boolean = false
+) : Serializable, Parcelable {
 
-) : Serializable {
-    init {
-        images.add("ic_pumpking.png")
-    }
+    constructor(parcel: Parcel) : this(
+        parcel.readInt(),
+        parcel.readString() ?: "",
+        parcel.readString() ?: "",
+        parcel.readInt(),
+        parcel.readLong(),
+        parcel.readString() ?: "",
+        parcel.readBoolean(),
+        parcel.readBoolean()
+    )
 
     fun exportData(context: Context) {
         // TODO: platform compatibility
         // TODO: save to platform
-        println("${context.filesDir}/out")
         val dir = File("${context.filesDir}/out")
         if (!dir.exists()) {
             dir.mkdir()
         }
-        val file = File(dir, "$id.txt")
-        println(file.absolutePath)
+        val file = File(dir, "Product-$id.txt")
         if (file.exists())
         {
             file.delete()
@@ -49,6 +55,31 @@ data class ProductInformation(
         if (file.exists())
         {
             file.delete()
+        }
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeInt(id)
+        parcel.writeString(name)
+        parcel.writeString(description)
+        parcel.writeInt(price)
+        parcel.writeLong(amount)
+        parcel.writeString(image)
+        parcel.writeBoolean(platform1)
+        parcel.writeBoolean(platform2)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<ProductInformation> {
+        override fun createFromParcel(parcel: Parcel): ProductInformation {
+            return ProductInformation(parcel)
+        }
+
+        override fun newArray(size: Int): Array<ProductInformation?> {
+            return arrayOfNulls(size)
         }
     }
 }
