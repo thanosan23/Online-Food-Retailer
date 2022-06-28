@@ -51,7 +51,7 @@ data class ProductInformation(
     }
 
     fun deleteData(context: Context) {
-        val file = File("${context.filesDir}/out", "$id.txt")
+        val file = File("${context.filesDir}/out", "Product-$id.txt")
         if (file.exists())
         {
             file.delete()
