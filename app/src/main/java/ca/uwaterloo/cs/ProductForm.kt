@@ -89,9 +89,9 @@ fun ShowProductForm(nav: DestinationsNavigator, data: ProductInformation, formSt
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        image = ""
-        image = uri.toString()
         if (uri != null) {
+            image = ""
+            image = uri.toString()
             try {
                 context.contentResolver.takePersistableUriPermission(
                     uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
