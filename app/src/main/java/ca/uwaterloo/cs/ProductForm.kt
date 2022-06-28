@@ -23,7 +23,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import androidx.navigation.compose.rememberNavController
 import ca.uwaterloo.cs.form.*
 import ca.uwaterloo.cs.platform.PlatformState
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
@@ -55,13 +54,10 @@ class ProductForm : ComponentActivity() {
 //                    Text(if (data == null) "ADD PRODUCT" else "EDIT PRODUCT")
 //                    ShowProductForm(data ?: ProductInformation())
 //                }
-                val navController = rememberNavController()
                 Scaffold(
                     content = { FullProductForm(data ?: ProductInformation() ) },
-                    bottomBar = { NavigationBar(navController) }
+                    bottomBar = { NavigationBar() }
                 )
-
-                //Navigation(navController)
             }
         }
         outputDirectory = getOutputDirectory()

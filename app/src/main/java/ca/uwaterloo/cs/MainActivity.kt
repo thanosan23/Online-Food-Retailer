@@ -29,10 +29,6 @@ import androidx.core.content.ContextCompat
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import java.io.*
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,10 +57,9 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     @Composable
     fun MainContent() {
-        val navController = rememberNavController()
         Scaffold(
             content = { TableScreen() },
-            bottomBar = { NavigationBar(navController) }
+            bottomBar = { NavigationBar() }
         )
     }
 

@@ -10,11 +10,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.core.content.ContextCompat.startActivity
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 
 sealed class NavItem(
@@ -30,7 +25,7 @@ sealed class NavItem(
 
 
 @Composable
-fun NavigationBar(navController: NavController) {
+fun NavigationBar() {
     val items = listOf(
         NavItem.Catalogue,
         NavItem.Logistics,
@@ -42,11 +37,9 @@ fun NavigationBar(navController: NavController) {
     BottomNavigation(
         backgroundColor = Color.InstagramPurple
     ) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route
         items.forEach { item ->
             BottomNavigationItem(
-                selected = currentRoute == item.title,
+                selected = false,
                 icon = { Icon(painterResource(id = item.icon), contentDescription = item.title) },
                 //label = { Text(text = item.title) },
                 onClick = {
