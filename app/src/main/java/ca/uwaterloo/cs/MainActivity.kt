@@ -1,10 +1,13 @@
 package ca.uwaterloo.cs
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,11 +34,14 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.ObjectInputStream
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             OnlineFoodRetailTheme {
+                val context = LocalContext.current
+                generateMockData(context = context)
                 DestinationsNavHost(navGraph = NavGraphs.root)
             }
         }
@@ -81,7 +87,6 @@ fun TableScreen(nav: DestinationsNavigator) {
     )
     // Just a fake data... a Pair of Int and String
     // TODO: REMOVE / UPGRADE MOCK DATA GENERATION IN FINAL PRODUCT
-    generateMockData(context = context)
     val tableData = readData(context)
     // Each cell of a column must have the same weight.
     // The LazyColumn will be our table. Notice the use of the weights below
@@ -120,11 +125,11 @@ fun TableScreen(nav: DestinationsNavigator) {
 
 
 private fun editItem(nav: DestinationsNavigator, data: ProductInformation) {
-    nav.navigate(ProductFormDestination (data))
+    nav.navigate(ProductFormDestination(data))
 }
 
 private fun addItem(nav: DestinationsNavigator) {
-    nav.navigate(ProductFormDestination ())
+    nav.navigate(ProductFormDestination())
 }
 
 private fun generateMockData(amount: Int = 7, context: Context) {
@@ -162,4 +167,12 @@ private fun readData(context: Context): List<Pair<Int, ProductInformation>> {
         fileIS.close()
     }
     return list
+}
+
+@Composable
+private fun requestPermissions(context: Context) {
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) {}
+    permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
 }

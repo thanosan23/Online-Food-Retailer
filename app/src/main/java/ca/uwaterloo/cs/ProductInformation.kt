@@ -1,7 +1,6 @@
 package ca.uwaterloo.cs
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.os.Parcel
 import android.os.Parcelable
 import java.io.File
@@ -17,9 +16,6 @@ data class ProductInformation(
     var amount: Long = 0,
     val images: ArrayList<String> = arrayListOf()
 ) : Serializable, Parcelable {
-    init {
-        images.add("ic_pumpking.png")
-    }
 
     constructor(parcel: Parcel) : this(
         parcel.readInt(),

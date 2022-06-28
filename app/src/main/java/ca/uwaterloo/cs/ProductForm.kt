@@ -1,27 +1,40 @@
 package ca.uwaterloo.cs
 
+import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
+import android.content.pm.PackageManager
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.form.*
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
-import coil.compose.rememberImagePainter
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import java.io.File
+import java.text.SimpleDateFormat
 
 
 @Destination
@@ -29,30 +42,27 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 fun ProductForm(navigator: DestinationsNavigator, data: ProductInformation?) {
     OnlineFoodRetailTheme {
         Scaffold(
-            content = { FullProductForm(navigator, data) },
+            content = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colors.background)
+                        .padding(20.dp),
+                ) {
+                    Text(if (data == null) "ADD PRODUCT" else "EDIT PRODUCT")
+                    ShowProductForm(navigator, data ?: ProductInformation())
+                }
+            },
             bottomBar = { NavigationBar() }
         )
     }
 }
 
 @Composable
-fun FullProductForm(navigator: DestinationsNavigator, data: ProductInformation?) {
-    Column(
-        modifier = Modifier
-            .fillMaxHeight()
-            .fillMaxWidth()
-            .background(MaterialTheme.colors.background)
-            .padding(20.dp),
-    ) {
-        Text(if (data == null) "ADD PRODUCT" else "EDIT PRODUCT")
-        ShowProductForm(navigator, data ?: ProductInformation())
-    }
-}
-
-@Composable
 fun ShowProductForm(nav: DestinationsNavigator, data: ProductInformation) {
     val state by remember { mutableStateOf(FormState()) }
-    val images = ArrayList<String>(data.images)
+    val images = ArrayList(data.images)
     val context = LocalContext.current
 
     Column(
@@ -124,7 +134,58 @@ fun ShowProductForm(nav: DestinationsNavigator, data: ProductInformation) {
 @Composable
 fun FormImages(images: ArrayList<String>) {
     var shouldShowPhoto by remember { mutableStateOf(images.isNotEmpty()) }
-    var shouldShowCamera by remember { mutableStateOf(images.isEmpty()) }
+    println("SHOULD SHOW: $shouldShowPhoto")
+    println(images.getOrNull(0))
+    var imageUri by remember {
+        mutableStateOf(images.getOrNull(0)?.toUri())
+    }
+    val context = LocalContext.current
+    var fileUri: Uri? = null
+    var isCameraSelected = false
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            imageUri = fileUri!!
+            images.add(fileUri.toString())
+            println("Images")
+            for (img in images) {
+                println(img)
+            }
+            println("end")
+            shouldShowPhoto = true
+        }
+    }
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        imageUri = uri
+        if (uri != null) {
+            images.add(uri.toString())
+            println("Images")
+            for (img in images) {
+                println(img)
+            }
+            println("end")
+            shouldShowPhoto = true
+        }
+    }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            if (isCameraSelected) {
+                fileUri = createImageFile(context)
+                cameraLauncher.launch(fileUri)
+            } else {
+                galleryLauncher.launch("image/*")
+            }
+        } else {
+            Toast.makeText(context, "Permission Denied!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Row(
             modifier = Modifier
@@ -133,48 +194,134 @@ fun FormImages(images: ArrayList<String>) {
                 .padding(horizontal = 16.dp, vertical = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            if (shouldShowPhoto) {
+            if (imageUri != null) {
                 Column(
                     Modifier
-                        .background(Color.Cyan)
+                        .background(Color.Cyan) // TODO: delete
                         .width(200.dp)
                         .height(200.dp)
                         .aspectRatio(1f)
                 )
                 {
-                    Image(
-                        painter = rememberImagePainter(images[0].toUri()),
-                        contentDescription = null,
+                    Box(
                         modifier = Modifier
-                            .fillMaxSize(1f)
+                            // .background(Color.InstagramPurple) // TODO: REMOVE DEBUG BACKGROUNDS
+                            .width(200.dp)
+                            .height(200.dp)
+                            .aspectRatio(1f),
+                        contentAlignment = Alignment.Center
                     )
+                    {
+                        imageUri?.let {
+                            val btm = if (Build.VERSION.SDK_INT < 28) {
+                                MediaStore.Images.Media.getBitmap(context.contentResolver, it)
+                            } else {
+                                val source = ImageDecoder.createSource(context.contentResolver, it)
+                                ImageDecoder.decodeBitmap(source)
+                            }
+                            Image(
+                                bitmap = btm.asImageBitmap(),
+                                contentDescription = "Image",
+                                alignment = Alignment.TopCenter,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxHeight(0.45f)
+                                    .padding(top = 10.dp),
+                                contentScale = ContentScale.Fit
+                            )
+                        }
+                        /*
+                        Image(
+                            painter = rememberImagePainter(images[0].toUri()),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .fillMaxSize(1f)
+                        )
+
+                         */
+                    }
                 }
             }
-            if (shouldShowCamera) {
-                // TODO: REQUEST CAMERA PERMISSION
-                // TODO: CHANGE PICTURE INTAKE METHOD
-                Box(
-                    modifier = Modifier
-                        .background(Color.Cyan)
-                        .width(200.dp)
-                        .height(200.dp)
-                        .aspectRatio(1f),
-                    contentAlignment = Alignment.Center
-                )
-                {
+            // TODO: REQUEST CAMERA PERMISSION
+            Box(
+                modifier = Modifier
+                    // .background(Color.InstagramPurple) // TODO: REMOVE DEBUG BACKGROUNDS
+                    .width(200.dp)
+                    .height(200.dp)
+                    .aspectRatio(1f),
+                contentAlignment = Alignment.Center
+            )
+            {
+                IconButton(
+                    modifier = Modifier.fillMaxSize(1f),
+                    onClick = {
+                        val options =
+                            arrayOf<CharSequence>("Take Photo", "Choose from Gallery", "Cancel")
+                        val builder = AlertDialog.Builder(context)
+                        builder.setTitle("Add Photo")
+                        builder.setItems(options) { dialog, item ->
+                            if (options[item] == "Take Photo") {
+                                when (PackageManager.PERMISSION_GRANTED) {
+                                    ContextCompat.checkSelfPermission(
+                                        context, Manifest.permission.CAMERA
+                                    ) -> {
+                                        fileUri = createImageFile(context)
+                                        cameraLauncher.launch(fileUri)
+                                    }
+                                    else -> {
+                                        isCameraSelected = true
+                                        permissionLauncher.launch(Manifest.permission.CAMERA)
+                                    }
+                                }
+                            } else if (options[item] == "Choose from Gallery") {
+                                when (PackageManager.PERMISSION_GRANTED) {
+                                    ContextCompat.checkSelfPermission(
+                                        context, Manifest.permission.READ_EXTERNAL_STORAGE
+                                    ) -> {
+                                        galleryLauncher.launch("image/*")
+                                    }
+                                    else -> {
+                                        isCameraSelected = false
+                                        permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                                    }
+                                }
+                            } else if (options[item] == "Cancel") {
+                                dialog.dismiss()
+                            }
+                        }
+                        builder.show()
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.PhotoCamera,
+                        contentDescription = "Catalogue",
+                        tint = Color.Black,
+                        modifier = Modifier.fillMaxSize(0.65f)
+                    )
                 }
             }
         }
         Button(
+            enabled = shouldShowPhoto,
             onClick = {
-                images.remove(images[0])
+                images.clear()
+                imageUri = null
                 shouldShowPhoto = false
-                shouldShowCamera = true
             },
         ) {
             Text("Change Image")
         }
     }
+}
+
+private fun createImageFile(context: Context): Uri {
+    val timeStamp = SimpleDateFormat.getDateTimeInstance()
+    val file = File(context.filesDir, "JPEG_test.jpg")
+    return FileProvider.getUriForFile(
+        context,
+        context.applicationContext.packageName + ".provider",
+        file
+    );
 }
 
 private fun saveProduct(
@@ -183,6 +330,11 @@ private fun saveProduct(
     newImages: ArrayList<String>,
     context: Context
 ) {
+    println("NEW IMAGES")
+    for (str in newImages) {
+        println(str)
+    }
+    println("END")
     data.name = newData["Name"]!!
     data.description = newData["Description"]!!
     data.price = (newData["Price"]!!.toDouble() * 100).toInt()
