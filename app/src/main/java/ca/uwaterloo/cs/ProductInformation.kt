@@ -13,7 +13,10 @@ data class ProductInformation(
     var description: String = "",
     var price: Int = 0,
     var amount: Long = 0,
-    val images: ArrayList<String> = arrayListOf()
+    val images: ArrayList<String> = arrayListOf(),
+    var plaform1: Boolean = false,
+    var plaform2: Boolean = false
+
 ) : Serializable {
     init {
         images.add("ic_pumpking.png")
@@ -49,5 +52,6 @@ data class ProductInformation(
         }
     }
 }
+
 // TODO: FIX images to image array
 // TODO: load data

@@ -8,22 +8,21 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import ca.uwaterloo.cs.form.*
+import ca.uwaterloo.cs.platform.PlatformState
+import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import coil.compose.rememberImagePainter
 import java.io.File
@@ -78,71 +77,102 @@ class ProductForm : ComponentActivity() {
 
     @Composable
     fun ShowProductForm(data: ProductInformation) {
-        val state by remember { mutableStateOf(FormState()) }
+        val formState by remember { mutableStateOf(FormState()) }
+        val platformState by remember {mutableStateOf(PlatformState())}
         val images = ArrayList<String>(data.images)
-
+        Spacer(Modifier.height(20.dp))
         Column(
             Modifier
                 .verticalScroll(rememberScrollState())
                 .padding(20.dp),
-
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Form(
-                state = state,
-                fields = listOf(
-                    Field(
-                        name = "Name",
-                        initValue = if (data.name == "") "" else data.name,
-                        prompt = "Enter product name",
-                        label = "Product Name",
-                        validators = listOf(Required())
-                    ),
-                    Field(
-                        name = "Description",
-                        initValue = if (data.description == "") "" else data.description,
-                        prompt = "Enter description",
-                        label = "Product Description",
-                        validators = listOf(Required())
-                    ),
-                    Field(
-                        name = "Amount",
-                        initValue = if (data.amount == 0L) "" else data.amount.toString(),
-                        prompt = "Enter amount available",
-                        label = "Product Amount",
-                        validators = listOf(Required()),
-                        inputType = KeyboardType.Number,
-                        formatter = NumberTransformation()
-                    ),
-                    Field(
-                        name = "Price",
-                        initValue = if (data.price == 0) "" else data.price.toString(),
-                        prompt = "Enter price",
-                        label = "Product Price",
-                        validators = listOf(Required(), NonZero()),
-                        inputType = KeyboardType.Number,
-                    ),
+            platformState.platformsUI.PlatformsDropDown()
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Spacer(Modifier.height(20.dp))
+                Form(
+                    state = formState,
+                    fields = listOf(
+                        Field(
+                            name = "Name",
+                            initValue = if (data.name == "") "" else data.name,
+                            prompt = "Enter product name",
+                            label = "Product Name",
+                            validators = listOf(Required())
+                        ),
+                        Field(
+                            name = "Description",
+                            initValue = if (data.description == "") "" else data.description,
+                            prompt = "Enter description",
+                            label = "Product Description",
+                            validators = listOf(Required())
+                        ),
+                        Field(
+                            name = "Amount",
+                            initValue = if (data.amount == 0L) "" else data.amount.toString(),
+                            prompt = "Enter amount available",
+                            label = "Product Amount",
+                            validators = listOf(Required()),
+                            inputType = KeyboardType.Number,
+                            formatter = NumberTransformation()
+                        ),
+                        Field(
+                            name = "Price",
+                            initValue = if (data.price == 0) "" else data.price.toString(),
+                            prompt = "Enter price",
+                            label = "Product Price",
+                            validators = listOf(Required(), NonZero()),
+                            inputType = KeyboardType.Number,
+                        ),
+
+                        )
                 )
-            )
-            FormImages(images)
+                FormImages(images)
+                SendCancelDeleteWidgets(
+                    formState = formState,
+                    platformState = platformState,
+                    data = data,
+                    images = images
+                )
+            }
+        }
+    }
+
+    @Composable
+    fun SendCancelDeleteWidgets(formState: FormState, platformState: PlatformState, data: ProductInformation, images: ArrayList<String>){
+        Row() {
             Button(onClick = {
-                if (state.validate()) {
-                    saveProduct(data, state.getData(), images)
+                if (formState.validate() && platformState.validate()) {
+                    saveProduct(data, formState.getData() + platformState.getData(), images)
                 }
             }) {
-                Text("Submit")
+                Icon(
+                    imageVector = Icons.Filled.Send,
+                    contentDescription = "Catalogue",
+                    tint = Color.InstagramPurple
+                )
             }
             Button(onClick = {
                 super.finish()
             }) {
-                Text("Cancel")
+                Icon(
+                    imageVector = Icons.Filled.Cancel,
+                    contentDescription = "Catalogue",
+                    tint = Color.InstagramPurple
+                )
             }
             Button(onClick = {
                 deleteProduct(data)
             }) {
-                Text("Delete")
+                Icon(
+                    imageVector = Icons.Filled.Delete,
+                    contentDescription = "Catalogue",
+                    tint = Color.InstagramPurple
+                )
             }
         }
+        Spacer(Modifier.height(30.dp))
     }
 
     @Composable
@@ -206,10 +236,15 @@ class ProductForm : ComponentActivity() {
                     shouldShowCamera = true
                 },
             ) {
-                Text("Change Image")
+                Icon(
+                    imageVector = Icons.Filled.ChangeCircle,
+                    contentDescription = "Catalogue",
+                    tint = Color.InstagramPurple
+                )
             }
         }
     }
+
 
     private fun saveProduct(
         data: ProductInformation,
@@ -250,6 +285,7 @@ class ProductForm : ComponentActivity() {
 
         return if ((mediaDir != null) && mediaDir.exists()) mediaDir else filesDir
     }
+
 
     override fun onDestroy() {
         super.onDestroy()

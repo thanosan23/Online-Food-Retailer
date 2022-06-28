@@ -62,13 +62,6 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-    @Composable
-    fun TopApp(){
-        TopAppBar(
-        ) {
-            Text(text = "hey")
-        }
-    }
 
     @Composable
     fun TableScreen() {
