@@ -37,4 +37,4 @@ fun OnlineFoodRetailTheme(content: @Composable () -> Unit) {
 val Color.Companion.VeryDarkGray get() = Color(0xFF121212)
 val Color.Companion.InstagramOrange get() = Color(0xFFFF7A00)
 val Color.Companion.InstagramPeach get() = Color(0xFFFF0069)
-val Color.Companion.InstagramPurple get() = Color(0xFFD300C5)
+val Color.Companion.InstagramPurple get() = Color(0xFF669933)

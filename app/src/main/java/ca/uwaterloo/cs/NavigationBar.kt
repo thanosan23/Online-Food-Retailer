@@ -1,14 +1,20 @@
 package ca.uwaterloo.cs
 
 import android.content.Intent
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 
@@ -40,8 +46,12 @@ fun NavigationBar() {
         items.forEach { item ->
             BottomNavigationItem(
                 selected = false,
-                icon = { Icon(painterResource(id = item.icon), contentDescription = item.title) },
-                //label = { Text(text = item.title) },
+                icon = { Icon(painterResource(id = item.icon,), contentDescription = item.title,
+                    modifier= Modifier.width(25.dp).height(25.dp),
+                tint = Color.White)
+                },
+                label = { Text(text = item.title, fontSize = 12.sp, color = Color.White
+                ) },
                 onClick = {
                     var intent = Intent(context, Profile::class.java)
                     when (item.title) {

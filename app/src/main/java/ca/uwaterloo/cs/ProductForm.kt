@@ -64,7 +64,7 @@ fun ProductForm(
                         },
                 ) {
                     Text(if (data == null) "ADD PRODUCT" else "EDIT PRODUCT")
-                    ShowProductForm(navigator, data ?: ProductInformation(), useTemplate, formState)
+                    ShowProductForm(navigator, data ?: ProductInformation())
                 }
             },
             bottomBar = { NavigationBar() }
@@ -77,9 +77,9 @@ fun ShowProductForm(
     nav: DestinationsNavigator,
     data: ProductInformation,
     useTemplate: Boolean,
-    formState: FormState
 ) {
-    val platformState by remember { mutableStateOf(PlatformState()) }
+    val formState by remember { mutableStateOf(FormState()) }
+    val platformState by remember { mutableStateOf(PlatformState(data)) }
     var image by remember { mutableStateOf(data.image) }
     val context = LocalContext.current
     var fileUri: Uri? = null
@@ -246,7 +246,7 @@ fun ShowProductForm(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.ChangeCircle,
-                                        contentDescription = "Catalogue",
+                                        contentDescription = "Delete Image",
                                         tint = Color.InstagramPurple
                                     )
                                 }
@@ -308,12 +308,16 @@ fun ShowProductForm(
                                     builder.show()
                                 }
                             ) {
-                                Icon(
-                                    imageVector = Icons.Filled.PhotoCamera,
-                                    contentDescription = "Catalogue",
-                                    tint = Color.Black,
-                                    modifier = Modifier.fillMaxSize(0.65f)
-                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.PhotoCamera,
+                                        contentDescription = "Catalogue",
+                                        tint = Color.Black,
+                                        modifier = Modifier.fillMaxSize(0.65f)
+                                    )
+                                }
                             }
                         }
                     }
@@ -394,7 +398,7 @@ private fun saveProduct(
 ) {
     data.name = newData["Name"]!!
     data.description = newData["Description"]!!
-    data.price = (newData["Price"]!!.toDouble() * 100).toInt()
+    data.price = (newData["Price"]!!.toDouble()).toInt()
     data.amount = newData["Amount"]!!.toLong()
     data.image = newImage
     data.platform1 = newData["platform1"].toBoolean()
