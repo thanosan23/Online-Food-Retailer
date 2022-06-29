@@ -12,11 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import ca.uwaterloo.cs.ProductInformation
 import ca.uwaterloo.cs.R
 
-class PlatformsUI {
-    var platform1CheckBoxState: Boolean by mutableStateOf(false)
-    var platform2CheckBoxState: Boolean by mutableStateOf(false)
+class PlatformsUI(data: ProductInformation) {
+    var platform1CheckBoxState: Boolean by mutableStateOf(data.platform1)
+    var platform2CheckBoxState: Boolean by mutableStateOf(data.platform2)
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable

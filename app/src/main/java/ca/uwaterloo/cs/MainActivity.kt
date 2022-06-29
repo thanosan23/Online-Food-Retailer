@@ -81,26 +81,26 @@ fun TableScreen(nav: DestinationsNavigator) {
     val tableData = readData(context)
     // Each cell of a column must have the same weight.
     // The LazyColumn will be our table. Notice the use of the weights below
-    Spacer(Modifier.height(70.dp))
+    Row() {
+        Spacer(Modifier.width(22.dp))
     LazyColumn(
         Modifier
-            .padding(61.dp)
+            .padding(66.dp)
             .background(Color.White)
-            .border(BorderStroke(5.dp, Color.InstagramPurple))
             .heightIn(0.dp, 640.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Here are all the lines of your table.
         items(tableData, key = { it }) {
-            Divider(
-                Modifier
-                    .border(BorderStroke(0.dp, Color.InstagramPurple))
-            )
+            Spacer(Modifier.height(10.dp))
+
             Row(
                 Modifier
                     .height(IntrinsicSize.Min)
-                    .clickable { editItem(nav, it.second) },
-                verticalAlignment = Alignment.CenterVertically
+                    .clickable { editItem(nav, it.second) }
+                    .border(BorderStroke(3.dp, Color.InstagramPurple)),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
             ) {
                 val painter = if (it.second.image == "") {
                     painterResource(id = R.drawable.apple_fruit)
@@ -112,12 +112,13 @@ fun TableScreen(nav: DestinationsNavigator) {
                     painter = painter,
                     contentDescription = null,
                     modifier = Modifier
-                        .width(200.dp)
-                        .height(200.dp)
+                        .fillMaxWidth(0.9f)
+                        .fillMaxHeight(0.9f)
                 )
             }
         }
     }
+}
 }
 
 
