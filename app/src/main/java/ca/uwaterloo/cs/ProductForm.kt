@@ -71,7 +71,7 @@ fun ProductForm(navigator: DestinationsNavigator, data: ProductInformation?) {
 @Composable
 fun ShowProductForm(nav: DestinationsNavigator, data: ProductInformation) {
     val formState by remember { mutableStateOf(FormState()) }
-    val platformState by remember { mutableStateOf(PlatformState()) }
+    val platformState by remember { mutableStateOf(PlatformState(data)) }
     var image by remember { mutableStateOf(data.image) }
     val context = LocalContext.current
     var fileUri: Uri? = null
@@ -213,12 +213,34 @@ fun ShowProductForm(nav: DestinationsNavigator, data: ProductInformation) {
                                 }
 
                                  */
-                                Image(
-                                    painter = rememberImagePainter(image.toUri()),
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .fillMaxSize(1f)
-                                )
+                                Row(
+                                    verticalAlignment = Alignment.Bottom
+                                ) {
+                                    Column() {
+                                        Spacer(Modifier.height(25.dp))
+                                        Button(
+                                            enabled = image != "",
+                                            onClick = {
+                                                image = ""
+                                            },
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Filled.ChangeCircle,
+                                                contentDescription = "Catalogue",
+                                                tint = Color.InstagramPurple
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(Modifier.width(2.dp))
+
+                                    Image(
+                                        painter = rememberImagePainter(image.toUri()),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .fillMaxSize(1f)
+                                    )
+                                }
                             }
                         }
                     } else {
@@ -277,27 +299,19 @@ fun ShowProductForm(nav: DestinationsNavigator, data: ProductInformation) {
                                     builder.show()
                                 }
                             ) {
-                                Icon(
-                                    imageVector = Icons.Filled.PhotoCamera,
-                                    contentDescription = "Catalogue",
-                                    tint = Color.Black,
-                                    modifier = Modifier.fillMaxSize(0.65f)
-                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.PhotoCamera,
+                                        contentDescription = "Catalogue",
+                                        tint = Color.Black,
+                                        modifier = Modifier.fillMaxSize(0.65f)
+                                    )
+                                }
                             }
                         }
                     }
-                }
-                Button(
-                    enabled = image != "",
-                    onClick = {
-                        image = ""
-                    },
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.ChangeCircle,
-                        contentDescription = "Catalogue",
-                        tint = Color.InstagramPurple
-                    )
                 }
             }
             SendCancelDeleteWidgets(
@@ -374,7 +388,7 @@ private fun saveProduct(
 ) {
     data.name = newData["Name"]!!
     data.description = newData["Description"]!!
-    data.price = (newData["Price"]!!.toDouble() * 100).toInt()
+    data.price = (newData["Price"]!!.toDouble()).toInt()
     data.amount = newData["Amount"]!!.toLong()
     data.image = newImage
     data.platform1 = newData["platform1"].toBoolean()
