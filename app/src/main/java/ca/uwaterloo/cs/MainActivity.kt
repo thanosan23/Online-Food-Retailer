@@ -113,8 +113,8 @@ fun TableScreen(nav: DestinationsNavigator) {
                     painter = painter,
                     contentDescription = null,
                     modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .fillMaxHeight(0.9f)
+                        .width(200.dp)
+                        .height(200.dp)
                 )
             }
         }
