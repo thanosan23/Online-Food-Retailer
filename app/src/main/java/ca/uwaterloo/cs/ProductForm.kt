@@ -43,6 +43,7 @@ import java.util.*
 @Destination
 @Composable
 fun ProductForm(navigator: DestinationsNavigator, data: ProductInformation?) {
+    val formState by remember { mutableStateOf(FormState()) }
     OnlineFoodRetailTheme {
         Scaffold(
             content = {
@@ -60,7 +61,7 @@ fun ProductForm(navigator: DestinationsNavigator, data: ProductInformation?) {
                         },
                 ) {
                     Text(if (data == null) "ADD PRODUCT" else "EDIT PRODUCT")
-                    ShowProductForm(navigator, data ?: ProductInformation())
+                    ShowProductForm(navigator, data ?: ProductInformation(), formState)
                 }
             },
             bottomBar = { NavigationBar() }
@@ -89,9 +90,9 @@ fun ShowProductForm(nav: DestinationsNavigator, data: ProductInformation) {
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        image = ""
-        image = uri.toString()
         if (uri != null) {
+            image = ""
+            image = uri.toString()
             try {
                 context.contentResolver.takePersistableUriPermission(
                     uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -135,21 +136,28 @@ fun ShowProductForm(nav: DestinationsNavigator, data: ProductInformation) {
                 fields = listOf(
                     Field(
                         name = "Name",
-                        initValue = if (data.name == "") "" else data.name,
+                        initValue = formState.getData()
+                            .getOrDefault("Name", if (data.name == "") "" else data.name),
                         prompt = "Enter product name",
                         label = "Product Name",
                         validators = listOf(Required())
                     ),
                     Field(
                         name = "Description",
-                        initValue = if (data.description == "") "" else data.description,
+                        initValue = formState.getData().getOrDefault(
+                            "Description",
+                            if (data.description == "") "" else data.description
+                        ),
                         prompt = "Enter description",
                         label = "Product Description",
                         validators = listOf(Required())
                     ),
                     Field(
                         name = "Amount",
-                        initValue = if (data.amount == 0L) "" else data.amount.toString(),
+                        initValue = formState.getData().getOrDefault(
+                            "Amount",
+                            if (data.amount == 0L) "0" else data.amount.toString()
+                        ),
                         prompt = "Enter amount available",
                         label = "Product Amount",
                         validators = listOf(Required()),
@@ -158,14 +166,16 @@ fun ShowProductForm(nav: DestinationsNavigator, data: ProductInformation) {
                     ),
                     Field(
                         name = "Price",
-                        initValue = if (data.price == 0) "" else data.price.toString(),
+                        initValue = formState.getData().getOrDefault(
+                            "Price",
+                            if (data.price == 0) "0.00" else (data.price / 100.0).toString()
+                        ),
                         prompt = "Enter price",
                         label = "Product Price",
                         validators = listOf(Required(), NonZero()),
                         inputType = KeyboardType.Number,
                     ),
-
-                    )
+                )
             )
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Row(
@@ -359,6 +369,7 @@ fun SendCancelDeleteWidgets(
         }
         Button(onClick = {
             deleteProduct(data, context)
+            nav.navigate(MainContentDestination)
         }) {
             Icon(
                 imageVector = Icons.Filled.Delete,

@@ -21,9 +21,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
+import coil.compose.rememberImagePainter
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -100,8 +102,14 @@ fun TableScreen(nav: DestinationsNavigator) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
+                val painter = if (it.second.image == "") {
+                    painterResource(id = R.drawable.apple_fruit)
+                }
+                else {
+                    rememberImagePainter(it.second.image.toUri())
+                }
                 Image(
-                    painter = painterResource(id = R.drawable.apple_fruit),
+                    painter = painter,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth(0.9f)
