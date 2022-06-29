@@ -103,11 +103,12 @@ class Field(
                 is IsNumber -> {
                     try  {
                         text.toDouble()
-                        return@map false
+                        return@map true
                     }
                     catch (e: Error) {
+                        showError(it.message)
+                        return@map false
                     }
-                    true
                 }
             }
         }.all { it }
@@ -135,19 +136,11 @@ class NumberTransformation : VisualTransformation {
 
             val offsetMapping = object : OffsetMapping {
                 override fun originalToTransformed(offset: Int): Int {
-                    println("originalToTransformed")
-                    println (offset)
-                    val tr = offset + (offset - 1) / 3
-                    println(tr)
-                    return tr
+                    return offset + (offset - 1) / 3
                 }
 
                 override fun transformedToOriginal(offset: Int): Int {
-                    println("transformedToOriginal")
-                    println (offset)
-                    val tr = offset / 4 * 3 + offset % 4
-                    println(tr)
-                    return tr
+                    return offset / 4 * 3 + offset % 4
                 }
             }
             return TransformedText(AnnotatedString(formattedText), offsetMapping)

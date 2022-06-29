@@ -64,7 +64,7 @@ fun ProductForm(
                         },
                 ) {
                     Text(if (data == null) "ADD PRODUCT" else "EDIT PRODUCT")
-                    ShowProductForm(navigator, data ?: ProductInformation())
+                    ShowProductForm(navigator, data ?: ProductInformation(), useTemplate)
                 }
             },
             bottomBar = { NavigationBar() }
@@ -167,7 +167,7 @@ fun ShowProductForm(
                         ),
                         prompt = "Enter amount available",
                         label = "Product Amount",
-                        validators = listOf(IsNumber(), Required()),
+                        validators = listOf(Required(), IsNumber()),
                         inputType = KeyboardType.Number,
                         formatter = NumberTransformation()
                     ),
