@@ -22,8 +22,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
@@ -86,41 +87,54 @@ fun TableScreen(nav: DestinationsNavigator) {
     // The LazyColumn will be our table. Notice the use of the weights below
     Row() {
         Spacer(Modifier.width(22.dp))
-    LazyColumn(
-        Modifier
-            .padding(66.dp)
-            .background(Color.White)
-            .heightIn(0.dp, 640.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Here are all the lines of your table.
-        items(tableData, key = { it }) {
-            Spacer(Modifier.height(10.dp))
+        LazyColumn(
+            Modifier
+                .padding(66.dp)
+                .background(Color.White)
+                .heightIn(0.dp, 640.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Here are all the lines of your table.
+            items(tableData, key = { it }) {
+                Spacer(Modifier.height(10.dp))
 
-            Row(
-                Modifier
-                    .height(IntrinsicSize.Min)
-                    .clickable { editItem(nav, it.second) }
-                    .border(BorderStroke(3.dp, Color.InstagramPurple)),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                val painter = if (it.second.image == "") {
-                    painterResource(id = R.drawable.apple_fruit)
-                } else {
-                    rememberImagePainter(it.second.image.toUri())
+                Row(
+                    Modifier
+                        .height(IntrinsicSize.Min)
+                        .clickable { editItem(nav, it.second) }
+                        .border(BorderStroke(3.dp, Color.InstagramPurple)),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    if (it.second.image == "") {
+                        Box(
+                            modifier = Modifier
+                                .width(200.dp)
+                                .height(200.dp),
+                            contentAlignment = Alignment.Center
+                        )
+                        {
+                            Text(
+                                text = it.second.name,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 32.sp
+                            )
+                        }
+                    } else {
+                        rememberImagePainter(it.second.image.toUri())
+                        Image(
+                            painter = rememberImagePainter(it.second.image.toUri()),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .width(200.dp)
+                                .height(200.dp)
+                        )
+                    }
+
                 }
-                Image(
-                    painter = painter,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .width(200.dp)
-                        .height(200.dp)
-                )
             }
         }
     }
-}
 }
 
 
