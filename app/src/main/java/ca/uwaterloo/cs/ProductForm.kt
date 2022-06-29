@@ -39,10 +39,13 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 @Destination
 @Composable
-fun ProductForm(navigator: DestinationsNavigator, data: ProductInformation?) {
+fun ProductForm(
+    navigator: DestinationsNavigator,
+    data: ProductInformation?,
+    useTemplate: Boolean = false
+) {
     val formState by remember { mutableStateOf(FormState()) }
     OnlineFoodRetailTheme {
         Scaffold(
@@ -61,7 +64,7 @@ fun ProductForm(navigator: DestinationsNavigator, data: ProductInformation?) {
                         },
                 ) {
                     Text(if (data == null) "ADD PRODUCT" else "EDIT PRODUCT")
-                    ShowProductForm(navigator, data ?: ProductInformation(), formState)
+                    ShowProductForm(navigator, data ?: ProductInformation(), useTemplate, formState)
                 }
             },
             bottomBar = { NavigationBar() }
@@ -70,7 +73,12 @@ fun ProductForm(navigator: DestinationsNavigator, data: ProductInformation?) {
 }
 
 @Composable
-fun ShowProductForm(nav: DestinationsNavigator, data: ProductInformation, formState: FormState) {
+fun ShowProductForm(
+    nav: DestinationsNavigator,
+    data: ProductInformation,
+    useTemplate: Boolean,
+    formState: FormState
+) {
     val platformState by remember { mutableStateOf(PlatformState()) }
     var image by remember { mutableStateOf(data.image) }
     val context = LocalContext.current
@@ -228,6 +236,20 @@ fun ShowProductForm(nav: DestinationsNavigator, data: ProductInformation, formSt
                                     modifier = Modifier
                                         .fillMaxSize(1f)
                                 )
+
+                                Button(
+                                    enabled = image != "",
+                                    onClick = {
+                                        image = ""
+                                    },
+                                    modifier = Modifier.align(Alignment.BottomEnd)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.ChangeCircle,
+                                        contentDescription = "Catalogue",
+                                        tint = Color.InstagramPurple
+                                    )
+                                }
                             }
                         }
                     } else {
@@ -296,18 +318,6 @@ fun ShowProductForm(nav: DestinationsNavigator, data: ProductInformation, formSt
                         }
                     }
                 }
-                Button(
-                    enabled = image != "",
-                    onClick = {
-                        image = ""
-                    },
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.ChangeCircle,
-                        contentDescription = "Catalogue",
-                        tint = Color.InstagramPurple
-                    )
-                }
             }
             SendCancelDeleteWidgets(
                 formState = formState,
@@ -338,7 +348,7 @@ fun SendCancelDeleteWidgets(
             }
         }) {
             Icon(
-                imageVector = Icons.Filled.Send,
+                imageVector = Icons.Filled.Save,
                 contentDescription = "Catalogue",
                 tint = Color.InstagramPurple
             )
