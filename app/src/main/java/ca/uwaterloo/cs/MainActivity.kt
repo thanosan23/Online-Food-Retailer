@@ -9,7 +9,10 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -125,6 +128,10 @@ private fun editItem(nav: DestinationsNavigator, data: ProductInformation) {
 }
 
 private fun addItem(nav: DestinationsNavigator, context: Context) {
+    nav.navigate(ProductFormDestination())
+}
+/*
+private fun addItem(nav: DestinationsNavigator, context: Context) {
     val options =
         arrayOf<CharSequence>(
             "From scratch",
@@ -134,16 +141,16 @@ private fun addItem(nav: DestinationsNavigator, context: Context) {
     val builder = android.app.AlertDialog.Builder(context)
     builder.setTitle("Create Product")
     builder.setItems(options) { dialog, item ->
-        if (options[item] == "Take Photo") {
+        if (options[item] == "From scratch") {
             nav.navigate(ProductFormDestination())
-        } else if (options[item] == "Choose from Gallery") {
+        } else if (options[item] == "From template") {
             nav.navigate(ProductFormDestination(useTemplate = true))
         } else if (options[item] == "Cancel") {
             dialog.dismiss()
         }
     }
     builder.show()
-}
+}*/
 
 private fun generateMockData(amount: Int = 7, context: Context) {
     val dir = File("${context.filesDir}/out")
