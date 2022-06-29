@@ -39,10 +39,13 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 @Destination
 @Composable
-fun ProductForm(navigator: DestinationsNavigator, data: ProductInformation?) {
+fun ProductForm(
+    navigator: DestinationsNavigator,
+    data: ProductInformation?,
+    useTemplate: Boolean = false
+) {
     val formState by remember { mutableStateOf(FormState()) }
     OnlineFoodRetailTheme {
         Scaffold(
@@ -61,7 +64,7 @@ fun ProductForm(navigator: DestinationsNavigator, data: ProductInformation?) {
                         },
                 ) {
                     Text(if (data == null) "ADD PRODUCT" else "EDIT PRODUCT")
-                    ShowProductForm(navigator, data ?: ProductInformation(), formState)
+                    ShowProductForm(navigator, data ?: ProductInformation(), useTemplate)
                 }
             },
             bottomBar = { NavigationBar() }
@@ -70,7 +73,11 @@ fun ProductForm(navigator: DestinationsNavigator, data: ProductInformation?) {
 }
 
 @Composable
-fun ShowProductForm(nav: DestinationsNavigator, data: ProductInformation) {
+fun ShowProductForm(
+    nav: DestinationsNavigator,
+    data: ProductInformation,
+    useTemplate: Boolean,
+) {
     val formState by remember { mutableStateOf(FormState()) }
     val platformState by remember { mutableStateOf(PlatformState(data)) }
     var image by remember { mutableStateOf(data.image) }
@@ -160,7 +167,7 @@ fun ShowProductForm(nav: DestinationsNavigator, data: ProductInformation) {
                         ),
                         prompt = "Enter amount available",
                         label = "Product Amount",
-                        validators = listOf(Required()),
+                        validators = listOf(Required(), IsNumber()),
                         inputType = KeyboardType.Number,
                         formatter = NumberTransformation()
                     ),
@@ -172,7 +179,7 @@ fun ShowProductForm(nav: DestinationsNavigator, data: ProductInformation) {
                         ),
                         prompt = "Enter price",
                         label = "Product Price",
-                        validators = listOf(Required(), NonZero()),
+                        validators = listOf(Required(), IsNumber(), NonZero()),
                         inputType = KeyboardType.Number,
                     ),
                 )
@@ -223,32 +230,24 @@ fun ShowProductForm(nav: DestinationsNavigator, data: ProductInformation) {
                                 }
 
                                  */
-                                Row(
-                                    verticalAlignment = Alignment.Bottom
+                                Image(
+                                    painter = rememberImagePainter(image.toUri()),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .fillMaxSize(1f)
+                                )
+
+                                Button(
+                                    enabled = image != "",
+                                    onClick = {
+                                        image = ""
+                                    },
+                                    modifier = Modifier.align(Alignment.BottomEnd)
                                 ) {
-                                    Column() {
-                                        Spacer(Modifier.height(25.dp))
-                                        Button(
-                                            enabled = image != "",
-                                            onClick = {
-                                                image = ""
-                                            },
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Filled.ChangeCircle,
-                                                contentDescription = "Catalogue",
-                                                tint = Color.InstagramPurple
-                                            )
-                                        }
-                                    }
-
-                                    Spacer(Modifier.width(2.dp))
-
-                                    Image(
-                                        painter = rememberImagePainter(image.toUri()),
-                                        contentDescription = null,
-                                        modifier = Modifier
-                                            .fillMaxSize(1f)
+                                    Icon(
+                                        imageVector = Icons.Filled.ChangeCircle,
+                                        contentDescription = "Delete Image",
+                                        tint = Color.InstagramPurple
                                     )
                                 }
                             }
@@ -353,7 +352,7 @@ fun SendCancelDeleteWidgets(
             }
         }) {
             Icon(
-                imageVector = Icons.Filled.Send,
+                imageVector = Icons.Filled.Save,
                 contentDescription = "Catalogue",
                 tint = Color.InstagramPurple
             )

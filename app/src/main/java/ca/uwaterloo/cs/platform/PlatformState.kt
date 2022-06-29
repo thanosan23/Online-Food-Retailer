@@ -14,8 +14,6 @@ class PlatformState(data: ProductInformation) {
         val map = mutableMapOf<String, String>()
         map["platform1"] = platformsUI.platform1CheckBoxState.toString()
         map["platform2"] = platformsUI.platform2CheckBoxState.toString()
-        println("what is going on")
-        println(map)
         return map
     }
 }

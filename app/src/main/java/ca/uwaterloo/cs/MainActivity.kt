@@ -65,7 +65,7 @@ fun TableScreen(nav: DestinationsNavigator) {
         title = { Text("Catalogue", color = Color.White) },
         navigationIcon = {
             IconButton(onClick = {
-                addItem(nav)
+                addItem(nav, context)
             }) {
                 Icon(
                     imageVector = Icons.Filled.Add,
@@ -76,7 +76,6 @@ fun TableScreen(nav: DestinationsNavigator) {
         },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
     )
-    // Just a fake data... a Pair of Int and String
     // TODO: REMOVE / UPGRADE MOCK DATA GENERATION IN FINAL PRODUCT
     val tableData = readData(context)
     // Each cell of a column must have the same weight.
@@ -104,8 +103,7 @@ fun TableScreen(nav: DestinationsNavigator) {
             ) {
                 val painter = if (it.second.image == "") {
                     painterResource(id = R.drawable.apple_fruit)
-                }
-                else {
+                } else {
                     rememberImagePainter(it.second.image.toUri())
                 }
                 Image(
@@ -126,8 +124,25 @@ private fun editItem(nav: DestinationsNavigator, data: ProductInformation) {
     nav.navigate(ProductFormDestination(data))
 }
 
-private fun addItem(nav: DestinationsNavigator) {
-    nav.navigate(ProductFormDestination())
+private fun addItem(nav: DestinationsNavigator, context: Context) {
+    val options =
+        arrayOf<CharSequence>(
+            "From scratch",
+            "From template",
+            "Cancel"
+        )
+    val builder = android.app.AlertDialog.Builder(context)
+    builder.setTitle("Create Product")
+    builder.setItems(options) { dialog, item ->
+        if (options[item] == "Take Photo") {
+            nav.navigate(ProductFormDestination())
+        } else if (options[item] == "Choose from Gallery") {
+            nav.navigate(ProductFormDestination(useTemplate = true))
+        } else if (options[item] == "Cancel") {
+            dialog.dismiss()
+        }
+    }
+    builder.show()
 }
 
 private fun generateMockData(amount: Int = 7, context: Context) {
