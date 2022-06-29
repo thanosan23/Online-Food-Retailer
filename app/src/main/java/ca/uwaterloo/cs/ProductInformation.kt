@@ -7,9 +7,10 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
+import java.util.*
 
 data class ProductInformation(
-    val id: Int = 1, // Internal id number of product, should we store this?
+    val id: String = UUID.randomUUID().toString(), // Internal id number of product, should we store this?
     var name: String = "",
     var description: String = "",
     var price: Int = 0,
@@ -20,7 +21,7 @@ data class ProductInformation(
 ) : Serializable, Parcelable {
 
     constructor(parcel: Parcel) : this(
-        parcel.readInt(),
+        parcel.readString() ?: UUID.randomUUID().toString(),
         parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.readInt(),
@@ -59,7 +60,7 @@ data class ProductInformation(
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeInt(id)
+        parcel.writeString(id)
         parcel.writeString(name)
         parcel.writeString(description)
         parcel.writeInt(price)

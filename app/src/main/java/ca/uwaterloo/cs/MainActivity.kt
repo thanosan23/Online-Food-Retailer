@@ -35,6 +35,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import java.io.File
 import java.io.FileInputStream
 import java.io.ObjectInputStream
+import java.util.*
 
 
 class MainActivity : ComponentActivity() {
@@ -160,7 +161,7 @@ private fun generateMockData(amount: Int = 7, context: Context) {
     dir.mkdir()
     (1..amount).forEach { value ->
         ProductInformation(
-            value,
+            UUID.randomUUID().toString(),
             "apple $value",
             "apple $value description",
             100 * value + 1,
@@ -172,14 +173,14 @@ private fun generateMockData(amount: Int = 7, context: Context) {
     }
 }
 
-private fun readData(context: Context): List<Pair<Int, ProductInformation>> {
+private fun readData(context: Context): List<Pair<String, ProductInformation>> {
     // TODO: platform compatibility
     // TODO: load from platform
     val dir = File("${context.filesDir}/out")
     if (!dir.exists()) {
         return emptyList()
     }
-    val list = ArrayList<Pair<Int, ProductInformation>>()
+    val list = ArrayList<Pair<String, ProductInformation>>()
     for (saveFile in dir.walk()) {
         if (saveFile.isFile && saveFile.canRead() && saveFile.name.contains("Product-")) {
             val fileIS = FileInputStream(saveFile)
