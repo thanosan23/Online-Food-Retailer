@@ -105,7 +105,7 @@ class Field(
                         text.toDouble()
                         return@map true
                     }
-                    catch (e: Error) {
+                    catch (e: NumberFormatException) {
                         showError(it.message)
                         return@map false
                     }

@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             OnlineFoodRetailTheme {
                 val context = LocalContext.current
-                generateMockData(context = context)
+                generateMockData(1, context = context)
                 DestinationsNavHost(navGraph = NavGraphs.root)
             }
         }

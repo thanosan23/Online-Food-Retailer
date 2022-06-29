@@ -367,8 +367,7 @@ fun SendCancelDeleteWidgets(
             )
         }
         Button(onClick = {
-            deleteProduct(data, context)
-            nav.navigate(MainContentDestination)
+            deleteProduct(data, context, nav)
         }) {
             Icon(
                 imageVector = Icons.Filled.Delete,
@@ -398,7 +397,7 @@ private fun saveProduct(
 ) {
     data.name = newData["Name"]!!
     data.description = newData["Description"]!!
-    data.price = (newData["Price"]!!.toDouble()).toInt()
+    data.price = (newData["Price"]!!.toDouble() * 100).toInt()
     data.amount = newData["Amount"]!!.toLong()
     data.image = newImage
     data.platform1 = newData["platform1"].toBoolean()
@@ -406,7 +405,7 @@ private fun saveProduct(
     data.exportData(context)
 }
 
-private fun deleteProduct(data: ProductInformation, context: Context) {
+private fun deleteProduct(data: ProductInformation, context: Context, nav: DestinationsNavigator) {
     AlertDialog.Builder(context)
         .setTitle("Delete Product")
         .setMessage("Are you sure you want to delete this product? This operation is irreversible.")
@@ -415,6 +414,7 @@ private fun deleteProduct(data: ProductInformation, context: Context) {
             android.R.string.yes
         ) { _, _ ->
             data.deleteData(context)
+            nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()
 }
