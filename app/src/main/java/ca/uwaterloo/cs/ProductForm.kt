@@ -167,7 +167,7 @@ fun ShowProductForm(
                         ),
                         prompt = "Enter amount available",
                         label = "Product Amount",
-                        validators = listOf(Required()),
+                        validators = listOf(IsNumber(), Required()),
                         inputType = KeyboardType.Number,
                         formatter = NumberTransformation()
                     ),
@@ -179,7 +179,7 @@ fun ShowProductForm(
                         ),
                         prompt = "Enter price",
                         label = "Product Price",
-                        validators = listOf(Required(), NonZero()),
+                        validators = listOf(Required(), IsNumber(), NonZero()),
                         inputType = KeyboardType.Number,
                     ),
                 )
