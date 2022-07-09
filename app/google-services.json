@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1064089892249",
+    "project_id": "cs446-project-d1451",
+    "storage_bucket": "cs446-project-d1451.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1064089892249:android:9f82adb5f7b2000bfccf08",
+        "android_client_info": {
+          "package_name": "ca.uwaterloo.cs"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1064089892249-as33h7eg7pvjv78ub9erhbrgcdic7m87.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtever-OPA8NHAT2r9CJeus_IBGiM1JKo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1064089892249-as33h7eg7pvjv78ub9erhbrgcdic7m87.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

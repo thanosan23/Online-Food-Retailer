@@ -30,6 +30,7 @@ import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import coil.compose.rememberImagePainter
+import com.google.firebase.database.FirebaseDatabase
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -41,6 +42,12 @@ import java.util.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        val mDatabase = FirebaseDatabase.getInstance().reference;
+        mDatabase.child("users").child("test id").setValue("test user").addOnSuccessListener {
+            println("MainActivity: Saved to Firebase Database")
+        }.addOnFailureListener{
+            println("MainActivity: FAILED")
+        }
         super.onCreate(savedInstanceState)
         setContent {
             OnlineFoodRetailTheme {
