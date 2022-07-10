@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
+import ca.uwaterloo.cs.destinations.HarvestFormDestination
 import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.product.ProductInformation
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
@@ -47,7 +48,7 @@ class MainActivity : ComponentActivity() {
         val mDatabase = FirebaseDatabase.getInstance().reference;
         mDatabase.child("users").child("test id").setValue("test user").addOnSuccessListener {
             println("MainActivity: Saved to Firebase Database")
-        }.addOnFailureListener{
+        }.addOnFailureListener {
             println("MainActivity: FAILED")
         }
         super.onCreate(savedInstanceState)
@@ -117,7 +118,6 @@ fun TableScreen(nav: DestinationsNavigator) {
                 Row(
                     Modifier
                         .height(IntrinsicSize.Min)
-                        .clickable { editItem(nav, it.second) }
                         .border(BorderStroke(3.dp, Color.InstagramPurple)),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
@@ -126,7 +126,8 @@ fun TableScreen(nav: DestinationsNavigator) {
                         Box(
                             modifier = Modifier
                                 .width(200.dp)
-                                .height(200.dp),
+                                .height(200.dp)
+                                .clickable { editItem(nav, it.second) },
                             contentAlignment = Alignment.Center
                         )
                         {
@@ -144,6 +145,22 @@ fun TableScreen(nav: DestinationsNavigator) {
                             modifier = Modifier
                                 .width(200.dp)
                                 .height(200.dp)
+                                .clickable { editItem(nav, it.second) }
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            nav.navigate(HarvestFormDestination(it.second))
+                        },
+                        modifier = Modifier
+                            .width(60.dp)
+                            .height(60.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = "Catalogue",
+                            tint = Color.Green,
+                            modifier = Modifier.fillMaxSize(1.0f)
                         )
                     }
 

@@ -1,18 +1,23 @@
 package ca.uwaterloo.cs.harvest
 
+import android.content.Context
 import android.os.Parcel
 import android.os.Parcelable
+import ca.uwaterloo.cs.product.ProductInformation
+import java.io.File
+import java.io.FileOutputStream
+import java.io.ObjectOutputStream
 import java.io.Serializable
 import java.util.*
 
 data class HarvestInformation (
-    val harvestId: String = UUID.randomUUID().toString(),
+    val harvestId: String,
     val fromWorker: String,
     val productId: String,
     val name: String,
     val description: String,
     val image: String,
-    var amount: Long,
+    var amount: Int,
 ) : Serializable, Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString()!!,
@@ -21,9 +26,28 @@ data class HarvestInformation (
         parcel.readString()!!,
         parcel.readString()!!,
         parcel.readString()!!,
-        parcel.readLong()
-    ) {
-    }
+        parcel.readInt()
+    )
+
+    constructor(fromWorker: String, product: ProductInformation, amount: Int): this (
+        UUID.randomUUID().toString(),
+        fromWorker,
+        product.productId,
+        product.name,
+        product.description,
+        product.image,
+        amount
+    )
+
+    constructor(fromWorker: String, name: String, description: String, image: String, amount: Int): this (
+        UUID.randomUUID().toString(),
+        fromWorker,
+        UUID.randomUUID().toString(),
+        name,
+        description,
+        image,
+        amount
+    )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(harvestId)
@@ -32,7 +56,7 @@ data class HarvestInformation (
         parcel.writeString(name)
         parcel.writeString(description)
         parcel.writeString(image)
-        parcel.writeLong(amount)
+        parcel.writeInt(amount)
     }
 
     override fun describeContents(): Int {
@@ -49,4 +73,29 @@ data class HarvestInformation (
         }
     }
 
+    fun exportData(context: Context) {
+        val dir = File("${context.filesDir}/out")
+        if (!dir.exists()) {
+            dir.mkdir()
+        }
+        val file = File(dir, "Harvest-$harvestId.txt")
+        if (file.exists())
+        {
+            file.delete()
+        }
+        file.createNewFile()
+        val fileOS = FileOutputStream(file)
+        val outStream = ObjectOutputStream(fileOS)
+        outStream.writeObject(this)
+        outStream.close()
+        fileOS.close()
+    }
+
+    fun deleteData(context: Context) {
+        val file = File("${context.filesDir}/out", "Harvest-$harvestId.txt")
+        if (file.exists())
+        {
+            file.delete()
+        }
+    }
 }

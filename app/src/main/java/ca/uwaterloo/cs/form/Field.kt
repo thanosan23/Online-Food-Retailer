@@ -29,7 +29,8 @@ class Field(
     val label: String = "",
     val validators: List<Validator>,
     val inputType: KeyboardType = KeyboardType.Text,
-    val formatter: VisualTransformation = NoTransformation()
+    val formatter: VisualTransformation = NoTransformation(),
+    val readOnly: Boolean = false
 ) {
     var text: String by mutableStateOf(initValue)
     var lbl: String by mutableStateOf(label)
@@ -79,8 +80,17 @@ class Field(
             onValueChange = { value ->
                 hideError()
                 text = value
-            }
+            },
+            readOnly = readOnly
         )
+    }
+
+    fun setValue(newValue: String) {
+        this.text = newValue
+    }
+
+    fun getValue(): String {
+        return this.text
     }
 
     fun validate(): Boolean {

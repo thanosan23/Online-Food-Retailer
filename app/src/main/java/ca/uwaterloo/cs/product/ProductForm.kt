@@ -202,7 +202,6 @@ fun ShowProductForm(
                         {
                             Box(
                                 modifier = Modifier
-                                    // .background(Color.InstagramPurple) // TODO: REMOVE DEBUG BACKGROUNDS
                                     .width(200.dp)
                                     .height(200.dp)
                                     .aspectRatio(1f),
