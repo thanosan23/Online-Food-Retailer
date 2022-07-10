@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import ca.uwaterloo.cs.destinations.ProductFormDestination
+import ca.uwaterloo.cs.product.ProductInformation
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import coil.compose.rememberImagePainter
@@ -53,7 +54,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             OnlineFoodRetailTheme {
                 val context = LocalContext.current
-                generateMockData(1, context = context)
+                // generateMockData(1, context = context)
                 DestinationsNavHost(navGraph = NavGraphs.root)
             }
         }
@@ -218,7 +219,7 @@ private fun readData(context: Context): List<Pair<String, ProductInformation>> {
             val fileIS = FileInputStream(saveFile)
             val inStream = ObjectInputStream(fileIS)
             val productInformation = inStream.readObject() as ProductInformation
-            list.add(Pair(productInformation.id, productInformation))
+            list.add(Pair(productInformation.productId, productInformation))
             inStream.close()
             fileIS.close()
         }

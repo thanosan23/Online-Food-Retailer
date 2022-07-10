@@ -1,4 +1,4 @@
-package ca.uwaterloo.cs
+package ca.uwaterloo.cs.product
 
 import android.Manifest
 import android.app.AlertDialog
@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
+import ca.uwaterloo.cs.NavigationBar
 import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.form.*
 import ca.uwaterloo.cs.platform.PlatformState
@@ -95,7 +96,7 @@ fun ShowProductForm(
         }
     }
     val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
+        contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
         if (uri != null) {
             image = ""
@@ -103,7 +104,6 @@ fun ShowProductForm(
             try {
                 context.contentResolver.takePersistableUriPermission(
                     uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
-                            or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 )
             } catch (e: Exception) {
                 println("Exception: " + e.message)
@@ -119,7 +119,7 @@ fun ShowProductForm(
                 fileUri = createImageFile(context)
                 cameraLauncher.launch(fileUri)
             } else if (isGallerySelected) {
-                galleryLauncher.launch("image/*")
+                galleryLauncher.launch(arrayOf("image/*"))
             }
         } else {
             Toast.makeText(context, "Permission Denied!", Toast.LENGTH_SHORT).show()
@@ -209,27 +209,6 @@ fun ShowProductForm(
                                 contentAlignment = Alignment.Center
                             )
                             {
-                                /* TODO: FIX PERMISSION ISSUE
-                                imageUri?.let {
-                                    val btm = if (Build.VERSION.SDK_INT < 28) {
-                                        MediaStore.Images.Media.getBitmap(context.contentResolver, it)
-                                    } else {
-                                        val source = ImageDecoder.createSource(context.contentResolver, it)
-                                        ImageDecoder.decodeBitmap(source)
-                                    }
-                                    Image(
-                                        bitmap = btm.asImageBitmap(),
-                                        contentDescription = "Image",
-                                        alignment = Alignment.TopCenter,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .fillMaxHeight(0.45f)
-                                            .padding(top = 10.dp),
-                                        contentScale = ContentScale.Fit
-                                    )
-                                }
-
-                                 */
                                 Image(
                                     painter = rememberImagePainter(image.toUri()),
                                     contentDescription = null,
@@ -293,7 +272,7 @@ fun ShowProductForm(
                                                     context,
                                                     Manifest.permission.READ_EXTERNAL_STORAGE
                                                 ) -> {
-                                                    galleryLauncher.launch("image/*")
+                                                    galleryLauncher.launch(arrayOf("image/*"))
                                                 }
                                                 else -> {
                                                     isCameraSelected = false

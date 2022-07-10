@@ -1,11 +1,12 @@
-package ca.uwaterloo.cs
+package ca.uwaterloo.cs.harvest
 
 import android.os.Parcel
 import android.os.Parcelable
 import java.io.Serializable
+import java.util.*
 
 data class HarvestInformation (
-    val harvestId: String,
+    val harvestId: String = UUID.randomUUID().toString(),
     val fromWorker: String,
     val productId: String,
     val name: String,

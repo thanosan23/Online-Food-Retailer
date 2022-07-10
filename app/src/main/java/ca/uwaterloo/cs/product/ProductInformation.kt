@@ -1,4 +1,4 @@
-package ca.uwaterloo.cs
+package ca.uwaterloo.cs.product
 
 import android.content.Context
 import android.os.Parcel
@@ -10,7 +10,7 @@ import java.io.Serializable
 import java.util.*
 
 data class ProductInformation(
-    val id: String = UUID.randomUUID().toString(), // Internal id number of product, should we store this?
+    val productId: String = UUID.randomUUID().toString(), // Internal id number of product, should we store this?
     var name: String = "",
     var description: String = "",
     var price: Int = 0,
@@ -38,7 +38,7 @@ data class ProductInformation(
         if (!dir.exists()) {
             dir.mkdir()
         }
-        val file = File(dir, "Product-$id.txt")
+        val file = File(dir, "Product-$productId.txt")
         if (file.exists())
         {
             file.delete()
@@ -52,7 +52,7 @@ data class ProductInformation(
     }
 
     fun deleteData(context: Context) {
-        val file = File("${context.filesDir}/out", "Product-$id.txt")
+        val file = File("${context.filesDir}/out", "Product-$productId.txt")
         if (file.exists())
         {
             file.delete()
@@ -60,7 +60,7 @@ data class ProductInformation(
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(id)
+        parcel.writeString(productId)
         parcel.writeString(name)
         parcel.writeString(description)
         parcel.writeInt(price)
