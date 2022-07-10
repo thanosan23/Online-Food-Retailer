@@ -42,7 +42,7 @@ import java.util.*
 @Destination
 @Composable
 fun ProductForm(
-    navigator: DestinationsNavigator,
+    nav: DestinationsNavigator,
     data: ProductInformation?,
     useTemplate: Boolean = false
 ) {
@@ -64,10 +64,10 @@ fun ProductForm(
                         },
                 ) {
                     Text(if (data == null) "ADD PRODUCT" else "EDIT PRODUCT")
-                    ShowProductForm(navigator, data ?: ProductInformation(), useTemplate)
+                    ShowProductForm(nav, data ?: ProductInformation(), useTemplate)
                 }
             },
-            bottomBar = { NavigationBar() }
+            bottomBar = { NavigationBar(nav) }
         )
     }
 }

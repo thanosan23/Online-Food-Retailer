@@ -15,6 +15,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -57,7 +58,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
 fun MainContent(nav: DestinationsNavigator) {
     Scaffold(
         content = { TableScreen(nav) },
-        bottomBar = { NavigationBar() }
+        bottomBar = { NavigationBar(nav) }
     )
 }
 
@@ -83,6 +83,14 @@ fun TableScreen(nav: DestinationsNavigator) {
                     imageVector = Icons.Filled.Add,
                     contentDescription = "Catalogue",
                     tint = Color.White
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = { /* doSomething() */ }) {
+                Icon(
+                    imageVector = Icons.Filled.Favorite,
+                    contentDescription = "Localized description"
                 )
             }
         },
@@ -144,6 +152,9 @@ fun TableScreen(nav: DestinationsNavigator) {
     }
 }
 
+private fun mergeChanges(nav: DestinationsNavigator) {
+    nav.navigate(ProductFormDestination())
+}
 
 private fun editItem(nav: DestinationsNavigator, data: ProductInformation) {
     nav.navigate(ProductFormDestination(data))
