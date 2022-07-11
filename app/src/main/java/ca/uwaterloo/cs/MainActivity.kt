@@ -18,6 +18,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,11 +28,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
+import ca.uwaterloo.cs.db.DBInterFaceTest
+import ca.uwaterloo.cs.db.DBClient
 import ca.uwaterloo.cs.destinations.ProductFormDestination
+import ca.uwaterloo.cs.models.Address
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import coil.compose.rememberImagePainter
-import com.google.firebase.database.FirebaseDatabase
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -42,12 +46,6 @@ import java.util.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        val mDatabase = FirebaseDatabase.getInstance().reference;
-        mDatabase.child("users").child("test id").setValue("test user").addOnSuccessListener {
-            println("MainActivity: Saved to Firebase Database")
-        }.addOnFailureListener{
-            println("MainActivity: FAILED")
-        }
         super.onCreate(savedInstanceState)
         setContent {
             OnlineFoodRetailTheme {
@@ -65,9 +63,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainContent(nav: DestinationsNavigator) {
     Scaffold(
-        content = { TableScreen(nav) },
-        bottomBar = { NavigationBar() }
-    )
+                content = { TableScreen(nav) },
+                bottomBar = { NavigationBar()})
+
 }
 
 @Composable
