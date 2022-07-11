@@ -44,8 +44,7 @@ import java.util.*
 @Composable
 fun ProductForm(
     nav: DestinationsNavigator,
-    data: ProductInformation?,
-    useTemplate: Boolean = false
+    data: ProductInformation?
 ) {
     val formState by remember { mutableStateOf(FormState()) }
     OnlineFoodRetailTheme {
@@ -65,7 +64,7 @@ fun ProductForm(
                         },
                 ) {
                     Text(if (data == null) "ADD PRODUCT" else "EDIT PRODUCT")
-                    ShowProductForm(nav, data ?: ProductInformation(), useTemplate)
+                    ShowProductForm(nav, data ?: ProductInformation())
                 }
             },
             bottomBar = { NavigationBar(nav) }
@@ -76,8 +75,7 @@ fun ProductForm(
 @Composable
 fun ShowProductForm(
     nav: DestinationsNavigator,
-    data: ProductInformation,
-    useTemplate: Boolean,
+    data: ProductInformation
 ) {
     val formState by remember { mutableStateOf(FormState()) }
     val platformState by remember { mutableStateOf(PlatformState(data)) }
