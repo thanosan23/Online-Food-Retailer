@@ -1,6 +1,6 @@
 package ca.uwaterloo.cs.platform
 
-import ca.uwaterloo.cs.ProductInformation
+import ca.uwaterloo.cs.product.ProductInformation
 
 
 class PlatformState(data: ProductInformation) {

@@ -1,6 +1,5 @@
 package ca.uwaterloo.cs
 
-import android.content.Intent
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.BottomNavigation
@@ -8,15 +7,15 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat.startActivity
+import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 sealed class NavItem(
     var title: String,
@@ -31,7 +30,7 @@ sealed class NavItem(
 
 
 @Composable
-fun NavigationBar() {
+fun NavigationBar(nav: DestinationsNavigator) {
     val items = listOf(
         NavItem.Catalogue,
         NavItem.Logistics,
@@ -53,20 +52,14 @@ fun NavigationBar() {
                 label = { Text(text = item.title, fontSize = 12.sp, color = Color.White
                 ) },
                 onClick = {
-                    var intent = Intent(context, Profile::class.java)
                     when (item.title) {
-                        "Catalogue" -> intent = Intent(context, MainActivity::class.java)
-                        "Logistics" -> intent = Intent(context, MainActivity::class.java)
-                        "History" -> intent = Intent(context, MainActivity::class.java)
-                        "Profile" -> intent = Intent(context, MainActivity::class.java)
+                        "Catalogue" -> nav.navigate(MainContentDestination)
+                        "Logistics" -> nav.navigate(MainContentDestination)
+                        "History" -> nav.navigate(MainContentDestination)
+                        "Profile" -> nav.navigate(MainContentDestination)
                     }
-                    startActivity(context, intent, null)
                 }
             )
         }
     }
 }
-
-
-
-

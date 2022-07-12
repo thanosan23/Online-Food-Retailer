@@ -1,4 +1,4 @@
-package ca.uwaterloo.cs
+package ca.uwaterloo.cs.product
 
 import android.Manifest
 import android.app.AlertDialog
@@ -27,8 +27,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
+import ca.uwaterloo.cs.NavigationBar
 import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.form.*
+import ca.uwaterloo.cs.harvest.HarvestInformation
 import ca.uwaterloo.cs.platform.PlatformState
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
@@ -46,7 +48,6 @@ fun ProductForm(
     data: ProductInformation?,
     useTemplate: Boolean = true  //worker:false, farmer:true
 ) {
-    val formState by remember { mutableStateOf(FormState()) }
     OnlineFoodRetailTheme {
         Scaffold(
             content = {
@@ -67,7 +68,7 @@ fun ProductForm(
                     ShowProductForm(navigator, data ?: ProductInformation(), useTemplate)
                 }
             },
-            bottomBar = { NavigationBar() }
+            bottomBar = { NavigationBar(navigator) }
         )
     }
 }
@@ -131,8 +132,8 @@ fun ShowProductForm(
         Modifier
             .verticalScroll(rememberScrollState())
             .padding(20.dp),
-        ) {
-        if(useTemplate) {
+    ) {
+        if (useTemplate) {
             platformState.platformsUI.PlatformsDropDown()
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -228,7 +229,6 @@ fun ShowProductForm(
                                         contentScale = ContentScale.Fit
                                     )
                                 }
-
                                  */
                                     Image(
                                         painter = rememberImagePainter(image.toUri()),
@@ -333,8 +333,7 @@ fun ShowProductForm(
                     useTemplate = useTemplate
                 )
             }
-        }
-        else{
+        } else {
             Form(
                 state = formState,
                 fields = listOf(
@@ -416,6 +415,7 @@ fun ShowProductForm(
         }
     }
 }
+
 @Composable
 fun AddOrRemove(
     formState: FormState,
@@ -425,12 +425,13 @@ fun AddOrRemove(
     nav: DestinationsNavigator,
     context: Context,
     useTemplate: Boolean
-){Row {
+) {
+    Row {
         Button(onClick = {
             if (formState.validate()) {
-                addProductNumber(data,formState.getData(),context,nav)
-                    //nav.navigate(MainContentDestination)
-                }
+                addProductNumber(data, formState.getData(), context, nav)
+                //nav.navigate(MainContentDestination)
+            }
         }) {
             Icon(
                 imageVector = Icons.Filled.Add,
@@ -441,7 +442,7 @@ fun AddOrRemove(
         Spacer(Modifier.weight(1f))
         Button(onClick = {
             if (formState.validate()) {
-                removeProductNumber(data,formState.getData(),context,nav)
+                removeProductNumber(data, formState.getData(), context, nav)
             }
         }) {
             Icon(
@@ -498,6 +499,7 @@ fun SendCancelDeleteWidgets(
     }
     Spacer(Modifier.height(30.dp))
 }
+
 private fun createImageFile(context: Context): Uri {
     val timeStamp = SimpleDateFormat.getDateTimeInstance().format(Date())
     val file = File(context.filesDir, "JPEG_$timeStamp.jpg")
@@ -521,7 +523,7 @@ private fun saveProduct(
     data.image = newImage
     data.platform1 = newData["platform1"].toBoolean()
     data.platform2 = newData["platform2"].toBoolean()
-    data.exportData(context)
+    data.exportData(context.filesDir.toString())
 }
 
 private fun deleteProduct(data: ProductInformation, context: Context, nav: DestinationsNavigator) {
@@ -532,16 +534,18 @@ private fun deleteProduct(data: ProductInformation, context: Context, nav: Desti
         .setPositiveButton(
             android.R.string.yes
         ) { _, _ ->
-            data.deleteData(context)
+            data.deleteData(context.filesDir.toString())
             nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()
 }
+
 private fun addProductNumber(
     data: ProductInformation,
     newData: Map<String, String>,
     context: Context,
-    nav: DestinationsNavigator) {
+    nav: DestinationsNavigator
+) {
     AlertDialog.Builder(context)
         .setTitle("Edit Product Number")
         .setMessage("Are you sure to edit this product number? This will send a request to your manager.")
@@ -549,19 +553,25 @@ private fun addProductNumber(
         .setPositiveButton(
             android.R.string.yes
         ) { _, _ ->
-            data.amount+=newData["Amount Editor"]!!.toLong()
+            val harvestRequest = HarvestInformation(
+                fromWorker = "Test Worker",
+                product = data,
+                amount = newData["Amount Editor"]!!.toInt()
+            )
             AlertDialog.Builder(context)
                 .setMessage("Request has been sent").show()
-            data.exportData(context)
+            harvestRequest.exportData(context.filesDir.toString())
             nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()
 }
+
 private fun removeProductNumber(
     data: ProductInformation,
     newData: Map<String, String>,
     context: Context,
-    nav: DestinationsNavigator) {
+    nav: DestinationsNavigator
+) {
     AlertDialog.Builder(context)
         .setTitle("Edit Product Number")
         .setMessage("Are you sure to edit this product number? This will send a request to your manager.")
@@ -569,10 +579,14 @@ private fun removeProductNumber(
         .setPositiveButton(
             android.R.string.yes
         ) { _, _ ->
-            data.amount-=newData["Amount Editor"]!!.toLong()
+            val harvestRequest = HarvestInformation(
+                fromWorker = "Test Worker",
+                product = data,
+                amount = -newData["Amount Editor"]!!.toInt()
+            )
             AlertDialog.Builder(context)
                 .setMessage("Request has been sent").show()
-            data.exportData(context)
+            harvestRequest.exportData(context.filesDir.toString())
             nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()

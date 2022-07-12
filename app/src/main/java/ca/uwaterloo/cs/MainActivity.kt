@@ -15,11 +15,10 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,10 +27,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
-import ca.uwaterloo.cs.db.DBInterFaceTest
-import ca.uwaterloo.cs.db.DBClient
+import ca.uwaterloo.cs.destinations.HarvestFormDestination
+import ca.uwaterloo.cs.destinations.MergeFormDestination
 import ca.uwaterloo.cs.destinations.ProductFormDestination
-import ca.uwaterloo.cs.models.Address
+import ca.uwaterloo.cs.product.ProductInformation
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import coil.compose.rememberImagePainter
@@ -55,30 +54,27 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Destination(start = true)
 @Composable
 fun MainContent(nav: DestinationsNavigator) {
-    val useTemplate: Boolean=true //farmer:true,worker:false
+    val useTemplate: Boolean = true //farmer:true,worker:false
     Scaffold(
-
-                content = { TableScreen(nav,useTemplate) },
-                bottomBar = { NavigationBar()})
-
+        content = { TableScreen(nav, useTemplate) },
+        bottomBar = { NavigationBar(nav) })
 }
 
 @Composable
 fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean) {
     val context = LocalContext.current
-    if(useTemplate) {
+    if (useTemplate) {
         CenterAlignedTopAppBar(
             title = { Text("Catalogue", color = Color.White) },
             navigationIcon = {
                 IconButton(onClick = {
-                    addItem(nav, context)
+                    addItem(nav)
                 }) {
                     Icon(
                         imageVector = Icons.Filled.Add,
@@ -87,10 +83,18 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean) {
                     )
                 }
             },
+            actions = {
+                IconButton(onClick = { nav.navigate(MergeFormDestination()) }) {
+                    Icon(
+                        imageVector = Icons.Filled.Receipt,
+                        contentDescription = "Localized description",
+                        tint = Color.White
+                    )
+                }
+            },
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
         )
-    }
-    else{
+    } else {
         CenterAlignedTopAppBar(
             title = { Text("Catalogue", color = Color.White) },
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
@@ -125,7 +129,8 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean) {
                         Box(
                             modifier = Modifier
                                 .width(200.dp)
-                                .height(200.dp),
+                                .height(200.dp)
+                                .clickable { editItem(nav, it.second, useTemplate) },
                             contentAlignment = Alignment.Center
                         )
                         {
@@ -143,9 +148,52 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean) {
                             modifier = Modifier
                                 .width(200.dp)
                                 .height(200.dp)
+                                .clickable { editItem(nav, it.second, useTemplate) }
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            nav.navigate(HarvestFormDestination(it.second))
+                        },
+                        modifier = Modifier
+                            .width(60.dp)
+                            .height(60.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = "Catalogue",
+                            tint = Color.Green,
+                            modifier = Modifier.fillMaxSize(1.0f)
                         )
                     }
 
+                }
+            }
+            item() {
+                Spacer(Modifier.height(10.dp))
+
+                Row(
+                    Modifier
+                        .height(IntrinsicSize.Min)
+                        .border(BorderStroke(3.dp, Color.InstagramPurple)),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    IconButton(
+                        onClick = {
+                            nav.navigate(HarvestFormDestination())
+                        },
+                        modifier = Modifier
+                            .width(60.dp)
+                            .height(60.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = "Catalogue",
+                            tint = Color.Green,
+                            modifier = Modifier.fillMaxSize(1.0f)
+                        )
+                    }
                 }
             }
         }
@@ -154,33 +202,12 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean) {
 
 
 private fun editItem(nav: DestinationsNavigator, data: ProductInformation, useTemplate: Boolean) {
-    nav.navigate(ProductFormDestination(data,useTemplate))
+    nav.navigate(ProductFormDestination(data, useTemplate))
 }
 
-private fun addItem(nav: DestinationsNavigator, context: Context) {
+private fun addItem(nav: DestinationsNavigator) {
     nav.navigate(ProductFormDestination())
 }
-/*
-private fun addItem(nav: DestinationsNavigator, context: Context) {
-    val options =
-        arrayOf<CharSequence>(
-            "From scratch",
-            "From template",
-            "Cancel"
-        )
-    val builder = android.app.AlertDialog.Builder(context)
-    builder.setTitle("Create Product")
-    builder.setItems(options) { dialog, item ->
-        if (options[item] == "From scratch") {
-            nav.navigate(ProductFormDestination())
-        } else if (options[item] == "From template") {
-            nav.navigate(ProductFormDestination(useTemplate = true))
-        } else if (options[item] == "Cancel") {
-            dialog.dismiss()
-        }
-    }
-    builder.show()
-}*/
 
 private fun generateMockData(amount: Int = 7, context: Context) {
     val dir = File("${context.filesDir}/out")
@@ -188,18 +215,36 @@ private fun generateMockData(amount: Int = 7, context: Context) {
         dir.deleteRecursively()
     }
     dir.mkdir()
-    (1..amount).forEach { value ->
-        ProductInformation(
-            UUID.randomUUID().toString(),
-            "apple $value",
-            "apple $value description",
-            100 * value + 1,
-            10 * value + 1L,
-            "",
-            platform1 = false,
-            platform2 = false
-        ).exportData(context)
-    }
+    ProductInformation(
+        UUID.randomUUID().toString(),
+        "apple",
+        "apple description",
+        100,
+        100,
+        "",
+        platform1 = false,
+        platform2 = false
+    ).exportData(context.filesDir.toString())
+    ProductInformation(
+        UUID.randomUUID().toString(),
+        "carrot",
+        "carrot description",
+        200,
+        200,
+        "",
+        platform1 = false,
+        platform2 = false
+    ).exportData(context.filesDir.toString())
+    ProductInformation(
+        UUID.randomUUID().toString(),
+        "banana",
+        "banana description",
+        300,
+        300,
+        "",
+        platform1 = false,
+        platform2 = false
+    ).exportData(context.filesDir.toString())
 }
 
 private fun readData(context: Context): List<Pair<String, ProductInformation>> {
@@ -215,7 +260,7 @@ private fun readData(context: Context): List<Pair<String, ProductInformation>> {
             val fileIS = FileInputStream(saveFile)
             val inStream = ObjectInputStream(fileIS)
             val productInformation = inStream.readObject() as ProductInformation
-            list.add(Pair(productInformation.id, productInformation))
+            list.add(Pair(productInformation.productId, productInformation))
             inStream.close()
             fileIS.close()
         }
