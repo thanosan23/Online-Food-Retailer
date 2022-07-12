@@ -378,7 +378,7 @@ private fun saveProduct(
     data.image = newImage
     data.platform1 = newData["platform1"].toBoolean()
     data.platform2 = newData["platform2"].toBoolean()
-    data.exportData(context)
+    data.exportData(context.filesDir.toString())
 }
 
 private fun deleteProduct(data: ProductInformation, context: Context, nav: DestinationsNavigator) {
@@ -389,7 +389,7 @@ private fun deleteProduct(data: ProductInformation, context: Context, nav: Desti
         .setPositiveButton(
             android.R.string.yes
         ) { _, _ ->
-            data.deleteData(context)
+            data.deleteData(context.filesDir.toString())
             nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()

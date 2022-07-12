@@ -1,6 +1,5 @@
 package ca.uwaterloo.cs.harvest
 
-import android.content.Context
 import android.os.Parcel
 import android.os.Parcelable
 import ca.uwaterloo.cs.product.ProductInformation
@@ -13,7 +12,7 @@ import java.util.*
 data class HarvestInformation (
     val harvestId: String,
     val fromWorker: String,
-    val productId: String,
+    var productId: String,
     val name: String,
     val description: String,
     val image: String,
@@ -42,7 +41,7 @@ data class HarvestInformation (
     constructor(fromWorker: String, name: String, description: String, image: String, amount: Int): this (
         UUID.randomUUID().toString(),
         fromWorker,
-        UUID.randomUUID().toString(),
+        "",
         name,
         description,
         image,
@@ -73,8 +72,8 @@ data class HarvestInformation (
         }
     }
 
-    fun exportData(context: Context) {
-        val dir = File("${context.filesDir}/out")
+    fun exportData(fileDir: String) {
+        val dir = File("${fileDir}/out")
         if (!dir.exists()) {
             dir.mkdir()
         }
@@ -91,8 +90,8 @@ data class HarvestInformation (
         fileOS.close()
     }
 
-    fun deleteData(context: Context) {
-        val file = File("${context.filesDir}/out", "Harvest-$harvestId.txt")
+    fun deleteData(fileDir: String) {
+        val file = File("${fileDir}/out", "Harvest-$harvestId.txt")
         if (file.exists())
         {
             file.delete()

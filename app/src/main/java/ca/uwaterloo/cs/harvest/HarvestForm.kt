@@ -54,12 +54,9 @@ fun HarvestForm(
                 ) {
                     val amountField = Field(
                         name = "Amount",
-                        initValue = formState.getData().getOrDefault(
-                            "Amount",
-                            data?.amount?.toString() ?: "0"
-                        ),
-                        prompt = "Enter amount available",
-                        label = "Product Amount",
+                        initValue = "0",
+                        prompt = "Enter amount harvested",
+                        label = "Harvest Amount",
                         validators = listOf(Required(), IsNumber()),
                         inputType = KeyboardType.Number,
                         formatter = NumberTransformation()
@@ -161,14 +158,15 @@ fun SendCancelDeleteWidgets(
     nav: DestinationsNavigator,
 ) {
     val context = LocalContext.current
+    val saveDir = context.filesDir.toString()
     Row {
         Button(onClick = {
             if (formState.validate()) {
                 if (data != null) {
-                    saveHarvestRequestWithProduct(data, formState.getData(), context)
+                    saveHarvestRequestWithProduct(data, formState.getData(), saveDir)
                 }
                 else {
-                    saveHarvestRequestNoProduct(formState.getData(), "", context)
+                    saveHarvestRequestNoProduct(formState.getData(), "", saveDir)
                 }
                 nav.navigate(MainContentDestination)
             }
@@ -196,7 +194,7 @@ fun SendCancelDeleteWidgets(
 private fun saveHarvestRequestWithProduct(
     data: ProductInformation,
     newData: Map<String, String>,
-    context: Context
+    saveDir: String
 ) {
     val harvestInformation =
         HarvestInformation(
@@ -204,13 +202,13 @@ private fun saveHarvestRequestWithProduct(
             product = data,
             amount = newData["Amount"]!!.toInt()
         )
-    harvestInformation.exportData(context)
+    harvestInformation.exportData(saveDir)
 }
 
 private fun saveHarvestRequestNoProduct(
     newData: Map<String, String>,
     image: String,
-    context: Context
+    saveDir: String
 ) {
     val harvestInformation =
         HarvestInformation(
@@ -220,7 +218,7 @@ private fun saveHarvestRequestNoProduct(
             image = image,
             amount = newData["Amount"]!!.toInt()
         )
-    harvestInformation.exportData(context)
+    harvestInformation.exportData(saveDir)
 }
 
 private fun deleteHarvestRequest(context: Context, nav: DestinationsNavigator) {

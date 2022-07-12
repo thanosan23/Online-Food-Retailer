@@ -15,7 +15,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import ca.uwaterloo.cs.destinations.HarvestFormDestination
+import ca.uwaterloo.cs.destinations.MergeFormDestination
 import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.product.ProductInformation
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
@@ -55,7 +56,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             OnlineFoodRetailTheme {
                 val context = LocalContext.current
-                // generateMockData(1, context = context)
+                generateMockData(1, context = context)
                 DestinationsNavHost(navGraph = NavGraphs.root)
             }
         }
@@ -79,7 +80,7 @@ fun TableScreen(nav: DestinationsNavigator) {
         title = { Text("Catalogue", color = Color.White) },
         navigationIcon = {
             IconButton(onClick = {
-                addItem(nav, context)
+                addItem(nav)
             }) {
                 Icon(
                     imageVector = Icons.Filled.Add,
@@ -89,10 +90,11 @@ fun TableScreen(nav: DestinationsNavigator) {
             }
         },
         actions = {
-            IconButton(onClick = { /* doSomething() */ }) {
+            IconButton(onClick = { nav.navigate(MergeFormDestination()) }) {
                 Icon(
-                    imageVector = Icons.Filled.Favorite,
-                    contentDescription = "Localized description"
+                    imageVector = Icons.Filled.Receipt,
+                    contentDescription = "Localized description",
+                    tint = Color.White
                 )
             }
         },
@@ -166,42 +168,44 @@ fun TableScreen(nav: DestinationsNavigator) {
 
                 }
             }
+            item() {
+                Spacer(Modifier.height(10.dp))
+
+                Row(
+                    Modifier
+                        .height(IntrinsicSize.Min)
+                        .border(BorderStroke(3.dp, Color.InstagramPurple)),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    IconButton(
+                        onClick = {
+                            nav.navigate(HarvestFormDestination())
+                        },
+                        modifier = Modifier
+                            .width(60.dp)
+                            .height(60.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = "Catalogue",
+                            tint = Color.Green,
+                            modifier = Modifier.fillMaxSize(1.0f)
+                        )
+                    }
+                }
+            }
         }
     }
-}
-
-private fun mergeChanges(nav: DestinationsNavigator) {
-    nav.navigate(ProductFormDestination())
 }
 
 private fun editItem(nav: DestinationsNavigator, data: ProductInformation) {
     nav.navigate(ProductFormDestination(data))
 }
 
-private fun addItem(nav: DestinationsNavigator, context: Context) {
+private fun addItem(nav: DestinationsNavigator) {
     nav.navigate(ProductFormDestination())
 }
-/*
-private fun addItem(nav: DestinationsNavigator, context: Context) {
-    val options =
-        arrayOf<CharSequence>(
-            "From scratch",
-            "From template",
-            "Cancel"
-        )
-    val builder = android.app.AlertDialog.Builder(context)
-    builder.setTitle("Create Product")
-    builder.setItems(options) { dialog, item ->
-        if (options[item] == "From scratch") {
-            nav.navigate(ProductFormDestination())
-        } else if (options[item] == "From template") {
-            nav.navigate(ProductFormDestination(useTemplate = true))
-        } else if (options[item] == "Cancel") {
-            dialog.dismiss()
-        }
-    }
-    builder.show()
-}*/
 
 private fun generateMockData(amount: Int = 7, context: Context) {
     val dir = File("${context.filesDir}/out")
@@ -209,18 +213,36 @@ private fun generateMockData(amount: Int = 7, context: Context) {
         dir.deleteRecursively()
     }
     dir.mkdir()
-    (1..amount).forEach { value ->
-        ProductInformation(
-            UUID.randomUUID().toString(),
-            "apple $value",
-            "apple $value description",
-            100 * value + 1,
-            10 * value + 1L,
-            "",
-            platform1 = false,
-            platform2 = false
-        ).exportData(context)
-    }
+    ProductInformation(
+        UUID.randomUUID().toString(),
+        "apple",
+        "apple description",
+        100,
+        100,
+        "",
+        platform1 = false,
+        platform2 = false
+    ).exportData(context.filesDir.toString())
+    ProductInformation(
+        UUID.randomUUID().toString(),
+        "carrot",
+        "carrot description",
+        200,
+        200,
+        "",
+        platform1 = false,
+        platform2 = false
+    ).exportData(context.filesDir.toString())
+    ProductInformation(
+        UUID.randomUUID().toString(),
+        "banana",
+        "banana description",
+        300,
+        300,
+        "",
+        platform1 = false,
+        platform2 = false
+    ).exportData(context.filesDir.toString())
 }
 
 private fun readData(context: Context): List<Pair<String, ProductInformation>> {

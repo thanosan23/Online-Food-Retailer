@@ -1,6 +1,5 @@
 package ca.uwaterloo.cs.product
 
-import android.content.Context
 import android.os.Parcel
 import android.os.Parcelable
 import java.io.File
@@ -31,10 +30,10 @@ data class ProductInformation(
         parcel.readBoolean()
     )
 
-    fun exportData(context: Context) {
+    fun exportData(fileDir: String) {
         // TODO: platform compatibility
         // TODO: save to platform
-        val dir = File("${context.filesDir}/out")
+        val dir = File("${fileDir}/out")
         if (!dir.exists()) {
             dir.mkdir()
         }
@@ -51,8 +50,8 @@ data class ProductInformation(
         fileOS.close()
     }
 
-    fun deleteData(context: Context) {
-        val file = File("${context.filesDir}/out", "Product-$productId.txt")
+    fun deleteData(fileDir: String) {
+        val file = File("${fileDir}/out", "Product-$productId.txt")
         if (file.exists())
         {
             file.delete()
