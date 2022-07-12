@@ -30,6 +30,7 @@ import androidx.core.net.toUri
 import ca.uwaterloo.cs.NavigationBar
 import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.form.*
+import ca.uwaterloo.cs.harvest.HarvestInformation
 import ca.uwaterloo.cs.platform.PlatformState
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
@@ -552,10 +553,14 @@ private fun addProductNumber(
         .setPositiveButton(
             android.R.string.yes
         ) { _, _ ->
-            data.amount += newData["Amount Editor"]!!.toLong()
+            val harvestRequest = HarvestInformation(
+                fromWorker = "Test Worker",
+                product = data,
+                amount = newData["Amount Editor"]!!.toInt()
+            )
             AlertDialog.Builder(context)
                 .setMessage("Request has been sent").show()
-            data.exportData(context.filesDir.toString())
+            harvestRequest.exportData(context.filesDir.toString())
             nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()
@@ -574,10 +579,14 @@ private fun removeProductNumber(
         .setPositiveButton(
             android.R.string.yes
         ) { _, _ ->
-            data.amount -= newData["Amount Editor"]!!.toLong()
+            val harvestRequest = HarvestInformation(
+                fromWorker = "Test Worker",
+                product = data,
+                amount = -newData["Amount Editor"]!!.toInt()
+            )
             AlertDialog.Builder(context)
                 .setMessage("Request has been sent").show()
-            data.exportData(context.filesDir.toString())
+            harvestRequest.exportData(context.filesDir.toString())
             nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()
