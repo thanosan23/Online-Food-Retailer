@@ -62,30 +62,40 @@ class MainActivity : ComponentActivity() {
 @Destination(start = true)
 @Composable
 fun MainContent(nav: DestinationsNavigator) {
+    val useTemplate: Boolean=true //farmer:true,worker:false
     Scaffold(
-                content = { TableScreen(nav) },
+
+                content = { TableScreen(nav,useTemplate) },
                 bottomBar = { NavigationBar()})
 
 }
 
 @Composable
-fun TableScreen(nav: DestinationsNavigator) {
+fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean) {
     val context = LocalContext.current
-    CenterAlignedTopAppBar(
-        title = { Text("Catalogue", color = Color.White) },
-        navigationIcon = {
-            IconButton(onClick = {
-                addItem(nav, context)
-            }) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = "Catalogue",
-                    tint = Color.White
-                )
-            }
-        },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
-    )
+    if(useTemplate) {
+        CenterAlignedTopAppBar(
+            title = { Text("Catalogue", color = Color.White) },
+            navigationIcon = {
+                IconButton(onClick = {
+                    addItem(nav, context)
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = "Catalogue",
+                        tint = Color.White
+                    )
+                }
+            },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
+        )
+    }
+    else{
+        CenterAlignedTopAppBar(
+            title = { Text("Catalogue", color = Color.White) },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
+        )
+    }
     // TODO: REMOVE / UPGRADE MOCK DATA GENERATION IN FINAL PRODUCT
     val tableData = readData(context)
     // Each cell of a column must have the same weight.
@@ -106,7 +116,7 @@ fun TableScreen(nav: DestinationsNavigator) {
                 Row(
                     Modifier
                         .height(IntrinsicSize.Min)
-                        .clickable { editItem(nav, it.second) }
+                        .clickable { editItem(nav, it.second, useTemplate) }
                         .border(BorderStroke(3.dp, Color.InstagramPurple)),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
@@ -143,8 +153,8 @@ fun TableScreen(nav: DestinationsNavigator) {
 }
 
 
-private fun editItem(nav: DestinationsNavigator, data: ProductInformation) {
-    nav.navigate(ProductFormDestination(data))
+private fun editItem(nav: DestinationsNavigator, data: ProductInformation, useTemplate: Boolean) {
+    nav.navigate(ProductFormDestination(data,useTemplate))
 }
 
 private fun addItem(nav: DestinationsNavigator, context: Context) {
