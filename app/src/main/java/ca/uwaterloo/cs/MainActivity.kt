@@ -19,6 +19,8 @@ import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,14 +29,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
+import ca.uwaterloo.cs.db.DBInterFaceTest
+import ca.uwaterloo.cs.db.DBClient
 import ca.uwaterloo.cs.destinations.HarvestFormDestination
 import ca.uwaterloo.cs.destinations.MergeFormDestination
 import ca.uwaterloo.cs.destinations.ProductFormDestination
+import ca.uwaterloo.cs.models.Address
 import ca.uwaterloo.cs.product.ProductInformation
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import coil.compose.rememberImagePainter
-import com.google.firebase.database.FirebaseDatabase
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -46,12 +50,6 @@ import java.util.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        val mDatabase = FirebaseDatabase.getInstance().reference;
-        mDatabase.child("users").child("test id").setValue("test user").addOnSuccessListener {
-            println("MainActivity: Saved to Firebase Database")
-        }.addOnFailureListener {
-            println("MainActivity: FAILED")
-        }
         super.onCreate(savedInstanceState)
         setContent {
             OnlineFoodRetailTheme {
@@ -67,29 +65,32 @@ class MainActivity : ComponentActivity() {
 @Destination(start = true)
 @Composable
 fun MainContent(nav: DestinationsNavigator) {
+    val useTemplate: Boolean=true //farmer:true,worker:false
     Scaffold(
-        content = { TableScreen(nav) },
-        bottomBar = { NavigationBar(nav) }
-    )
+
+                content = { TableScreen(nav,useTemplate) },
+                bottomBar = { NavigationBar()})
+
 }
 
 @Composable
-fun TableScreen(nav: DestinationsNavigator) {
+fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean) {
     val context = LocalContext.current
-    CenterAlignedTopAppBar(
-        title = { Text("Catalogue", color = Color.White) },
-        navigationIcon = {
-            IconButton(onClick = {
-                addItem(nav)
-            }) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = "Catalogue",
-                    tint = Color.White
-                )
-            }
-        },
-        actions = {
+    if(useTemplate) {
+        CenterAlignedTopAppBar(
+            title = { Text("Catalogue", color = Color.White) },
+            navigationIcon = {
+                IconButton(onClick = {
+                    addItem(nav, context)
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = "Catalogue",
+                        tint = Color.White
+                    )
+                }
+            },
+            actions = {
             IconButton(onClick = { nav.navigate(MergeFormDestination()) }) {
                 Icon(
                     imageVector = Icons.Filled.Receipt,
@@ -98,8 +99,15 @@ fun TableScreen(nav: DestinationsNavigator) {
                 )
             }
         },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
-    )
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
+        )
+    }
+    else{
+        CenterAlignedTopAppBar(
+            title = { Text("Catalogue", color = Color.White) },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
+        )
+    }
     // TODO: REMOVE / UPGRADE MOCK DATA GENERATION IN FINAL PRODUCT
     val tableData = readData(context)
     // Each cell of a column must have the same weight.
@@ -120,6 +128,7 @@ fun TableScreen(nav: DestinationsNavigator) {
                 Row(
                     Modifier
                         .height(IntrinsicSize.Min)
+                        .clickable { editItem(nav, it.second, useTemplate) }
                         .border(BorderStroke(3.dp, Color.InstagramPurple)),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
@@ -199,8 +208,9 @@ fun TableScreen(nav: DestinationsNavigator) {
     }
 }
 
-private fun editItem(nav: DestinationsNavigator, data: ProductInformation) {
-    nav.navigate(ProductFormDestination(data))
+
+private fun editItem(nav: DestinationsNavigator, data: ProductInformation, useTemplate: Boolean) {
+    nav.navigate(ProductFormDestination(data,useTemplate))
 }
 
 private fun addItem(nav: DestinationsNavigator) {
