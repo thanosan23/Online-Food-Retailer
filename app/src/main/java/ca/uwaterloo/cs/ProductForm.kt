@@ -44,7 +44,7 @@ import java.util.*
 fun ProductForm(
     navigator: DestinationsNavigator,
     data: ProductInformation?,
-    useTemplate: Boolean = false
+    useTemplate: Boolean = true  //worker:false, farmer:true
 ) {
     val formState by remember { mutableStateOf(FormState()) }
     OnlineFoodRetailTheme {
@@ -131,85 +131,85 @@ fun ShowProductForm(
         Modifier
             .verticalScroll(rememberScrollState())
             .padding(20.dp),
-
         ) {
-        platformState.platformsUI.PlatformsDropDown()
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Spacer(Modifier.height(20.dp))
-            Form(
-                state = formState,
-                fields = listOf(
-                    Field(
-                        name = "Name",
-                        initValue = formState.getData()
-                            .getOrDefault("Name", if (data.name == "") "" else data.name),
-                        prompt = "Enter product name",
-                        label = "Product Name",
-                        validators = listOf(Required())
-                    ),
-                    Field(
-                        name = "Description",
-                        initValue = formState.getData().getOrDefault(
-                            "Description",
-                            if (data.description == "") "" else data.description
+        if(useTemplate) {
+            platformState.platformsUI.PlatformsDropDown()
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Spacer(Modifier.height(20.dp))
+                Form(
+                    state = formState,
+                    fields = listOf(
+                        Field(
+                            name = "Name",
+                            initValue = formState.getData()
+                                .getOrDefault("Name", if (data.name == "") "" else data.name),
+                            prompt = "Enter product name",
+                            label = "Product Name",
+                            validators = listOf(Required())
                         ),
-                        prompt = "Enter description",
-                        label = "Product Description",
-                        validators = listOf(Required())
-                    ),
-                    Field(
-                        name = "Amount",
-                        initValue = formState.getData().getOrDefault(
-                            "Amount",
-                            if (data.amount == 0L) "0" else data.amount.toString()
+                        Field(
+                            name = "Description",
+                            initValue = formState.getData().getOrDefault(
+                                "Description",
+                                if (data.description == "") "" else data.description
+                            ),
+                            prompt = "Enter description",
+                            label = "Product Description",
+                            validators = listOf(Required())
                         ),
-                        prompt = "Enter amount available",
-                        label = "Product Amount",
-                        validators = listOf(Required(), IsNumber()),
-                        inputType = KeyboardType.Number,
-                        formatter = NumberTransformation()
-                    ),
-                    Field(
-                        name = "Price",
-                        initValue = formState.getData().getOrDefault(
-                            "Price",
-                            if (data.price == 0) "0.00" else (data.price / 100.0).toString()
+                        Field(
+                            name = "Amount",
+                            initValue = formState.getData().getOrDefault(
+                                "Amount",
+                                if (data.amount == 0L) "0" else data.amount.toString()
+                            ),
+                            prompt = "Enter amount available",
+                            label = "Product Amount",
+                            validators = listOf(Required(), IsNumber()),
+                            inputType = KeyboardType.Number,
+                            formatter = NumberTransformation()
                         ),
-                        prompt = "Enter price",
-                        label = "Product Price",
-                        validators = listOf(Required(), IsNumber(), NonZero()),
-                        inputType = KeyboardType.Number,
-                    ),
+                        Field(
+                            name = "Price",
+                            initValue = formState.getData().getOrDefault(
+                                "Price",
+                                if (data.price == 0) "0.00" else (data.price / 100.0).toString()
+                            ),
+                            prompt = "Enter price",
+                            label = "Product Price",
+                            validators = listOf(Required(), IsNumber(), NonZero()),
+                            inputType = KeyboardType.Number,
+                        ),
+                    )
                 )
-            )
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Row(
-                    modifier = Modifier
-                        .horizontalScroll(rememberScrollState())
-                        .height(200.dp)
-                        .padding(horizontal = 16.dp, vertical = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    if (image != "") {
-                        Column(
-                            Modifier
-                                .width(200.dp)
-                                .height(200.dp)
-                                .aspectRatio(1f)
-                        )
-                        {
-                            Box(
-                                modifier = Modifier
-                                    // .background(Color.InstagramPurple) // TODO: REMOVE DEBUG BACKGROUNDS
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Row(
+                        modifier = Modifier
+                            .horizontalScroll(rememberScrollState())
+                            .height(200.dp)
+                            .padding(horizontal = 16.dp, vertical = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        if (image != "") {
+                            Column(
+                                Modifier
                                     .width(200.dp)
                                     .height(200.dp)
-                                    .aspectRatio(1f),
-                                contentAlignment = Alignment.Center
+                                    .aspectRatio(1f)
                             )
                             {
-                                /* TODO: FIX PERMISSION ISSUE
+                                Box(
+                                    modifier = Modifier
+                                        // .background(Color.InstagramPurple) // TODO: REMOVE DEBUG BACKGROUNDS
+                                        .width(200.dp)
+                                        .height(200.dp)
+                                        .aspectRatio(1f),
+                                    contentAlignment = Alignment.Center
+                                )
+                                {
+                                    /* TODO: FIX PERMISSION ISSUE
                                 imageUri?.let {
                                     val btm = if (Build.VERSION.SDK_INT < 28) {
                                         MediaStore.Images.Media.getBitmap(context.contentResolver, it)
@@ -230,106 +230,224 @@ fun ShowProductForm(
                                 }
 
                                  */
-                                Image(
-                                    painter = rememberImagePainter(image.toUri()),
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .fillMaxSize(1f)
-                                )
-
-                                Button(
-                                    enabled = image != "",
-                                    onClick = {
-                                        image = ""
-                                    },
-                                    modifier = Modifier.align(Alignment.BottomEnd)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.ChangeCircle,
-                                        contentDescription = "Delete Image",
-                                        tint = Color.InstagramPurple
+                                    Image(
+                                        painter = rememberImagePainter(image.toUri()),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .fillMaxSize(1f)
                                     )
+
+                                    Button(
+                                        enabled = image != "",
+                                        onClick = {
+                                            image = ""
+                                        },
+                                        modifier = Modifier.align(Alignment.BottomEnd)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Filled.ChangeCircle,
+                                            contentDescription = "Delete Image",
+                                            tint = Color.InstagramPurple
+                                        )
+                                    }
                                 }
                             }
-                        }
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .width(200.dp)
-                                .height(200.dp)
-                                .aspectRatio(1f),
-                            contentAlignment = Alignment.Center
-                        )
-                        {
-                            IconButton(
-                                modifier = Modifier.fillMaxSize(1f),
-                                onClick = {
-                                    val options =
-                                        arrayOf<CharSequence>(
-                                            "Take Photo",
-                                            "Choose from Gallery",
-                                            "Cancel"
-                                        )
-                                    val builder = AlertDialog.Builder(context)
-                                    builder.setTitle("Add Photo")
-                                    builder.setItems(options) { dialog, item ->
-                                        if (options[item] == "Take Photo") {
-                                            when (PackageManager.PERMISSION_GRANTED) {
-                                                ContextCompat.checkSelfPermission(
-                                                    context, Manifest.permission.CAMERA
-                                                ) -> {
-                                                    fileUri = createImageFile(context)
-                                                    cameraLauncher.launch(fileUri)
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .width(200.dp)
+                                    .height(200.dp)
+                                    .aspectRatio(1f),
+                                contentAlignment = Alignment.Center
+                            )
+                            {
+                                IconButton(
+                                    modifier = Modifier.fillMaxSize(1f),
+                                    onClick = {
+                                        val options =
+                                            arrayOf<CharSequence>(
+                                                "Take Photo",
+                                                "Choose from Gallery",
+                                                "Cancel"
+                                            )
+                                        val builder = AlertDialog.Builder(context)
+                                        builder.setTitle("Add Photo")
+                                        builder.setItems(options) { dialog, item ->
+                                            if (options[item] == "Take Photo") {
+                                                when (PackageManager.PERMISSION_GRANTED) {
+                                                    ContextCompat.checkSelfPermission(
+                                                        context, Manifest.permission.CAMERA
+                                                    ) -> {
+                                                        fileUri = createImageFile(context)
+                                                        cameraLauncher.launch(fileUri)
+                                                    }
+                                                    else -> {
+                                                        isCameraSelected = true
+                                                        isGallerySelected = false
+                                                        permissionLauncher.launch(Manifest.permission.CAMERA)
+                                                    }
                                                 }
-                                                else -> {
-                                                    isCameraSelected = true
-                                                    isGallerySelected = false
-                                                    permissionLauncher.launch(Manifest.permission.CAMERA)
+                                            } else if (options[item] == "Choose from Gallery") {
+                                                when (PackageManager.PERMISSION_GRANTED) {
+                                                    ContextCompat.checkSelfPermission(
+                                                        context,
+                                                        Manifest.permission.READ_EXTERNAL_STORAGE
+                                                    ) -> {
+                                                        galleryLauncher.launch("image/*")
+                                                    }
+                                                    else -> {
+                                                        isCameraSelected = false
+                                                        isGallerySelected = true
+                                                        permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                                                    }
                                                 }
+                                            } else if (options[item] == "Cancel") {
+                                                dialog.dismiss()
                                             }
-                                        } else if (options[item] == "Choose from Gallery") {
-                                            when (PackageManager.PERMISSION_GRANTED) {
-                                                ContextCompat.checkSelfPermission(
-                                                    context,
-                                                    Manifest.permission.READ_EXTERNAL_STORAGE
-                                                ) -> {
-                                                    galleryLauncher.launch("image/*")
-                                                }
-                                                else -> {
-                                                    isCameraSelected = false
-                                                    isGallerySelected = true
-                                                    permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-                                                }
-                                            }
-                                        } else if (options[item] == "Cancel") {
-                                            dialog.dismiss()
                                         }
+                                        builder.show()
                                     }
-                                    builder.show()
-                                }
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.PhotoCamera,
-                                        contentDescription = "Catalogue",
-                                        tint = Color.Black,
-                                        modifier = Modifier.fillMaxSize(0.65f)
-                                    )
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Filled.PhotoCamera,
+                                            contentDescription = "Catalogue",
+                                            tint = Color.Black,
+                                            modifier = Modifier.fillMaxSize(0.65f)
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
+                SendCancelDeleteWidgets(
+                    formState = formState,
+                    platformState = platformState,
+                    data = data,
+                    image = image,
+                    nav = nav,
+                    context = context,
+                    useTemplate = useTemplate
+                )
             }
-            SendCancelDeleteWidgets(
+        }
+        else{
+            Form(
+                state = formState,
+                fields = listOf(
+                    Field(
+                        name = "Name",
+                        initValue = formState.getData()
+                            .getOrDefault("Name", if (data.name == "") "" else data.name),
+                        prompt = "Enter product name",
+                        label = "Product Name",
+                        validators = listOf(Required()),
+                        readOnly = true
+                    ),
+                    Field(
+                        name = "Description",
+                        initValue = formState.getData().getOrDefault(
+                            "Description",
+                            if (data.description == "") "" else data.description
+                        ),
+                        prompt = "Enter description",
+                        label = "Product Description",
+                        validators = listOf(Required()),
+                        readOnly = true
+                    ),
+                    Field(
+                        name = "Amount",
+                        initValue = formState.getData().getOrDefault(
+                            "Amount",
+                            if (data.amount == 0L) "0" else data.amount.toString()
+                        ),
+                        prompt = "Enter amount available",
+                        label = "Product Amount",
+                        validators = listOf(Required(), IsNumber()),
+                        inputType = KeyboardType.Number,
+                        formatter = NumberTransformation(),
+                        readOnly = true
+                    ),
+                    Field(
+                        name = "Price",
+                        initValue = formState.getData().getOrDefault(
+                            "Price",
+                            if (data.price == 0) "0.00" else (data.price / 100.0).toString()
+                        ),
+                        prompt = "Enter price",
+                        label = "Product Price",
+                        validators = listOf(Required(), IsNumber(), NonZero()),
+                        inputType = KeyboardType.Number,
+                        readOnly = true
+                    ),
+                )
+            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Spacer(Modifier.height(20.dp))
+                Form(
+                    state = formState,
+                    fields = listOf(
+                        Field(
+                            name = "Amount Editor",
+                            initValue = "0",
+                            prompt = "Enter amount available",
+                            label = "Change Amount",
+                            validators = listOf(Required(), IsNumber()),
+                            inputType = KeyboardType.Number,
+                            formatter = NumberTransformation()
+                        )
+                    )
+                )
+            }
+            AddOrRemove(
                 formState = formState,
                 platformState = platformState,
                 data = data,
                 image = image,
                 nav = nav,
-                context = context
+                context = context,
+                useTemplate = useTemplate
+            )
+        }
+    }
+}
+@Composable
+fun AddOrRemove(
+    formState: FormState,
+    platformState: PlatformState,
+    data: ProductInformation,
+    image: String,
+    nav: DestinationsNavigator,
+    context: Context,
+    useTemplate: Boolean
+){Row {
+        Button(onClick = {
+            if (formState.validate()) {
+                addProductNumber(data,formState.getData(),context,nav)
+                    //nav.navigate(MainContentDestination)
+                }
+        }) {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = "Catalogue",
+                tint = Color.InstagramPurple
+            )
+        }
+        Spacer(Modifier.weight(1f))
+        Button(onClick = {
+            if (formState.validate()) {
+                removeProductNumber(data,formState.getData(),context,nav)
+            }
+        }) {
+            Icon(
+                imageVector = Icons.Filled.Remove,
+                contentDescription = "Catalogue",
+                tint = Color.InstagramPurple
             )
         }
     }
@@ -342,7 +460,8 @@ fun SendCancelDeleteWidgets(
     data: ProductInformation,
     image: String,
     nav: DestinationsNavigator,
-    context: Context
+    context: Context,
+    useTemplate: Boolean
 ) {
     Row {
         Button(onClick = {
@@ -375,10 +494,10 @@ fun SendCancelDeleteWidgets(
                 tint = Color.InstagramPurple
             )
         }
+
     }
     Spacer(Modifier.height(30.dp))
 }
-
 private fun createImageFile(context: Context): Uri {
     val timeStamp = SimpleDateFormat.getDateTimeInstance().format(Date())
     val file = File(context.filesDir, "JPEG_$timeStamp.jpg")
@@ -414,6 +533,46 @@ private fun deleteProduct(data: ProductInformation, context: Context, nav: Desti
             android.R.string.yes
         ) { _, _ ->
             data.deleteData(context)
+            nav.navigate(MainContentDestination)
+        }
+        .setNegativeButton(android.R.string.no, null).show()
+}
+private fun addProductNumber(
+    data: ProductInformation,
+    newData: Map<String, String>,
+    context: Context,
+    nav: DestinationsNavigator) {
+    AlertDialog.Builder(context)
+        .setTitle("Edit Product Number")
+        .setMessage("Are you sure to edit this product number? This will send a request to your manager.")
+        //.setIcon(android.R.drawable.ic_dialog_alert)
+        .setPositiveButton(
+            android.R.string.yes
+        ) { _, _ ->
+            data.amount+=newData["Amount Editor"]!!.toLong()
+            AlertDialog.Builder(context)
+                .setMessage("Request has been sent").show()
+            data.exportData(context)
+            nav.navigate(MainContentDestination)
+        }
+        .setNegativeButton(android.R.string.no, null).show()
+}
+private fun removeProductNumber(
+    data: ProductInformation,
+    newData: Map<String, String>,
+    context: Context,
+    nav: DestinationsNavigator) {
+    AlertDialog.Builder(context)
+        .setTitle("Edit Product Number")
+        .setMessage("Are you sure to edit this product number? This will send a request to your manager.")
+        //.setIcon(android.R.drawable.ic_dialog_alert)
+        .setPositiveButton(
+            android.R.string.yes
+        ) { _, _ ->
+            data.amount-=newData["Amount Editor"]!!.toLong()
+            AlertDialog.Builder(context)
+                .setMessage("Request has been sent").show()
+            data.exportData(context)
             nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()
