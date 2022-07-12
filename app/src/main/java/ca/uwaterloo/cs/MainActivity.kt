@@ -19,8 +19,6 @@ import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,12 +27,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
-import ca.uwaterloo.cs.db.DBInterFaceTest
-import ca.uwaterloo.cs.db.DBClient
 import ca.uwaterloo.cs.destinations.HarvestFormDestination
 import ca.uwaterloo.cs.destinations.MergeFormDestination
 import ca.uwaterloo.cs.destinations.ProductFormDestination
-import ca.uwaterloo.cs.models.Address
 import ca.uwaterloo.cs.product.ProductInformation
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
@@ -65,23 +60,21 @@ class MainActivity : ComponentActivity() {
 @Destination(start = true)
 @Composable
 fun MainContent(nav: DestinationsNavigator) {
-    val useTemplate: Boolean=true //farmer:true,worker:false
+    val useTemplate: Boolean = true //farmer:true,worker:false
     Scaffold(
-
-                content = { TableScreen(nav,useTemplate) },
-                bottomBar = { NavigationBar()})
-
+        content = { TableScreen(nav, useTemplate) },
+        bottomBar = { NavigationBar(nav) })
 }
 
 @Composable
 fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean) {
     val context = LocalContext.current
-    if(useTemplate) {
+    if (useTemplate) {
         CenterAlignedTopAppBar(
             title = { Text("Catalogue", color = Color.White) },
             navigationIcon = {
                 IconButton(onClick = {
-                    addItem(nav, context)
+                    addItem(nav)
                 }) {
                     Icon(
                         imageVector = Icons.Filled.Add,
@@ -91,18 +84,17 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean) {
                 }
             },
             actions = {
-            IconButton(onClick = { nav.navigate(MergeFormDestination()) }) {
-                Icon(
-                    imageVector = Icons.Filled.Receipt,
-                    contentDescription = "Localized description",
-                    tint = Color.White
-                )
-            }
-        },
+                IconButton(onClick = { nav.navigate(MergeFormDestination()) }) {
+                    Icon(
+                        imageVector = Icons.Filled.Receipt,
+                        contentDescription = "Localized description",
+                        tint = Color.White
+                    )
+                }
+            },
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
         )
-    }
-    else{
+    } else {
         CenterAlignedTopAppBar(
             title = { Text("Catalogue", color = Color.White) },
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
@@ -138,7 +130,7 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean) {
                             modifier = Modifier
                                 .width(200.dp)
                                 .height(200.dp)
-                                .clickable { editItem(nav, it.second) },
+                                .clickable { editItem(nav, it.second, useTemplate) },
                             contentAlignment = Alignment.Center
                         )
                         {
@@ -156,7 +148,7 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean) {
                             modifier = Modifier
                                 .width(200.dp)
                                 .height(200.dp)
-                                .clickable { editItem(nav, it.second) }
+                                .clickable { editItem(nav, it.second, useTemplate) }
                         )
                     }
                     IconButton(
@@ -210,7 +202,7 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean) {
 
 
 private fun editItem(nav: DestinationsNavigator, data: ProductInformation, useTemplate: Boolean) {
-    nav.navigate(ProductFormDestination(data,useTemplate))
+    nav.navigate(ProductFormDestination(data, useTemplate))
 }
 
 private fun addItem(nav: DestinationsNavigator) {

@@ -47,7 +47,6 @@ fun ProductForm(
     data: ProductInformation?,
     useTemplate: Boolean = true  //worker:false, farmer:true
 ) {
-    val formState by remember { mutableStateOf(FormState()) }
     OnlineFoodRetailTheme {
         Scaffold(
             content = {
@@ -65,10 +64,10 @@ fun ProductForm(
                         },
                 ) {
                     Text(if (data == null) "ADD PRODUCT" else "EDIT PRODUCT")
-                    ShowProductForm(nav, data ?: ProductInformation())
+                    ShowProductForm(navigator, data ?: ProductInformation(), useTemplate)
                 }
             },
-            bottomBar = { NavigationBar(nav) }
+            bottomBar = { NavigationBar(navigator) }
         )
     }
 }
@@ -76,7 +75,8 @@ fun ProductForm(
 @Composable
 fun ShowProductForm(
     nav: DestinationsNavigator,
-    data: ProductInformation
+    data: ProductInformation,
+    useTemplate: Boolean,
 ) {
     val formState by remember { mutableStateOf(FormState()) }
     val platformState by remember { mutableStateOf(PlatformState(data)) }
@@ -95,7 +95,7 @@ fun ShowProductForm(
         }
     }
     val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
+        contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
             image = ""
@@ -103,6 +103,7 @@ fun ShowProductForm(
             try {
                 context.contentResolver.takePersistableUriPermission(
                     uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 )
             } catch (e: Exception) {
                 println("Exception: " + e.message)
@@ -118,7 +119,7 @@ fun ShowProductForm(
                 fileUri = createImageFile(context)
                 cameraLauncher.launch(fileUri)
             } else if (isGallerySelected) {
-                galleryLauncher.launch(arrayOf("image/*"))
+                galleryLauncher.launch("image/*")
             }
         } else {
             Toast.makeText(context, "Permission Denied!", Toast.LENGTH_SHORT).show()
@@ -130,8 +131,8 @@ fun ShowProductForm(
         Modifier
             .verticalScroll(rememberScrollState())
             .padding(20.dp),
-        ) {
-        if(useTemplate) {
+    ) {
+        if (useTemplate) {
             platformState.platformsUI.PlatformsDropDown()
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -227,7 +228,6 @@ fun ShowProductForm(
                                         contentScale = ContentScale.Fit
                                     )
                                 }
-
                                  */
                                     Image(
                                         painter = rememberImagePainter(image.toUri()),
@@ -332,8 +332,7 @@ fun ShowProductForm(
                     useTemplate = useTemplate
                 )
             }
-        }
-        else{
+        } else {
             Form(
                 state = formState,
                 fields = listOf(
@@ -415,6 +414,7 @@ fun ShowProductForm(
         }
     }
 }
+
 @Composable
 fun AddOrRemove(
     formState: FormState,
@@ -424,12 +424,13 @@ fun AddOrRemove(
     nav: DestinationsNavigator,
     context: Context,
     useTemplate: Boolean
-){Row {
+) {
+    Row {
         Button(onClick = {
             if (formState.validate()) {
-                addProductNumber(data,formState.getData(),context,nav)
-                    //nav.navigate(MainContentDestination)
-                }
+                addProductNumber(data, formState.getData(), context, nav)
+                //nav.navigate(MainContentDestination)
+            }
         }) {
             Icon(
                 imageVector = Icons.Filled.Add,
@@ -440,7 +441,7 @@ fun AddOrRemove(
         Spacer(Modifier.weight(1f))
         Button(onClick = {
             if (formState.validate()) {
-                removeProductNumber(data,formState.getData(),context,nav)
+                removeProductNumber(data, formState.getData(), context, nav)
             }
         }) {
             Icon(
@@ -497,6 +498,7 @@ fun SendCancelDeleteWidgets(
     }
     Spacer(Modifier.height(30.dp))
 }
+
 private fun createImageFile(context: Context): Uri {
     val timeStamp = SimpleDateFormat.getDateTimeInstance().format(Date())
     val file = File(context.filesDir, "JPEG_$timeStamp.jpg")
@@ -536,11 +538,13 @@ private fun deleteProduct(data: ProductInformation, context: Context, nav: Desti
         }
         .setNegativeButton(android.R.string.no, null).show()
 }
+
 private fun addProductNumber(
     data: ProductInformation,
     newData: Map<String, String>,
     context: Context,
-    nav: DestinationsNavigator) {
+    nav: DestinationsNavigator
+) {
     AlertDialog.Builder(context)
         .setTitle("Edit Product Number")
         .setMessage("Are you sure to edit this product number? This will send a request to your manager.")
@@ -548,19 +552,21 @@ private fun addProductNumber(
         .setPositiveButton(
             android.R.string.yes
         ) { _, _ ->
-            data.amount+=newData["Amount Editor"]!!.toLong()
+            data.amount += newData["Amount Editor"]!!.toLong()
             AlertDialog.Builder(context)
                 .setMessage("Request has been sent").show()
-            data.exportData(context)
+            data.exportData(context.filesDir.toString())
             nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()
 }
+
 private fun removeProductNumber(
     data: ProductInformation,
     newData: Map<String, String>,
     context: Context,
-    nav: DestinationsNavigator) {
+    nav: DestinationsNavigator
+) {
     AlertDialog.Builder(context)
         .setTitle("Edit Product Number")
         .setMessage("Are you sure to edit this product number? This will send a request to your manager.")
@@ -568,10 +574,10 @@ private fun removeProductNumber(
         .setPositiveButton(
             android.R.string.yes
         ) { _, _ ->
-            data.amount-=newData["Amount Editor"]!!.toLong()
+            data.amount -= newData["Amount Editor"]!!.toLong()
             AlertDialog.Builder(context)
                 .setMessage("Request has been sent").show()
-            data.exportData(context)
+            data.exportData(context.filesDir.toString())
             nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()

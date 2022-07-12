@@ -54,7 +54,11 @@ fun HarvestForm(
                 ) {
                     val amountField = Field(
                         name = "Amount",
-                        initValue = "0",
+                        initValue = formState.getData()
+                            .getOrDefault(
+                                "Amount",
+                                "0"
+                            ),
                         prompt = "Enter amount harvested",
                         label = "Harvest Amount",
                         validators = listOf(Required(), IsNumber()),
@@ -164,8 +168,7 @@ fun SendCancelDeleteWidgets(
             if (formState.validate()) {
                 if (data != null) {
                     saveHarvestRequestWithProduct(data, formState.getData(), saveDir)
-                }
-                else {
+                } else {
                     saveHarvestRequestNoProduct(formState.getData(), "", saveDir)
                 }
                 nav.navigate(MainContentDestination)

@@ -1,6 +1,6 @@
 package ca.uwaterloo.cs.db
 
-import ca.uwaterloo.cs.ProductInformation
+import ca.uwaterloo.cs.product.ProductInformation
 import ca.uwaterloo.cs.models.CatalogItem
 import ca.uwaterloo.cs.models.Offer
 import ca.uwaterloo.cs.models.Quantity
