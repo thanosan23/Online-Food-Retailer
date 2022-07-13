@@ -14,6 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.uwaterloo.cs.destinations.MainContentDestination
+import ca.uwaterloo.cs.destinations.ProfileContentDestination
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -56,7 +57,7 @@ fun NavigationBar(nav: DestinationsNavigator) {
                         "Catalogue" -> nav.navigate(MainContentDestination)
                         "Logistics" -> nav.navigate(MainContentDestination)
                         "History" -> nav.navigate(MainContentDestination)
-                        "Profile" -> nav.navigate(MainContentDestination)
+                        "Profile" -> nav.navigate(ProfileContentDestination)
                     }
                 }
             )
