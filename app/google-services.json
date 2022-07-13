@@ -1,33 +1,34 @@
 {
   "project_info": {
-    "project_number": "1064089892249",
-    "project_id": "cs446-project-d1451",
-    "storage_bucket": "cs446-project-d1451.appspot.com"
+    "project_number": "666256052588",
+    "firebase_url": "https://cs446-project-2-default-rtdb.firebaseio.com",
+    "project_id": "cs446-project-2",
+    "storage_bucket": "cs446-project-2.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1064089892249:android:9f82adb5f7b2000bfccf08",
+        "mobilesdk_app_id": "1:666256052588:android:596a6e6e82f4535c9c2349",
         "android_client_info": {
           "package_name": "ca.uwaterloo.cs"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1064089892249-as33h7eg7pvjv78ub9erhbrgcdic7m87.apps.googleusercontent.com",
+          "client_id": "666256052588-63b1v98pgn8501oebf0snuk697171jq1.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDtever-OPA8NHAT2r9CJeus_IBGiM1JKo"
+          "current_key": "AIzaSyC8zx8cYvT2hqsVE8Xk79yq1UVrch6A5Dc"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "1064089892249-as33h7eg7pvjv78ub9erhbrgcdic7m87.apps.googleusercontent.com",
+              "client_id": "666256052588-63b1v98pgn8501oebf0snuk697171jq1.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
