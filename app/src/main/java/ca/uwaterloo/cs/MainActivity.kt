@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-@Destination(start = true)
+@Destination
 @Composable
 fun MainContent(nav: DestinationsNavigator) {
     val useTemplate: Boolean = true //farmer:true,worker:false
