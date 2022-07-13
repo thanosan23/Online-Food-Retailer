@@ -9,7 +9,7 @@ import java.io.Serializable
 import java.util.*
 
 data class ProductInformation(
-    val productId: String = UUID.randomUUID().toString(), // Internal id number of product, should we store this?
+    val productId: String = UUID.randomUUID().toString(),
     var name: String = "",
     var description: String = "",
     var price: Int = 0,
@@ -83,6 +83,3 @@ data class ProductInformation(
         }
     }
 }
-
-// TODO: FIX images to image array
-// TODO: load data
