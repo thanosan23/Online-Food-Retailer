@@ -2,6 +2,7 @@ package ca.uwaterloo.cs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.*
@@ -46,6 +47,8 @@ fun Login(
 
             var username by remember {mutableStateOf("")}
             var password by remember {mutableStateOf("")}
+            var usernameErrorFound by remember {mutableStateOf(false)}
+            var passwordErrorFound by remember {mutableStateOf(false)}
 
 //            Form(
 //                state = formState,
@@ -71,19 +74,29 @@ fun Login(
                 value = username,
                 onValueChange = { username = it },
                 label = { Text("username") },
+                isError = usernameErrorFound,
+                singleLine = true,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
+            Spacer(modifier = Modifier.height(2.dp))
             TextField(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("password") },
-                visualTransformation = PasswordVisualTransformation()
+                isError = passwordErrorFound,
+                singleLine = true,
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Button(
                 onClick = {
                     if (verifyLogin(username, password)) {
                         navigator.navigate(MainContentDestination)
                     }
-                    else {/*TODO:invalid credentials*/}
+                    else {
+                        usernameErrorFound = true;
+                        passwordErrorFound = true;
+                    }
                           },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
