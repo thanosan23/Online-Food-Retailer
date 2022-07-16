@@ -14,6 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.uwaterloo.cs.destinations.MainContentDestination
+import ca.uwaterloo.cs.destinations.MergeFormDestination
 import ca.uwaterloo.cs.destinations.ProfileContentDestination
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -24,7 +25,7 @@ sealed class NavItem(
 ) {
     // https://www.flaticon.com/free-icons
     object Catalogue: NavItem("Catalogue", R.drawable.catalogue_icon)
-    object Logistics: NavItem("Logistics", R.drawable.logistics_icon)
+    object Request: NavItem("Request", R.drawable.logistics_icon)
     object History: NavItem("History", R.drawable.history_icon)
     object Profile: NavItem("Profile", R.drawable.profile_icon)
 }
@@ -34,7 +35,7 @@ sealed class NavItem(
 fun NavigationBar(nav: DestinationsNavigator) {
     val items = listOf(
         NavItem.Catalogue,
-        NavItem.Logistics,
+        NavItem.Request,
         NavItem.History,
         NavItem.Profile
     )
@@ -55,7 +56,7 @@ fun NavigationBar(nav: DestinationsNavigator) {
                 onClick = {
                     when (item.title) {
                         "Catalogue" -> nav.navigate(MainContentDestination)
-                        "Logistics" -> nav.navigate(MainContentDestination)
+                        "Request" -> nav.navigate(MergeFormDestination())
                         "History" -> nav.navigate(MainContentDestination)
                         "Profile" -> nav.navigate(ProfileContentDestination)
                     }

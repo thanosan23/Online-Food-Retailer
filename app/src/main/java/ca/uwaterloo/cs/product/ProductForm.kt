@@ -402,6 +402,32 @@ fun ShowProductForm(
                         )
                     )
                 )
+                @Composable
+                fun numberButton(size: Int) {
+                    val button = Button(
+                        onClick = {
+                            formState.fields.first().setValue(
+                                (formState.fields.first().getValue().toInt()+size).toString()
+                            )
+                        },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
+                    ) {
+                        Text(size.toString())
+                    }
+                    return button
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    //.background(Color.Gray),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    numberButton(1)
+                    numberButton(10)
+                    numberButton(100)
+                    numberButton(1000)
+                }
             }
             AddOrRemove(
                 formState = formState,
