@@ -20,7 +20,7 @@ import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@Destination(start = true)
+@Destination()
 @Composable
 fun Signup(
     navigator: DestinationsNavigator
@@ -41,6 +41,8 @@ fun Signup(
                 fontSize = 32.sp
             )
             Spacer(modifier = Modifier.height(21.dp))
+            var username by remember {mutableStateOf("")}
+            var farmName by remember {mutableStateOf("")}
             Form(
                 state = formState,
                 fields = listOf(
@@ -73,4 +75,8 @@ fun Signup(
             )
         }
     }
+}
+
+fun verifySignup(username: String, farmName: String): Boolean {
+    return true
 }

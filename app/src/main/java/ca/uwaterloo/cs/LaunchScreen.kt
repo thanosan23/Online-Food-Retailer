@@ -1,5 +1,6 @@
 package ca.uwaterloo.cs
 
+import android.graphics.Color
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
@@ -10,13 +11,16 @@ import androidx.compose.ui.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ca.uwaterloo.cs.destinations.LoginDestination
 import ca.uwaterloo.cs.destinations.MainContentDestination
+import ca.uwaterloo.cs.destinations.SignupDestination
 import ca.uwaterloo.cs.form.FormState
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
+import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@Destination()
+@Destination(start = true)
 @Composable
 fun LaunchScreen(
     navigator: DestinationsNavigator
@@ -27,7 +31,7 @@ fun LaunchScreen(
             modifier = Modifier
                 .fillMaxHeight()
                 .fillMaxWidth()
-                .background(MaterialTheme.colors.background)
+                .background(color = MaterialTheme.colors.background)
                 .wrapContentSize(align = Alignment.Center)
                 .padding(20.dp)
         ) {
@@ -38,13 +42,16 @@ fun LaunchScreen(
             )
             Spacer(modifier = Modifier.height(21.dp))
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {navigator.navigate(SignupDestination)},
                 modifier = Modifier.align(Alignment.CenterHorizontally)) {
                 Text(text = "Sign Up")
             }
+            Spacer(modifier = Modifier.height(4.dp))
             Button(
-                onClick = { /*TODO*/ },
-                modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                onClick = {navigator.navigate(LoginDestination)},
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                colors = ButtonDefaults.buttonColors()
+            ) {
                 Text(text = "Login")
             }
         }

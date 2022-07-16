@@ -43,26 +43,59 @@ fun Login(
                 fontSize = 32.sp
             )
             Spacer(modifier = Modifier.height(21.dp))
-            Form(
-                state = formState,
-                fields = listOf(
-                    Field(
-                        name = "Username",
-                        initValue = "",
-                        prompt = "Enter username",
-                        label = "Username",
-                        validators = listOf(Required())
-                    ),
-                    Field(
-                        name = "Password",
-                        initValue = "",
-                        prompt = "Enter password",
-                        label = "Password",
-                        validators = listOf(Required()),
-                        formatter = PasswordVisualTransformation()
-                    )
-                )
+
+            var username by remember {mutableStateOf("")}
+            var password by remember {mutableStateOf("")}
+
+//            Form(
+//                state = formState,
+//                fields = listOf(
+//                    Field(
+//                        name = "Username",
+//                        initValue = username,
+//                        prompt = "Enter username",
+//                        label = "Username",
+//                        validators = listOf(Required())
+//                    ),
+//                    Field(
+//                        name = "Password",
+//                        initValue = password,
+//                        prompt = "Enter password",
+//                        label = "Password",
+//                        validators = listOf(Required()),
+//                        formatter = PasswordVisualTransformation()
+//                    ),
+//                )
+//            )
+            TextField(
+                value = username,
+                onValueChange = { username = it },
+                label = { Text("username") },
             )
+            TextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("password") },
+                visualTransformation = PasswordVisualTransformation()
+            )
+            Button(
+                onClick = {
+                    if (verifyLogin(username, password)) {
+                        navigator.navigate(MainContentDestination)
+                    }
+                    else {/*TODO:invalid credentials*/}
+                          },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text(text = "Login")
+            }
         }
     }
+}
+
+fun verifyLogin(username: String, password: String) : Boolean {
+    //check username and password against db
+    if (username != "test")
+        return false
+    return true
 }
