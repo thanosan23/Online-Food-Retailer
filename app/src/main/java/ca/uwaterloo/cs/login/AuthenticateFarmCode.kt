@@ -67,6 +67,7 @@ fun authenticateFarmerCode(
                                 label = "this is invalid"
                             }
                             else{
+                                println("this is the true $input")
                                 navigator.navigate(SignupAsWorkerDestination(input))
                             }
                         }
