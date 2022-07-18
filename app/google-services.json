@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "666256052588-6cmhri67v4obbu12v87a9ujmkpdft60v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ca.uwaterloo.cs",
+            "certificate_hash": "c8b457cd365ec12d6df9524a4f9498b6b8c931ed"
+          }
+        },
+        {
           "client_id": "666256052588-63b1v98pgn8501oebf0snuk697171jq1.apps.googleusercontent.com",
           "client_type": 3
         }

@@ -2,6 +2,7 @@ package ca.uwaterloo.cs.harvest
 
 import android.os.Parcel
 import android.os.Parcelable
+import ca.uwaterloo.cs.bemodels.HasOneImage
 import ca.uwaterloo.cs.product.ProductInformation
 import java.io.File
 import java.io.FileOutputStream
@@ -10,14 +11,14 @@ import java.io.Serializable
 import java.util.*
 
 data class HarvestInformation (
-    val harvestId: String,
+    var harvestId: String?,
     val fromWorker: String,
-    var productId: String,
+    var productId: String?,
     val name: String,
     val description: String,
-    val image: String,
+    override var image: String,
     var amount: Int,
-) : Serializable, Parcelable {
+) : Serializable, Parcelable, HasOneImage {
     constructor(parcel: Parcel) : this(
         parcel.readString()!!,
         parcel.readString()!!,

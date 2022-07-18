@@ -143,7 +143,7 @@ fun MergeScreen(nav: DestinationsNavigator) {
             context: Context
         ) {
             if (!linkedHarvests.contains(harvestData.harvestId)) {
-                linkedHarvests.add(harvestData.harvestId)
+                linkedHarvests.add(harvestData.harvestId!!)
             }
 
             Spacer(Modifier.height(10.dp).fillMaxWidth())
@@ -260,7 +260,7 @@ fun MergeScreen(nav: DestinationsNavigator) {
         @Composable
         fun MergeUnknownEntry(harvestData: HarvestInformation) {
             if (!unlinkedHarvests.contains(harvestData.harvestId)) {
-                unlinkedHarvests.add(harvestData.harvestId)
+                unlinkedHarvests.add(harvestData.harvestId!!)
             }
             Spacer(Modifier.height(20.dp).fillMaxWidth())
             Row(modifier = Modifier.height(100.dp)) {
@@ -434,12 +434,12 @@ fun MergeScreen(nav: DestinationsNavigator) {
                                             .selectable(
                                                 selected = isSelectedItem(
                                                     item.second.name,
-                                                    item.second.productId
+                                                    item.second.productId!!
                                                 ),
                                                 onClick = {
                                                     onChangeState(
                                                         item.second.name,
-                                                        item.second.productId
+                                                        item.second.productId!!
                                                     )
                                                 },
                                                 role = Role.RadioButton
@@ -449,7 +449,7 @@ fun MergeScreen(nav: DestinationsNavigator) {
                                         RadioButton(
                                             selected = isSelectedItem(
                                                 item.second.name,
-                                                item.second.productId
+                                                item.second.productId!!
                                             ),
                                             onClick = null
                                         )
@@ -492,7 +492,7 @@ fun MergeScreen(nav: DestinationsNavigator) {
 
                             if (selectedEntry!!.first == "") {
                                 unlinkedHarvests.remove(selectedHarvest!!.harvestId)
-                                linkedHarvests.add(selectedHarvest!!.harvestId)
+                                linkedHarvests.add(selectedHarvest!!.harvestId!!)
                             }
 
                             associationChangeVisible = false
@@ -577,7 +577,7 @@ fun MergeScreen(nav: DestinationsNavigator) {
                     }
                 }
                 processedData.filter { it.key == "" }.forEach { (_, value) ->
-                    items(value.second, key = { it.harvestId }) {
+                    items(value.second, key = { it.harvestId!! }) {
                         MergeUnknownEntry(it)
                     }
                 }
@@ -635,7 +635,7 @@ private fun getProducts(saveDir: String): HashMap<String, ProductInformation> {
             val fileIS = FileInputStream(saveFile)
             val inStream = ObjectInputStream(fileIS)
             val productInformation = inStream.readObject() as ProductInformation
-            products[productInformation.productId] = productInformation
+            products[productInformation.productId!!] = productInformation
             inStream.close()
             fileIS.close()
         }

@@ -1,5 +1,6 @@
-package ca.uwaterloo.cs.models
+package ca.uwaterloo.cs.dbmodels
 
+// Standard
 @kotlinx.serialization.Serializable
 data class Farmer (
     var id: String,
