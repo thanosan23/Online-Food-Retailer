@@ -1,13 +1,20 @@
 package ca.uwaterloo.cs.login
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.*
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,13 +31,19 @@ fun SignupAsWorker(
 ) {
     val formState by remember { mutableStateOf(FormState()) }
     OnlineFoodRetailTheme {
+        val focusManager = LocalFocusManager.current
         Column(
             modifier = Modifier
                 .fillMaxHeight()
                 .fillMaxWidth()
                 .background(MaterialTheme.colors.background)
-                .wrapContentSize(align = Alignment.Center)
+                //.wrapContentSize(align = Alignment.Center)
                 .padding(20.dp)
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        focusManager.clearFocus()
+                    })
+                }
         )  {
             Text(
                 text = "Sign up as a worker",
@@ -53,7 +66,12 @@ fun SignupAsWorker(
                 label = { Text("Farm ID") },
                 isError = farmIDErrorFound,
                 singleLine = true,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             )
             Spacer(modifier = Modifier.height(2.dp))
             TextField(
@@ -62,7 +80,12 @@ fun SignupAsWorker(
                 label = { Text("Username") },
                 isError = usernameErrorFound,
                 singleLine = true,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             )
             Spacer(modifier = Modifier.height(2.dp))
             TextField(
@@ -72,7 +95,12 @@ fun SignupAsWorker(
                 isError = passwordErrorFound,
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             )
             Spacer(modifier = Modifier.height(2.dp))
             TextField(
@@ -80,7 +108,12 @@ fun SignupAsWorker(
                 onValueChange = { name = it },
                 label = { Text("Your Name") },
                 singleLine = true,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             )
             Spacer(modifier = Modifier.height(2.dp))
 
