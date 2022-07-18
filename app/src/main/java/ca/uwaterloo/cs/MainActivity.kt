@@ -85,7 +85,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        logout()
-        dbManagerTest.part2ProductTest()
+//        dbManagerTest.part2ProductTest()
         signInLauncher.launch(signInIntent)
     }
 }

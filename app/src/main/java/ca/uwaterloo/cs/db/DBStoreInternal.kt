@@ -16,7 +16,7 @@ class DBStoreInternal {
                                 productId: Id,
                                 productInformation: ProductInformation){
         if (productCreation){
-            addProductToUser(userId, productId)
+            addProductToFarmer(userId, productId)
         }
         productInformation.productId = productId.idValue
         dbClient.store(
@@ -30,7 +30,7 @@ class DBStoreInternal {
                                 harvestId: Id,
                                 harvestInformation: HarvestInformation){
         if (harvestCreation){
-            addHarvestToUser(workerId, harvestId)
+            addHarvestToWorker(workerId, harvestId)
         }
         harvestInformation.harvestId = harvestId.idValue
         dbClient.store(
@@ -54,16 +54,20 @@ class DBStoreInternal {
     }
 
     fun storeSignUpWorker(signUpWorker: SignUpWorker){
+        signUpWorker.farmerUserId = signUpWorker.farmerUserId.replace("\"", "")
         val completeFarmerProfile = contentIngestion.getCompleteUserProfile(signUpWorker)
-        val completeFarmerProfileId = Id(signUpWorker.userId, IdType.CompleteUserProfileId)
+        val completeFarmerProfileId = Id(signUpWorker.workerUserId, IdType.CompleteUserProfileId)
         dbClient.store(
             completeFarmerProfileId.getPath(),
             completeFarmerProfile
         )
+        val workerId = Id(signUpWorker.workerUserId, IdType.CompleteUserProfileId)
+        val farmerId = Id(signUpWorker.farmerUserId, IdType.CompleteUserProfileId)
+        attachWorkerToFarmer(workerId, farmerId)
     }
 
-    private fun addProductToUser(userIdString: String, productId: Id){
-        val userId = Id(userIdString, IdType.CompleteUserProfileId)
+    private fun addProductToFarmer(farmerIdString: String, productId: Id){
+        val userId = Id(farmerIdString, IdType.CompleteUserProfileId)
         class ListenerImpl() : Listener<CompleteUserProfile>() {
             override fun activate(input: CompleteUserProfile) {
                 input.productIds.add(productId.idValue)
@@ -80,7 +84,7 @@ class DBStoreInternal {
         )
     }
 
-    private fun addHarvestToUser(workerIdString: String, harvestId: Id){
+    private fun addHarvestToWorker(workerIdString: String, harvestId: Id){
         val userId = Id(workerIdString, IdType.CompleteUserProfileId)
         class ListenerImpl() : Listener<CompleteUserProfile>() {
             override fun activate(input: CompleteUserProfile) {
@@ -94,6 +98,25 @@ class DBStoreInternal {
         val listener = ListenerImpl()
         dbClient.get(
             userId.getPath(),
+            listener
+        )
+    }
+
+    private fun attachWorkerToFarmer(workerId: Id, farmerId: Id){
+        class ListenerImpl() : Listener<CompleteUserProfile>() {
+            override fun activate(input: CompleteUserProfile) {
+                if (workerId.idValue !in input.workersIds){
+                    input.workersIds.add(workerId.idValue)
+                    dbClient.store(
+                        farmerId.getPath(),
+                        input
+                    )
+                }
+            }
+        }
+        val listener = ListenerImpl()
+        dbClient.get(
+            farmerId.getPath(),
             listener
         )
     }

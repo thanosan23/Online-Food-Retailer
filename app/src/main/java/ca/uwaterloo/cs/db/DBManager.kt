@@ -50,7 +50,7 @@ class DBManager {
         dbStoreInternal.storeProductInformation(productCreation, userId, productId, productInformation)
     }
 
-    fun getProductInformation(userId: String, belistener: Listener<List<ProductInformation>>){
+    fun getProductsInformation(userId: String, belistener: Listener<List<ProductInformation>>){
         dbGetInternal.getProductInformation(userId, belistener)
     }
 
@@ -68,11 +68,11 @@ class DBManager {
         )
     }
 
-    fun getHarvestInformation(workerUserId: String, belistener: Listener<List<HarvestInformation>>){
-        dbGetInternal.getHarvestInformation(workerUserId, belistener)
+    fun getHarvestInformation(workerUserId: String, beListener: Listener<List<HarvestInformation>>){
+        dbGetInternal.getHarvestInformation(workerUserId, beListener)
     }
 
-    fun getAllHarvestsFromFarmer(farmerUserId: String, belistener: Listener<List<HarvestInformation>>){
+    fun getAllHarvestsFromFarmer(farmerUserId: String, beListener: Listener<List<HarvestInformation>>){
 
     }
 
@@ -133,7 +133,7 @@ class DBManagerTest() {
             }
         }
         val listener = ListenerImpl()
-        dbManager.getProductInformation(userId1, listener)
+        dbManager.getProductsInformation(userId1, listener)
     }
 
     fun part1ProductTest(){

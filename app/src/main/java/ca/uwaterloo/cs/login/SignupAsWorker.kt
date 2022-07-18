@@ -33,6 +33,7 @@ fun SignupAsWorker(
     navigator: DestinationsNavigator,
     farmerUserId: String,
 ) {
+    println("did the navigation do any damage? $farmerUserId")
     val dbManager = DBManager()
     OnlineFoodRetailTheme {
         val focusManager = LocalFocusManager.current
@@ -100,6 +101,7 @@ fun SignupAsWorker(
 
             Button(
                 onClick = {
+                    println("is it here the problem $farmerUserId")
                     val signUpWorker = SignUpWorker(
                         Singleton.userId,
                         firstName,

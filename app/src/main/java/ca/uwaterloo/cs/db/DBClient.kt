@@ -49,6 +49,10 @@ class DBClient {
                 }
                 listener.activate(data!!)
             }
+            else{
+                println("attempt to get something that does not exist, key: $key")
+                assert(false)
+            }
         }
     }
 
