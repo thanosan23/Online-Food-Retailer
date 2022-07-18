@@ -148,7 +148,8 @@ fun ShowProductForm(
                                 .getOrDefault("Name", if (data.name == "") "" else data.name),
                             prompt = "Enter product name",
                             label = "Product Name",
-                            validators = listOf(Required())
+                            validators = listOf(Required()),
+                            dropdownList = listOf("Apple", "Banana", "Carrot")
                         ),
                         Field(
                             name = "Description",
@@ -182,6 +183,7 @@ fun ShowProductForm(
                             label = "Product Price",
                             validators = listOf(Required(), IsNumber(), NonZero()),
                             inputType = KeyboardType.Number,
+                            dropdownList = listOf("0.50", "1.00", "2.00", "5.00")
                         ),
                     )
                 )
