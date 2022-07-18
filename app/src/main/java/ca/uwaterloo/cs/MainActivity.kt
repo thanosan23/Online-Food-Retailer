@@ -57,22 +57,15 @@ class MainActivity : ComponentActivity() {
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
     ) { res ->
-        val userId = res.idpResponse?.email?.replace(".","")!!
+        val userId = res.idpResponse?.email?.replace(".","")?.replace("\"", "")!!
+        println("first time $userId")
         Singleton.userId = userId
         Singleton.isNewUser = res.idpResponse?.isNewUser!!
-        if (res.idpResponse?.isNewUser!!){
-            //TODO Nikita this where your work is
-            // Here you should decide whether you are a farmer or a
-            // worker
-            println("nothing happened")
-        }
-        else{
-            setContent {
-                OnlineFoodRetailTheme {
-                    val context = LocalContext.current
-                    generateMockData(1, context = context)
-                    DestinationsNavHost(navGraph = NavGraphs.root)
-                }
+        setContent {
+            OnlineFoodRetailTheme {
+                val context = LocalContext.current
+                generateMockData(1, context = context)
+                DestinationsNavHost(navGraph = NavGraphs.root)
             }
         }
     }
@@ -80,7 +73,7 @@ class MainActivity : ComponentActivity() {
     // Choose authentication providers
     private val providers = arrayListOf(
         //AuthUI.IdpConfig.EmailBuilder().build(),
-        AuthUI.IdpConfig.PhoneBuilder().build(),
+//        AuthUI.IdpConfig.PhoneBuilder().build(),
         AuthUI.IdpConfig.GoogleBuilder().build())
 
     // Create and launch sign-in intent

@@ -14,11 +14,12 @@ import androidx.compose.ui.unit.sp
 import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.destinations.SignupAsManagerDestination
 import ca.uwaterloo.cs.destinations.SignupAsWorkerDestination
+import ca.uwaterloo.cs.destinations.authenticateFarmerCodeDestination
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@Destination(start = true)
+@Destination
 @Composable
 fun Login(
     navigator: DestinationsNavigator
@@ -40,50 +41,6 @@ fun Login(
             )
             Spacer(modifier = Modifier.height(21.dp))
 
-            var username by remember {mutableStateOf("")}
-            var password by remember {mutableStateOf("")}
-            var usernameErrorFound by remember {mutableStateOf(false)}
-            var passwordErrorFound by remember {mutableStateOf(false)}
-
-            TextField(
-                value = username,
-                onValueChange = { username = it },
-                label = { Text("Username") },
-                isError = usernameErrorFound,
-                singleLine = true,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            TextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Password") },
-                isError = passwordErrorFound,
-                singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-            Button(
-                onClick = {
-                    if (verifyLogin(username, password)) {
-                        navigator.navigate(MainContentDestination)
-                    }
-                    else {
-                        usernameErrorFound = true
-                        passwordErrorFound = true
-                    }
-                          },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                Text(text = "Login")
-            }
-
-            Spacer(modifier = Modifier.height(21.dp))
-
-            Text(
-                text = "Don't have an account yet?",
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
             Button(
                 onClick = {
                     navigator.navigate(SignupAsManagerDestination)
@@ -94,7 +51,7 @@ fun Login(
             }
             Button(
                 onClick = {
-                    navigator.navigate(SignupAsWorkerDestination)
+                          navigator.navigate(authenticateFarmerCodeDestination)
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
@@ -102,11 +59,4 @@ fun Login(
             }
         }
     }
-}
-
-fun verifyLogin(username: String, password: String) : Boolean {
-    //check username and password against db
-    if (username != "test")
-        return false
-    return true
 }

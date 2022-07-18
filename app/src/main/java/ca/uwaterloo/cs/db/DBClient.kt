@@ -52,6 +52,22 @@ class DBClient {
         }
     }
 
+    fun getIfExists(key: String, listener: Listener<String?>){
+        db.child(key).get()
+            .addOnSuccessListener {
+            if (it.exists()){
+                val stringData = it.value as String
+                listener.activate(stringData)
+            }
+            else{
+                listener.activate(null)
+            }
+        }
+            .addOnFailureListener{
+                listener.activate(null)
+            }
+    }
+
     fun storeImage(file: Uri){
         val ref: StorageReference = storage.child("messi image")
         ref.putFile(file)

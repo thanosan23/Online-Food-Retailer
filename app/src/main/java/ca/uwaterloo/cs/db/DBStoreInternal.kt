@@ -39,7 +39,12 @@ class DBStoreInternal {
         )
     }
 
-    fun storeSignUpFarmer(signUpFarmer: SignUpFarmer){
+    fun storeSignUpFarmer(signUpFarmer: SignUpFarmer, farmCodeId: Id){
+        dbClient.store(
+            farmCodeId.getPath(),
+            signUpFarmer.userId
+        )
+        
         val completeFarmerProfile = contentIngestion.getCompleteUserProfile(signUpFarmer)
         val completeFarmerProfileId = Id(signUpFarmer.userId, IdType.CompleteUserProfileId)
         dbClient.store(

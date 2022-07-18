@@ -43,7 +43,6 @@ class ContentIngestion {
         return CompleteUserProfile(
             signUpFarmer.firstName,
             signUpFarmer.familyName,
-            signUpFarmer.password,
             "",
             null,
             "",
@@ -59,12 +58,11 @@ class ContentIngestion {
         return CompleteUserProfile(
             signUpWorker.firstName,
             signUpWorker.familyName,
-            signUpWorker.password,
             "",
             null,
             "",
             false,
-            "",
+            signUpWorker.farmerUserId,
             mutableListOf(),
             mutableListOf(),
             mutableListOf(),

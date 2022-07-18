@@ -11,7 +11,11 @@ import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ca.uwaterloo.cs.Singleton
+import ca.uwaterloo.cs.bemodels.SignUpFarmer
+import ca.uwaterloo.cs.db.DBManager
 import ca.uwaterloo.cs.destinations.LoginDestination
+import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.form.FormState
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import com.ramcosta.composedestinations.annotation.Destination
@@ -22,6 +26,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 fun SignupAsManager(
     navigator: DestinationsNavigator
 ) {
+    val dbManager = DBManager()
     val formState by remember { mutableStateOf(FormState()) }
     OnlineFoodRetailTheme {
         Column(
@@ -39,12 +44,11 @@ fun SignupAsManager(
             )
             Spacer(modifier = Modifier.height(21.dp))
             var username by remember {mutableStateOf("")}
-            var password by remember {mutableStateOf("")}
-            var name by remember { mutableStateOf("")}
+            var firstName by remember { mutableStateOf("")}
+            var familyName by remember { mutableStateOf("")}
             var farmName by remember {mutableStateOf("")}
 
             var usernameErrorFound by remember {mutableStateOf(false)}
-            var passwordErrorFound by remember {mutableStateOf(false)}
             var farmNameErrorFound by remember {mutableStateOf(false)}
 
             TextField(
@@ -57,19 +61,17 @@ fun SignupAsManager(
             )
             Spacer(modifier = Modifier.height(2.dp))
             TextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Password") },
-                isError = passwordErrorFound,
+                value = firstName,
+                onValueChange = { firstName = it },
+                label = { Text("First Name") },
                 singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Spacer(modifier = Modifier.height(2.dp))
             TextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Your Name") },
+                value = familyName,
+                onValueChange = { familyName = it },
+                label = { Text("Family Name") },
                 singleLine = true,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
@@ -86,7 +88,14 @@ fun SignupAsManager(
 
             Button(
                 onClick = {
-                    navigator.navigate(LoginDestination)
+                    val signUpFarmer = SignUpFarmer(
+                        Singleton.userId,
+                        firstName,
+                        familyName,
+                        farmName
+                    )
+                    dbManager.storeSignUpFarmer(signUpFarmer)
+                    navigator.navigate(MainContentDestination)
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {

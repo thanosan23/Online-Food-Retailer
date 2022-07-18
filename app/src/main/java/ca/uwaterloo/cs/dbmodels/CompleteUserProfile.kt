@@ -4,7 +4,6 @@ package ca.uwaterloo.cs.dbmodels
 data class CompleteUserProfile (
     val firstName: String,
     val familyName: String,
-    val password: String,
     val email: String,
     val address: Address?,
     val imageURI: String,
@@ -12,7 +11,7 @@ data class CompleteUserProfile (
     val isFarmer: Boolean,
 
     // parentFarmer should be empty if isFarmer is true
-    val parentFarmer: String,
+    val parentFarmerId: String,
     // harvestIds should be empty if isFarmer is true
     val harvestIds: MutableList<String>,
 

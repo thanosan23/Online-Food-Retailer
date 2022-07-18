@@ -15,12 +15,19 @@ class DBManager {
 
     // returns true if there is no user with the username false otherwise
     fun storeSignUpFarmer(signUpFarmer: SignUpFarmer){
-        dbStoreInternal.storeSignUpFarmer(signUpFarmer)
+        val farmCodeId = idResolver.standardResolver(null, IdType.FarmCodeId)
+        dbStoreInternal.storeSignUpFarmer(signUpFarmer, farmCodeId)
     }
 
     // returns true if the userName exists and it actually has that password
     fun authenticate(userName: String, password: String, listener: Listener<Boolean>){
         dbGetInternal.authenticate(userName, password, listener)
+    }
+
+    // returns true if the userName exists and it actually has that password
+    fun authenticateFarmCode(farmCode: String, beListener: Listener<String?>){
+        val farmCodeId = Id(farmCode, IdType.FarmCodeId)
+        dbGetInternal.authenticateFarmCode(farmCodeId, beListener)
     }
 
     // returns true if there is no user with the username
@@ -85,7 +92,6 @@ class DBManagerTest() {
         val signUpFarmer = SignUpFarmer(userId1,
             "messi2",
             "messi2",
-            "messi3",
             "messi land")
 
         dbManager.storeSignUpFarmer(signUpFarmer)

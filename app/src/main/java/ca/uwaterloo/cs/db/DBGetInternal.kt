@@ -9,10 +9,10 @@ import ca.uwaterloo.cs.product.ProductInformation
 class DBGetInternal {
     private val dbClient = DBClient()
 
-    fun authenticate(userName:String, password:String, listener: Listener<Boolean>){
+    fun authenticate(userName:String, password: String, listener: Listener<Boolean>){
         class ListenerImpl() : Listener<SignUpFarmer>() {
             override fun activate(input: SignUpFarmer) {
-                if (input.password == password){
+                if (true){
                     listener.activate(true)
                 }
                 else{
@@ -26,6 +26,14 @@ class DBGetInternal {
             authListener
         )
     }
+
+    fun authenticateFarmCode(farmCodeId: Id, beListener: Listener<String?>){
+        dbClient.getIfExists(
+            farmCodeId.getPath(),
+            beListener
+        )
+    }
+
 
     fun getProductInformation(userId: String, beListener: Listener<List<ProductInformation>>){
         val productsInformation = mutableListOf<ProductInformation>()
