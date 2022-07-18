@@ -16,7 +16,7 @@ import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@Destination()
+@Destination
 @Composable
 fun LaunchScreen(
     navigator: DestinationsNavigator

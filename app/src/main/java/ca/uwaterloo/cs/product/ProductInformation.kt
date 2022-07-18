@@ -2,22 +2,24 @@ package ca.uwaterloo.cs.product
 
 import android.os.Parcel
 import android.os.Parcelable
+import ca.uwaterloo.cs.bemodels.HasOneImage
 import java.io.File
 import java.io.FileOutputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
 import java.util.*
 
+@kotlinx.serialization.Serializable
 data class ProductInformation(
-    val productId: String = UUID.randomUUID().toString(),
+    var productId: String? = UUID.randomUUID().toString(), // Internal id number of product, should we store this?
     var name: String = "",
     var description: String = "",
     var price: Int = 0,
     var amount: Long = 0,
-    var image: String = "",
+    override var image: String = "",
     var platform1: Boolean = false,
     var platform2: Boolean = false
-) : Serializable, Parcelable {
+) : Serializable, Parcelable, HasOneImage {
 
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: UUID.randomUUID().toString(),

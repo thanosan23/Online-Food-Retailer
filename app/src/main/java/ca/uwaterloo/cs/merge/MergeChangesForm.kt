@@ -434,12 +434,12 @@ fun MergeScreen(nav: DestinationsNavigator) {
                                             .selectable(
                                                 selected = isSelectedItem(
                                                     item.second.name,
-                                                    item.second.productId
+                                                    item.second.productId!!
                                                 ),
                                                 onClick = {
                                                     onChangeState(
                                                         item.second.name,
-                                                        item.second.productId
+                                                        item.second.productId!!
                                                     )
                                                 },
                                                 role = Role.RadioButton
@@ -449,7 +449,7 @@ fun MergeScreen(nav: DestinationsNavigator) {
                                         RadioButton(
                                             selected = isSelectedItem(
                                                 item.second.name,
-                                                item.second.productId
+                                                item.second.productId!!
                                             ),
                                             onClick = null
                                         )
@@ -635,7 +635,7 @@ private fun getProducts(saveDir: String): HashMap<String, ProductInformation> {
             val fileIS = FileInputStream(saveFile)
             val inStream = ObjectInputStream(fileIS)
             val productInformation = inStream.readObject() as ProductInformation
-            products[productInformation.productId] = productInformation
+            products[productInformation.productId!!] = productInformation
             inStream.close()
             fileIS.close()
         }

@@ -11,7 +11,6 @@ import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.form.Field
 import ca.uwaterloo.cs.form.Form
 import ca.uwaterloo.cs.form.FormState
@@ -20,7 +19,7 @@ import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@Destination(start = true)
+@Destination()
 @Composable
 fun Signup(
     navigator: DestinationsNavigator

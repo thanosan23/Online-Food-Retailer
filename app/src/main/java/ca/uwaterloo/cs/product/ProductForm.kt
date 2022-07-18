@@ -28,6 +28,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import ca.uwaterloo.cs.NavigationBar
+import ca.uwaterloo.cs.db.DBClient
+import ca.uwaterloo.cs.db.DBManager
 import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.form.*
 import ca.uwaterloo.cs.harvest.HarvestInformation
@@ -550,6 +552,9 @@ private fun saveProduct(
     data.platform1 = newData["platform1"].toBoolean()
     data.platform2 = newData["platform2"].toBoolean()
     data.exportData(context.filesDir.toString())
+
+    val dbClient = DBClient()
+    dbClient.storeImage(data.image.toUri())
 }
 
 private fun deleteProduct(data: ProductInformation, context: Context, nav: DestinationsNavigator) {
