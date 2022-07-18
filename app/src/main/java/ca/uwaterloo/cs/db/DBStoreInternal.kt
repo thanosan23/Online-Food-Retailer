@@ -4,6 +4,7 @@ import ca.uwaterloo.cs.Listener
 import ca.uwaterloo.cs.bemodels.SignUpFarmer
 import ca.uwaterloo.cs.bemodels.SignUpWorker
 import ca.uwaterloo.cs.dbmodels.CompleteUserProfile
+import ca.uwaterloo.cs.harvest.HarvestInformation
 import ca.uwaterloo.cs.product.ProductInformation
 
 class DBStoreInternal {
@@ -21,6 +22,20 @@ class DBStoreInternal {
         dbClient.store(
             productId.getPath(),
             productInformation
+        )
+    }
+
+    fun storeHarvestInformation(harvestCreation: Boolean,
+                                workerId: String,
+                                harvestId: Id,
+                                harvestInformation: HarvestInformation){
+        if (harvestCreation){
+            addHarvestToUser(workerId, harvestId)
+        }
+        harvestInformation.harvestId = harvestId.idValue
+        dbClient.store(
+            harvestId.getPath(),
+            harvestInformation
         )
     }
 
@@ -59,4 +74,23 @@ class DBStoreInternal {
             listener
         )
     }
+
+    private fun addHarvestToUser(workerIdString: String, harvestId: Id){
+        val userId = Id(workerIdString, IdType.CompleteUserProfileId)
+        class ListenerImpl() : Listener<CompleteUserProfile>() {
+            override fun activate(input: CompleteUserProfile) {
+                input.harvestIds.add(harvestId.idValue)
+                dbClient.store(
+                    userId.getPath(),
+                    input
+                )
+            }
+        }
+        val listener = ListenerImpl()
+        dbClient.get(
+            userId.getPath(),
+            listener
+        )
+    }
+
 }

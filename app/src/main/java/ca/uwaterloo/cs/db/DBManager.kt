@@ -5,7 +5,6 @@ import ca.uwaterloo.cs.bemodels.SignUpFarmer
 import ca.uwaterloo.cs.bemodels.SignUpWorker
 import ca.uwaterloo.cs.bemodels.UserProfileFarmer
 import ca.uwaterloo.cs.harvest.HarvestInformation
-import ca.uwaterloo.cs.messages.ResponseSignUpFarmerWorker
 import ca.uwaterloo.cs.product.ProductInformation
 
 class DBManager {
@@ -44,18 +43,30 @@ class DBManager {
         dbStoreInternal.storeProductInformation(productCreation, userId, productId, productInformation)
     }
 
-    fun getProductInformation(userId: String, listener: Listener<List<ProductInformation>>){
-        dbGetInternal.getProductInformation(userId, listener)
+    fun getProductInformation(userId: String, belistener: Listener<List<ProductInformation>>){
+        dbGetInternal.getProductInformation(userId, belistener)
     }
 
     // if the harvest is being created for the first time add harvestId to be null in the HarvestInformation
-    fun storeHarvestInformation(harvestInformation: HarvestInformation){
+    fun storeHarvestInformation(userId: String, harvestInformation: HarvestInformation){
+        val harvestIdString = harvestInformation.harvestId
+        val harvestCreation = harvestIdString == null
+
+        val harvestId = idResolver.standardResolver(harvestIdString, IdType.HarvestId)
+        dbStoreInternal.storeHarvestInformation(
+            harvestCreation,
+            userId,
+            harvestId,
+            harvestInformation
+        )
     }
 
-    fun getHarvestInformation(workerUserId: String, listener: Listener<List<HarvestInformation>>){
+    fun getHarvestInformation(workerUserId: String, belistener: Listener<List<HarvestInformation>>){
+        dbGetInternal.getHarvestInformation(workerUserId, belistener)
     }
 
-    fun getAllHarvestsFromFarm(farmerUserId: String, listener: Listener<List<HarvestInformation>>){
+    fun getAllHarvestsFromFarmer(farmerUserId: String, belistener: Listener<List<HarvestInformation>>){
+
     }
 
     fun storeUserProfile(userProfileFarmer: UserProfileFarmer){
@@ -88,7 +99,7 @@ class DBManagerTest() {
                 "vamos fugis",
                 13,
                 17L,
-                "what",
+                "",
                 platform1 = true,
                 platform2 = false
             )
@@ -103,7 +114,7 @@ class DBManagerTest() {
                 "nao vamos fugir",
                 13,
                 17L,
-                "where are the images",
+                "",
                 platform1 = true,
                 platform2 = false
             )

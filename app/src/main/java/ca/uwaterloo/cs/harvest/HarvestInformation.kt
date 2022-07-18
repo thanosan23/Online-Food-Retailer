@@ -11,7 +11,7 @@ import java.io.Serializable
 import java.util.*
 
 data class HarvestInformation (
-    val harvestId: String,
+    var harvestId: String?,
     val fromWorker: String,
     var productId: String?,
     val name: String,

@@ -26,7 +26,7 @@ import java.util.*
 
 class DBClient {
     val db = Firebase.database.reference
-    private val storage = FirebaseStorage.getInstance("gs://cs446-project-d1451.appspot.com/").reference
+    private val storage = FirebaseStorage.getInstance("gs://cs446-project-2.appspot.com").reference
     var context: Context? = null
 
     inline fun <reified T> store(key: String, data: T){

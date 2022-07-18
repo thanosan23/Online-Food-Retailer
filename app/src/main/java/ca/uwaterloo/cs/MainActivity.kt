@@ -55,14 +55,14 @@ class MainActivity : ComponentActivity() {
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
     ) { res ->
-        println("what again $res")
-        //val userId = res.idpResponse?.idpToken
-        //Singleton.userId = userId!!
+        val userId = res.idpResponse?.email?.replace(".","")!!
+        Singleton.userId = userId
         Singleton.isNewUser = res.idpResponse?.isNewUser!!
         if (res.idpResponse?.isNewUser!!){
             //TODO Nikita this where your work is
             // Here you should decide whether you are a farmer or a
             // worker
+            println("nothing happened")
         }
         else{
             setContent {
