@@ -1,12 +1,11 @@
 package ca.uwaterloo.cs.db
 
+import ca.uwaterloo.cs.bemodels.SignUpFarmer
+import ca.uwaterloo.cs.bemodels.SignUpWorker
+import ca.uwaterloo.cs.dbmodels.*
 import ca.uwaterloo.cs.product.ProductInformation
-import ca.uwaterloo.cs.models.CatalogItem
-import ca.uwaterloo.cs.models.Offer
-import ca.uwaterloo.cs.models.Quantity
-import ca.uwaterloo.cs.models.SuppliedProduct
 
-class ProductInformationContentIngestion {
+class ContentIngestion {
     fun getSuppliedProduct(productId: String, productInformation: ProductInformation, catalogItemId: List<String>): SuppliedProduct{
         return SuppliedProduct(
             productId,
@@ -37,6 +36,36 @@ class ProductInformationContentIngestion {
         return Quantity(
             "u",
             productInformation.amount.toString()
+        )
+    }
+
+    fun getCompleteUserProfile(signUpFarmer: SignUpFarmer): CompleteUserProfile{
+        return CompleteUserProfile(
+            signUpFarmer.firstName,
+            signUpFarmer.familyName,
+            "",
+            null,
+            "",
+            true,
+            "",
+            mutableListOf(),
+            mutableListOf(),
+            mutableListOf(),
+        )
+    }
+
+    fun getCompleteUserProfile(signUpWorker: SignUpWorker): CompleteUserProfile{
+        return CompleteUserProfile(
+            signUpWorker.firstName,
+            signUpWorker.familyName,
+            "",
+            null,
+            "",
+            false,
+            signUpWorker.farmerUserId,
+            mutableListOf(),
+            mutableListOf(),
+            mutableListOf(),
         )
     }
 }

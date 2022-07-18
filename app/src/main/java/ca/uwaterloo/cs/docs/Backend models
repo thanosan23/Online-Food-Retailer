@@ -1,0 +1,4 @@
+model: signUpFarmerModel
+actions: validateUserName, validate EnterpriseId, generateFarmerId
+
+store: key=farmerId, value=signUpFarmerModel
