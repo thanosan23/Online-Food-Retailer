@@ -1,8 +1,7 @@
-package ca.uwaterloo.cs
+package ca.uwaterloo.cs.login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.*
@@ -10,24 +9,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.uwaterloo.cs.destinations.MainContentDestination
-import ca.uwaterloo.cs.form.Field
-import ca.uwaterloo.cs.form.Form
-import ca.uwaterloo.cs.form.FormState
-import ca.uwaterloo.cs.form.Required
+import ca.uwaterloo.cs.destinations.SignupAsManagerDestination
+import ca.uwaterloo.cs.destinations.SignupAsWorkerDestination
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@Destination()
+@Destination(start = true)
 @Composable
 fun Login(
     navigator: DestinationsNavigator
 ) {
-    val formState by remember { mutableStateOf(FormState()) }
     OnlineFoodRetailTheme {
         Column(
             modifier = Modifier
@@ -39,7 +34,7 @@ fun Login(
         ) {
             //Spacer(modifier = Modifier.height(40.dp))
             Text(
-                text = "Enter your credentials",
+                text = "Online Food Retailer",
                 fontWeight = FontWeight.Bold,
                 fontSize = 32.sp
             )
@@ -50,30 +45,10 @@ fun Login(
             var usernameErrorFound by remember {mutableStateOf(false)}
             var passwordErrorFound by remember {mutableStateOf(false)}
 
-//            Form(
-//                state = formState,
-//                fields = listOf(
-//                    Field(
-//                        name = "Username",
-//                        initValue = username,
-//                        prompt = "Enter username",
-//                        label = "Username",
-//                        validators = listOf(Required())
-//                    ),
-//                    Field(
-//                        name = "Password",
-//                        initValue = password,
-//                        prompt = "Enter password",
-//                        label = "Password",
-//                        validators = listOf(Required()),
-//                        formatter = PasswordVisualTransformation()
-//                    ),
-//                )
-//            )
             TextField(
                 value = username,
                 onValueChange = { username = it },
-                label = { Text("username") },
+                label = { Text("Username") },
                 isError = usernameErrorFound,
                 singleLine = true,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -82,7 +57,7 @@ fun Login(
             TextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("password") },
+                label = { Text("Password") },
                 isError = passwordErrorFound,
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
@@ -94,13 +69,36 @@ fun Login(
                         navigator.navigate(MainContentDestination)
                     }
                     else {
-                        usernameErrorFound = true;
-                        passwordErrorFound = true;
+                        usernameErrorFound = true
+                        passwordErrorFound = true
                     }
                           },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text(text = "Login")
+            }
+
+            Spacer(modifier = Modifier.height(21.dp))
+
+            Text(
+                text = "Don't have an account yet?",
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+            Button(
+                onClick = {
+                    navigator.navigate(SignupAsManagerDestination)
+                },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text(text = "Sign up as Manager")
+            }
+            Button(
+                onClick = {
+                    navigator.navigate(SignupAsWorkerDestination)
+                },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text(text = "Sign up as Worker")
             }
         }
     }
