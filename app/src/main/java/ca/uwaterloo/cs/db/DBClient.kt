@@ -82,7 +82,7 @@ class DBClient {
         val timeStamp = SimpleDateFormat.getDateTimeInstance().format(Date())
         val localFile = File(context!!.filesDir, "JPEG_$timeStamp.jpg")
         ref.getFile(localFile).addOnFailureListener{
-            println("failture to get image $it")
+            println("failure to get image $it")
         }
         Thread.sleep(1000)
         return FileProvider.getUriForFile(

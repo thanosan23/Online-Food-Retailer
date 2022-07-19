@@ -108,7 +108,6 @@ class DBGetInternal(context: Context?) {
                     val id = Id(harvestId, IdType.HarvestId)
                     dbClient.get(id.getPath(), listener1)
                 }
-                Thread.sleep(2000)
                 beListener.activate(harvestsInformation)
             }
         }

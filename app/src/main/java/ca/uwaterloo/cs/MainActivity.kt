@@ -12,7 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Receipt
+import android.os.Handler;
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -95,19 +95,27 @@ class MainActivity : ComponentActivity() {
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Destination
 @Composable
-fun MainContent(nav: DestinationsNavigator) {
+fun MainContent(
+    nav: DestinationsNavigator) {
+    println("entered here")
+    val readFromDB = Singleton.readFromDB
+    Singleton.readFromDB = false
     val useTemplate = Singleton.isFarmer
     println("user template $useTemplate")
 
     Scaffold(
         content = {
             val context = LocalContext.current
-//            val tableData = readData(context)
-            val tableData = remember {
+            var tableData = remember {
                 ArrayList<Pair<String, ProductInformation>>()
             }
-            readDataFromDB(tableData)
-            TableScreen(nav, useTemplate, tableData) },
+            if (!readFromDB) {
+                tableData = readData(context)
+            }
+            else {
+                readDataFromDB(tableData, LocalContext.current)
+            }
+            TableScreen(nav, useTemplate, tableData)},
         bottomBar = { NavigationBar(nav) })
 }
 
@@ -161,7 +169,7 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean, table: ArrayLi
                         confirmButton = {
                             Button(
                                 onClick = {
-                                    //val tableData = readData(context)
+                                    val tableData = readData(context)
                                     val tmpTable = ArrayList<Pair<String, ProductInformation>>()
                                     for (item in tableData) {
 //                                        Log.d("item", item.second.name)
@@ -210,7 +218,7 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean, table: ArrayLi
         )
     }
     // TODO: REMOVE / UPGRADE MOCK DATA GENERATION IN FINAL PRODUCT
-    // val tableData = readData(context)
+//    val tableData = readData(context)
     // Each cell of a column must have the same weight.
     // The LazyColumn will be our table. Notice the use of the weights below
     Row() {
@@ -318,43 +326,43 @@ private fun addItem(nav: DestinationsNavigator) {
 }
 @Composable
 fun generateMockData(amount: Int = 7, context: Context) {
-    val dir = File("${context.filesDir}/out")
-    if (dir.exists()) {
-        dir.deleteRecursively()
-    }
-    val dbClient = DBClient()
-    dbClient.context = LocalContext.current
-
-    ProductInformation(
-        UUID.randomUUID().toString(),
-        "apple",
-        "apple description",
-        100,
-        100,
-        "",
-        platform1 = false,
-        platform2 = false
-    ).exportData(context.filesDir.toString())
-    ProductInformation(
-        UUID.randomUUID().toString(),
-        "carrot",
-        "carrot description",
-        200,
-        200,
-        "",
-        platform1 = false,
-        platform2 = false
-    ).exportData(context.filesDir.toString())
-    ProductInformation(
-        UUID.randomUUID().toString(),
-        "banana",
-        "banana description",
-        300,
-        300,
-        "",
-        platform1 = false,
-        platform2 = false
-    ).exportData(context.filesDir.toString())
+//    val dir = File("${context.filesDir}/out")
+//    if (dir.exists()) {
+//        dir.deleteRecursively()
+//    }
+//    val dbClient = DBClient()
+//    dbClient.context = LocalContext.current
+//
+//    ProductInformation(
+//        UUID.randomUUID().toString(),
+//        "apple",
+//        "apple description",
+//        100,
+//        100,
+//        "",
+//        platform1 = false,
+//        platform2 = false
+//    ).exportData(context.filesDir.toString())
+//    ProductInformation(
+//        UUID.randomUUID().toString(),
+//        "carrot",
+//        "carrot description",
+//        200,
+//        200,
+//        "",
+//        platform1 = false,
+//        platform2 = false
+//    ).exportData(context.filesDir.toString())
+//    ProductInformation(
+//        UUID.randomUUID().toString(),
+//        "banana",
+//        "banana description",
+//        300,
+//        300,
+//        "",
+//        platform1 = false,
+//        platform2 = false
+//    ).exportData(context.filesDir.toString())
 }
 
 private fun readData(context: Context): ArrayList<Pair<String, ProductInformation>> {
@@ -379,16 +387,21 @@ private fun readData(context: Context): ArrayList<Pair<String, ProductInformatio
 }
 
 @Composable
-private fun readDataFromDB(tableData: ArrayList<Pair<String, ProductInformation>>){
+private fun readDataFromDB(
+        tableData: ArrayList<Pair<String, ProductInformation>>,
+        context: Context){
+
     val dbManager = DBManager(LocalContext.current)
     class ListenerImpl() : Listener<List<ProductInformation>>() {
         override fun activate(input: List<ProductInformation>) {
             for (product in input){
                 tableData.add(Pair(product.productId!!, product))
             }
+            for (product in input){
+                product.exportData(context.filesDir.toString())
+            }
         }
     }
     val listener = ListenerImpl()
     dbManager.getProductsInformation(Singleton.userId, listener)
-    Thread.sleep(2000)
 }

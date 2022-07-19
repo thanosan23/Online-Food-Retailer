@@ -88,6 +88,25 @@ class DBStoreInternal(context: Context?) {
         )
     }
 
+    fun removeProductFromFarmer(farmerIdString: String, productIdString: String){
+        val userId = Id(farmerIdString, IdType.CompleteUserProfileId)
+        val productId = Id(productIdString, IdType.ProductId)
+        class ListenerImpl() : Listener<CompleteUserProfile>() {
+            override fun activate(input: CompleteUserProfile) {
+                input.productIds.remove(productId.idValue)
+                dbClient.store(
+                    userId.getPath(),
+                    input
+                )
+            }
+        }
+        val listener = ListenerImpl()
+        dbClient.get(
+            userId.getPath(),
+            listener
+        )
+    }
+
     private fun addHarvestToWorker(workerIdString: String, harvestId: Id){
         val userId = Id(workerIdString, IdType.CompleteUserProfileId)
         class ListenerImpl() : Listener<CompleteUserProfile>() {

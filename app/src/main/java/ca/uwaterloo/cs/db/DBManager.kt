@@ -9,6 +9,7 @@ import ca.uwaterloo.cs.harvest.HarvestInformation
 import ca.uwaterloo.cs.product.ProductInformation
 
 class DBManager(context: Context?) {
+    // it is important to pass the context if you are getting images
     private val idResolver = IdResolver()
     private val dbStoreDFCManager = DBStoreDFC()
     private val dbStoreInternal = DBStoreInternal(context)
@@ -53,6 +54,10 @@ class DBManager(context: Context?) {
         // Internal storage
         val productId = Id(DFCSuppliedProductId.idValue, IdType.ProductId)
         dbStoreInternal.storeProductInformation(productCreation, userId, productId, productInformation)
+    }
+
+    fun deleteProductInformation(farmerId: String, productIdString: String){
+        dbStoreInternal.removeProductFromFarmer(farmerId, productIdString)
     }
 
     fun getProductsInformation(userId: String, belistener: Listener<List<ProductInformation>>){

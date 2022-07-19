@@ -2,7 +2,9 @@ package ca.uwaterloo.cs.product
 
 import android.os.Parcel
 import android.os.Parcelable
+import ca.uwaterloo.cs.Singleton
 import ca.uwaterloo.cs.bemodels.HasOneImage
+import ca.uwaterloo.cs.db.DBManager
 import java.io.File
 import java.io.FileOutputStream
 import java.io.ObjectOutputStream
@@ -58,6 +60,11 @@ data class ProductInformation(
         {
             file.delete()
         }
+    }
+
+    fun deleteDataFromDB(data: ProductInformation){
+        val dbManager = DBManager(null)
+        dbManager.deleteProductInformation(Singleton.userId, data.productId!!)
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {

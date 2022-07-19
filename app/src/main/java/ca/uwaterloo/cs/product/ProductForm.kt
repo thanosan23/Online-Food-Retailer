@@ -498,6 +498,7 @@ fun SendCancelDeleteWidgets(
     Row {
         Button(onClick = {
             if (formState.validate() && platformState.validate()) {
+                saveProduct(data, formState.getData() + platformState.getData(), image, context)
                 saveProductToDB(data, formState.getData() + platformState.getData(), image)
                 nav.navigate(MainContentDestination)
             }
@@ -541,24 +542,21 @@ private fun createImageFile(context: Context): Uri {
     )
 }
 
-//private fun saveProduct(
-//    data: ProductInformation,
-//    newData: Map<String, String>,
-//    newImage: String,
-//    context: Context
-//) {
-//    data.name = newData["Name"]!!
-//    data.description = newData["Description"]!!
-//    data.price = (newData["Price"]!!.toDouble() * 100).toInt()
-//    data.amount = newData["Amount"]!!.toLong()
-//    data.image = newImage
-//    data.platform1 = newData["platform1"].toBoolean()
-//    data.platform2 = newData["platform2"].toBoolean()
-//    data.exportData(context.filesDir.toString())
-//
-//    val dbClient = DBClient()
-//    dbClient.storeImage(data.image.toUri())
-//}
+private fun saveProduct(
+    data: ProductInformation,
+    newData: Map<String, String>,
+    newImage: String,
+    context: Context
+) {
+    data.name = newData["Name"]!!
+    data.description = newData["Description"]!!
+    data.price = (newData["Price"]!!.toDouble() * 100).toInt()
+    data.amount = newData["Amount"]!!.toLong()
+    data.image = newImage
+    data.platform1 = newData["platform1"].toBoolean()
+    data.platform2 = newData["platform2"].toBoolean()
+    data.exportData(context.filesDir.toString())
+}
 
 private fun saveProductToDB(
     data: ProductInformation,
@@ -587,6 +585,7 @@ private fun deleteProduct(data: ProductInformation, context: Context, nav: Desti
         .setPositiveButton(
             android.R.string.yes
         ) { _, _ ->
+            data.deleteDataFromDB(data)
             data.deleteData(context.filesDir.toString())
             nav.navigate(MainContentDestination)
         }
