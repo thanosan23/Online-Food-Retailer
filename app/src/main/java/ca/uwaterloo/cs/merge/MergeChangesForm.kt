@@ -77,7 +77,7 @@ fun MergeScreen(nav: DestinationsNavigator) {
                 }
             },
             actions = {
-                IconButton(onClick = { nav.navigate(MainContentDestination) }) {
+                IconButton(onClick = { nav.navigate(MainContentDestination(false)) }) {
                     Icon(
                         imageVector = Icons.Filled.Home,
                         contentDescription = "Catalogue",
@@ -607,7 +607,7 @@ private fun processData(
 }
 
 private fun readData(saveDir: String): ArrayList<HarvestInformation> {
-    val dir = File("${saveDir}/out")
+    val dir = File("${saveDir}/out2")
     if (!dir.exists()) {
         return arrayListOf()
     }
@@ -626,7 +626,7 @@ private fun readData(saveDir: String): ArrayList<HarvestInformation> {
 }
 
 private fun getProducts(saveDir: String): HashMap<String, ProductInformation> {
-    val dir = File("${saveDir}/out")
+    val dir = File("${saveDir}/out2")
     if (!dir.exists()) {
         return HashMap()
     }

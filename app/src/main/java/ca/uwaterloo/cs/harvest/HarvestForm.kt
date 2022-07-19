@@ -172,7 +172,7 @@ fun SendCancelDeleteWidgets(
                 } else {
                     saveHarvestRequestNoProduct(formState.getData(), "", saveDir)
                 }
-                nav.navigate(MainContentDestination)
+                nav.navigate(MainContentDestination(false))
             }
         }) {
             Icon(
@@ -233,7 +233,7 @@ private fun deleteHarvestRequest(context: Context, nav: DestinationsNavigator) {
         .setPositiveButton(
             android.R.string.yes
         ) { _, _ ->
-            nav.navigate(MainContentDestination)
+            nav.navigate(MainContentDestination(false))
         }
         .setNegativeButton(android.R.string.no, null).show()
 }

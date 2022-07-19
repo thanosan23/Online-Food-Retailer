@@ -77,6 +77,9 @@ class DBGetInternal(context: Context?) {
             override fun activate(input: CompleteUserProfile) {
                 val productIds = input.productIds
                 amount = input.productIds.size
+                if (amount == 0){
+                    Singleton.readFromDB += 1
+                }
                 for (productId in productIds){
                     val id = Id(productId, IdType.ProductId)
                     dbClient.get(id.getPath(), listener1)

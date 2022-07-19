@@ -7,6 +7,7 @@ import ca.uwaterloo.cs.bemodels.SignUpWorker
 import ca.uwaterloo.cs.bemodels.UserProfileFarmer
 import ca.uwaterloo.cs.harvest.HarvestInformation
 import ca.uwaterloo.cs.product.ProductInformation
+import java.util.*
 
 class DBManager(context: Context?) {
     // it is important to pass the context if you are getting images
@@ -43,9 +44,8 @@ class DBManager(context: Context?) {
     }
 
     // if the product is being created for the first time add productIdString to be null
-    fun storeProductInformation(userId: String, productInformation: ProductInformation){
+    fun storeProductInformation(productCreation: Boolean, userId: String, productInformation: ProductInformation){
         val productIdString = productInformation.productId
-        val productCreation = productIdString == null
 
         // DFC storage
         val DFCSuppliedProductId = idResolver.standardResolver(productIdString, IdType.DFCSuppliedProductId)
@@ -60,8 +60,8 @@ class DBManager(context: Context?) {
         dbStoreInternal.removeProductFromFarmer(farmerId, productIdString)
     }
 
-    fun getProductsInformation(userId: String, belistener: Listener<List<ProductInformation>>){
-        dbGetInternal.getProductInformation(userId, belistener)
+    fun getProductsInformation(userId: String, beListener: Listener<List<ProductInformation>>){
+        dbGetInternal.getProductInformation(userId, beListener)
     }
 
     // if the harvest is being created for the first time add harvestId to be null in the HarvestInformation
@@ -110,7 +110,7 @@ class DBManagerTest() {
     private fun simple1StoreProductTest() {
         val productInformation =
             ProductInformation(
-                null,
+                UUID.randomUUID().toString(),
                 "new name",
                 "vamos fugis",
                 13,
@@ -119,13 +119,13 @@ class DBManagerTest() {
                 platform1 = true,
                 platform2 = false
             )
-        dbManager.storeProductInformation(userId1, productInformation)
+        dbManager.storeProductInformation(true, userId1, productInformation)
     }
 
     private fun simple2StoreProductTest() {
         val productInformation =
             ProductInformation(
-                null,
+                UUID.randomUUID().toString(),
                 "not new name",
                 "nao vamos fugir",
                 13,
@@ -134,7 +134,7 @@ class DBManagerTest() {
                 platform1 = true,
                 platform2 = false
             )
-        dbManager.storeProductInformation(userId1, productInformation)
+        dbManager.storeProductInformation(true, userId1, productInformation)
     }
 
     private fun simpleGetProductTest(){

@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import android.os.Handler;
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -26,14 +25,12 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
-import ca.uwaterloo.cs.db.DBClient
 import ca.uwaterloo.cs.db.DBManager
 import ca.uwaterloo.cs.db.DBManagerTest
-import ca.uwaterloo.cs.dbmodels.CompleteUserProfile
 import ca.uwaterloo.cs.destinations.HarvestFormDestination
-import ca.uwaterloo.cs.destinations.MergeFormDestination
 import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.product.ProductInformation
+import ca.uwaterloo.cs.product.copy
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import coil.compose.rememberImagePainter
@@ -42,9 +39,9 @@ import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import java.io.File
-import java.io.FileInputStream
-import java.io.ObjectInputStream
 import java.util.*
 
 
@@ -92,16 +89,12 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Destination
 @Composable
 fun MainContent(
-    nav: DestinationsNavigator) {
-    println("entered here")
-    val readFromDB = Singleton.readFromDB
-    Singleton.readFromDB += 1
+    nav: DestinationsNavigator,
+    user: Boolean) {
     val useTemplate = Singleton.isFarmer
-    println("user template $useTemplate")
 
     Scaffold(
         content = {
@@ -109,11 +102,11 @@ fun MainContent(
             var tableData = remember {
                 ArrayList<Pair<String, ProductInformation>>()
             }
-            if (readFromDB >= 2) {
-                tableData = readData(context)
+            if (Singleton.readFromDB == 0) {
+                readDataFromDB(tableData, LocalContext.current)
             }
             else {
-                readDataFromDB(tableData, LocalContext.current)
+                tableData = readDataFromFiles(context)
             }
             TableScreen(nav, useTemplate, tableData)},
         bottomBar = { NavigationBar(nav) })
@@ -169,7 +162,7 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean, table: ArrayLi
                         confirmButton = {
                             Button(
                                 onClick = {
-                                    val tableData = readData(context)
+                                    val tableData = readDataFromFiles(context)
                                     val tmpTable = ArrayList<Pair<String, ProductInformation>>()
                                     for (item in tableData) {
 //                                        Log.d("item", item.second.name)
@@ -322,11 +315,11 @@ private fun editItem(nav: DestinationsNavigator, data: ProductInformation, useTe
 }
 
 private fun addItem(nav: DestinationsNavigator) {
-    nav.navigate(ProductFormDestination())
+    nav.navigate(ProductFormDestination(creation = true))
 }
 @Composable
 fun generateMockData(amount: Int = 7, context: Context) {
-//    val dir = File("${context.filesDir}/out")
+//    val dir = File("${context.filesDir}/out2")
 //    if (dir.exists()) {
 //        dir.deleteRecursively()
 //    }
@@ -365,22 +358,29 @@ fun generateMockData(amount: Int = 7, context: Context) {
 //    ).exportData(context.filesDir.toString())
 }
 
-private fun readData(context: Context): ArrayList<Pair<String, ProductInformation>> {
+private fun readDataFromFiles(context: Context): ArrayList<Pair<String, ProductInformation>> {
     // TODO: platform compatibility
     // TODO: load from platform
-    val dir = File("${context.filesDir}/out")
+    val dir = File("${context.filesDir}/out2")
     if (!dir.exists()) {
         return ArrayList()
     }
     val list = ArrayList<Pair<String, ProductInformation>>()
     for (saveFile in dir.walk()) {
         if (saveFile.isFile && saveFile.canRead() && saveFile.name.contains("Product-")) {
-            val fileIS = FileInputStream(saveFile)
-            val inStream = ObjectInputStream(fileIS)
-            val productInformation = inStream.readObject() as ProductInformation
-            list.add(Pair(productInformation.productId!!, productInformation))
-            inStream.close()
-            fileIS.close()
+//            val fileIS = FileInputStream(saveFile)
+//            val inStream = ObjectInputStream(fileIS)
+//            val productInformation = inStream.readObject() as ProductInformation
+            try {
+                val productInformation =
+                    Json.decodeFromString<ProductInformation>(saveFile.readText())
+                list.add(Pair(productInformation.productId!!, productInformation))
+            }
+            catch (e: Throwable){
+
+            }
+//            inStream.close()
+//            fileIS.close()
         }
     }
     return list
@@ -390,16 +390,21 @@ private fun readData(context: Context): ArrayList<Pair<String, ProductInformatio
 private fun readDataFromDB(
         tableData: ArrayList<Pair<String, ProductInformation>>,
         context: Context){
-
+    val dir = File("${context.filesDir}/out2")
+    if (dir.exists()){
+        dir.deleteRecursively()
+    }
     val dbManager = DBManager(LocalContext.current)
     class ListenerImpl() : Listener<List<ProductInformation>>() {
         override fun activate(input: List<ProductInformation>) {
             for (product in input){
-                tableData.add(Pair(product.productId!!, product))
+                tableData.add(Pair(product.productId, product))
             }
             for (product in input){
-                product.exportData(context.filesDir.toString())
+                val product2 = copy(product)
+                product2.exportData(context.filesDir.toString())
             }
+            Singleton.readFromDB += 1
         }
     }
     val listener = ListenerImpl()

@@ -49,7 +49,8 @@ import java.util.*
 fun ProductForm(
     navigator: DestinationsNavigator,
     data: ProductInformation?,
-    useTemplate: Boolean = true  //worker:false, farmer:true
+    useTemplate: Boolean = true,  //worker:false, farmer:true
+    creation: Boolean = false
 ) {
     OnlineFoodRetailTheme {
         Scaffold(
@@ -68,7 +69,10 @@ fun ProductForm(
                         },
                 ) {
                     Text(if (data == null) "ADD PRODUCT" else "EDIT PRODUCT")
-                    ShowProductForm(navigator, data ?: ProductInformation(), useTemplate)
+                    ShowProductForm(navigator,
+                        data ?: ProductInformation(),
+                        useTemplate,
+                        creation)
                 }
             },
             bottomBar = { NavigationBar(navigator) }
@@ -81,6 +85,7 @@ fun ShowProductForm(
     nav: DestinationsNavigator,
     data: ProductInformation,
     useTemplate: Boolean,
+    creation: Boolean,
 ) {
     val formState by remember { mutableStateOf(FormState()) }
     val platformState by remember { mutableStateOf(PlatformState(data)) }
@@ -335,8 +340,8 @@ fun ShowProductForm(
                     image = image,
                     nav = nav,
                     context = context,
-                    useTemplate = useTemplate
-                )
+                    useTemplate = useTemplate,
+                    creation = creation)
             }
         } else {
             Form(
@@ -493,14 +498,15 @@ fun SendCancelDeleteWidgets(
     image: String,
     nav: DestinationsNavigator,
     context: Context,
-    useTemplate: Boolean
-) {
+    useTemplate: Boolean,
+    creation: Boolean
+    ) {
     Row {
         Button(onClick = {
             if (formState.validate() && platformState.validate()) {
                 saveProduct(data, formState.getData() + platformState.getData(), image, context)
-                saveProductToDB(data, formState.getData() + platformState.getData(), image)
-                nav.navigate(MainContentDestination)
+                saveProductToDB(creation, data, formState.getData() + platformState.getData(), image)
+                nav.navigate(MainContentDestination(false))
             }
         }) {
             Icon(
@@ -510,7 +516,7 @@ fun SendCancelDeleteWidgets(
             )
         }
         Button(onClick = {
-            nav.navigate(MainContentDestination)
+            nav.navigate(MainContentDestination(false))
         }) {
             Icon(
                 imageVector = Icons.Filled.Cancel,
@@ -559,6 +565,7 @@ private fun saveProduct(
 }
 
 private fun saveProductToDB(
+    creation: Boolean,
     data: ProductInformation,
     newData: Map<String, String>,
     newImage: String,
@@ -572,6 +579,7 @@ private fun saveProductToDB(
     data.platform1 = newData["platform1"].toBoolean()
     data.platform2 = newData["platform2"].toBoolean()
     dbManager.storeProductInformation(
+        creation,
         Singleton.userId,
         data
     )
@@ -587,7 +595,7 @@ private fun deleteProduct(data: ProductInformation, context: Context, nav: Desti
         ) { _, _ ->
             data.deleteDataFromDB(data)
             data.deleteData(context.filesDir.toString())
-            nav.navigate(MainContentDestination)
+            nav.navigate(MainContentDestination(false))
         }
         .setNegativeButton(android.R.string.no, null).show()
 }
@@ -613,7 +621,7 @@ private fun addProductNumber(
             AlertDialog.Builder(context)
                 .setMessage("Request has been sent").show()
             harvestRequest.exportData(context.filesDir.toString())
-            nav.navigate(MainContentDestination)
+            nav.navigate(MainContentDestination(false))
         }
         .setNegativeButton(android.R.string.no, null).show()
 }
@@ -639,7 +647,7 @@ private fun removeProductNumber(
             AlertDialog.Builder(context)
                 .setMessage("Request has been sent").show()
             harvestRequest.exportData(context.filesDir.toString())
-            nav.navigate(MainContentDestination)
+            nav.navigate(MainContentDestination(false))
         }
         .setNegativeButton(android.R.string.no, null).show()
 }

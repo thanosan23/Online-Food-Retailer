@@ -74,7 +74,7 @@ data class HarvestInformation (
     }
 
     fun exportData(fileDir: String) {
-        val dir = File("${fileDir}/out")
+        val dir = File("${fileDir}/out2")
         if (!dir.exists()) {
             dir.mkdir()
         }
@@ -92,7 +92,7 @@ data class HarvestInformation (
     }
 
     fun deleteData(fileDir: String) {
-        val file = File("${fileDir}/out", "Harvest-$harvestId.txt")
+        val file = File("${fileDir}/out2", "Harvest-$harvestId.txt")
         if (file.exists())
         {
             file.delete()
