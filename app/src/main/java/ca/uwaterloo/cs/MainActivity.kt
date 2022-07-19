@@ -99,7 +99,7 @@ fun MainContent(
     nav: DestinationsNavigator) {
     println("entered here")
     val readFromDB = Singleton.readFromDB
-    Singleton.readFromDB = false
+    Singleton.readFromDB += 1
     val useTemplate = Singleton.isFarmer
     println("user template $useTemplate")
 
@@ -109,7 +109,7 @@ fun MainContent(
             var tableData = remember {
                 ArrayList<Pair<String, ProductInformation>>()
             }
-            if (!readFromDB) {
+            if (readFromDB >= 2) {
                 tableData = readData(context)
             }
             else {

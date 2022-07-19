@@ -10,5 +10,5 @@ object Singleton
     var userId = ""
     var isFarmer = true
     var isNewUser = false
-    var readFromDB = true
+    var readFromDB = 0
 }
