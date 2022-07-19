@@ -1,5 +1,6 @@
 package ca.uwaterloo.cs.db
 
+import android.content.Context
 import ca.uwaterloo.cs.Listener
 import ca.uwaterloo.cs.bemodels.SignUpFarmer
 import ca.uwaterloo.cs.bemodels.SignUpWorker
@@ -7,9 +8,12 @@ import ca.uwaterloo.cs.dbmodels.CompleteUserProfile
 import ca.uwaterloo.cs.harvest.HarvestInformation
 import ca.uwaterloo.cs.product.ProductInformation
 
-class DBStoreInternal {
+class DBStoreInternal(context: Context?) {
     private val dbClient = DBClient()
     private val contentIngestion = ContentIngestion()
+    init {
+        dbClient.context = context
+    }
 
     fun storeProductInformation(productCreation: Boolean,
                                 userId: String,

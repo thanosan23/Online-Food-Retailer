@@ -28,6 +28,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import ca.uwaterloo.cs.NavigationBar
+import ca.uwaterloo.cs.Singleton
 import ca.uwaterloo.cs.db.DBClient
 import ca.uwaterloo.cs.db.DBManager
 import ca.uwaterloo.cs.destinations.MainContentDestination
@@ -497,7 +498,7 @@ fun SendCancelDeleteWidgets(
     Row {
         Button(onClick = {
             if (formState.validate() && platformState.validate()) {
-                saveProduct(data, formState.getData() + platformState.getData(), image, context)
+                saveProductToDB(data, formState.getData() + platformState.getData(), image)
                 nav.navigate(MainContentDestination)
             }
         }) {
@@ -540,12 +541,31 @@ private fun createImageFile(context: Context): Uri {
     )
 }
 
-private fun saveProduct(
+//private fun saveProduct(
+//    data: ProductInformation,
+//    newData: Map<String, String>,
+//    newImage: String,
+//    context: Context
+//) {
+//    data.name = newData["Name"]!!
+//    data.description = newData["Description"]!!
+//    data.price = (newData["Price"]!!.toDouble() * 100).toInt()
+//    data.amount = newData["Amount"]!!.toLong()
+//    data.image = newImage
+//    data.platform1 = newData["platform1"].toBoolean()
+//    data.platform2 = newData["platform2"].toBoolean()
+//    data.exportData(context.filesDir.toString())
+//
+//    val dbClient = DBClient()
+//    dbClient.storeImage(data.image.toUri())
+//}
+
+private fun saveProductToDB(
     data: ProductInformation,
     newData: Map<String, String>,
     newImage: String,
-    context: Context
-) {
+){
+    val dbManager = DBManager(null)
     data.name = newData["Name"]!!
     data.description = newData["Description"]!!
     data.price = (newData["Price"]!!.toDouble() * 100).toInt()
@@ -553,10 +573,10 @@ private fun saveProduct(
     data.image = newImage
     data.platform1 = newData["platform1"].toBoolean()
     data.platform2 = newData["platform2"].toBoolean()
-    data.exportData(context.filesDir.toString())
-
-    val dbClient = DBClient()
-    dbClient.storeImage(data.image.toUri())
+    dbManager.storeProductInformation(
+        Singleton.userId,
+        data
+    )
 }
 
 private fun deleteProduct(data: ProductInformation, context: Context, nav: DestinationsNavigator) {

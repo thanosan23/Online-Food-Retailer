@@ -33,7 +33,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 fun SignupAsManager(
     navigator: DestinationsNavigator
 ) {
-    val dbManager = DBManager()
+    val dbManager = DBManager(null)
     val formState by remember { mutableStateOf(FormState()) }
     OnlineFoodRetailTheme {
         val focusManager = LocalFocusManager.current

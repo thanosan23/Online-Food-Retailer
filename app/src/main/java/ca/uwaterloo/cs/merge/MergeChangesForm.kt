@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import ca.uwaterloo.cs.NavigationBar
+import ca.uwaterloo.cs.Singleton
 import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.harvest.HarvestInformation

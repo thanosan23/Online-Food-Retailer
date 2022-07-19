@@ -27,7 +27,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 fun authenticateFarmerCode(
     navigator: DestinationsNavigator
 ){
-    val dbManager = DBManager()
+    val dbManager = DBManager(null)
     OnlineFoodRetailTheme {
         Column(
             modifier = Modifier

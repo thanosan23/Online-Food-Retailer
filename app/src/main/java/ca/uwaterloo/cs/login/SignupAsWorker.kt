@@ -34,7 +34,7 @@ fun SignupAsWorker(
     farmerUserId: String,
 ) {
     println("did the navigation do any damage? $farmerUserId")
-    val dbManager = DBManager()
+    val dbManager = DBManager(null)
     OnlineFoodRetailTheme {
         val focusManager = LocalFocusManager.current
         Column(

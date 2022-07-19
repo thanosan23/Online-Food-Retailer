@@ -27,7 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import ca.uwaterloo.cs.db.DBClient
+import ca.uwaterloo.cs.db.DBManager
 import ca.uwaterloo.cs.db.DBManagerTest
+import ca.uwaterloo.cs.dbmodels.CompleteUserProfile
 import ca.uwaterloo.cs.destinations.HarvestFormDestination
 import ca.uwaterloo.cs.destinations.MergeFormDestination
 import ca.uwaterloo.cs.destinations.ProductFormDestination
@@ -47,8 +49,7 @@ import java.util.*
 
 
 class MainActivity : ComponentActivity() {
-    // for testing
-
+    val dbManager = DBManager(null)
     fun logout(){
         AuthUI.getInstance().signOut(this)
     }
@@ -61,6 +62,7 @@ class MainActivity : ComponentActivity() {
         println("first time $userId")
         Singleton.userId = userId
         Singleton.isNewUser = res.idpResponse?.isNewUser!!
+        dbManager.getUserType(Singleton.userId)
         setContent {
             OnlineFoodRetailTheme {
                 val context = LocalContext.current
@@ -94,11 +96,17 @@ class MainActivity : ComponentActivity() {
 @Destination
 @Composable
 fun MainContent(nav: DestinationsNavigator) {
-    val useTemplate: Boolean = true //farmer:true,worker:false
+    val useTemplate = Singleton.isFarmer
+    println("user template $useTemplate")
+
     Scaffold(
         content = {
             val context = LocalContext.current
-            val tableData = readData(context)
+//            val tableData = readData(context)
+            val tableData = remember {
+                ArrayList<Pair<String, ProductInformation>>()
+            }
+            readDataFromDB(tableData)
             TableScreen(nav, useTemplate, tableData) },
         bottomBar = { NavigationBar(nav) })
 }
@@ -323,7 +331,7 @@ fun generateMockData(amount: Int = 7, context: Context) {
         "apple description",
         100,
         100,
-        dbClient.getImage().toString(),
+        "",
         platform1 = false,
         platform2 = false
     ).exportData(context.filesDir.toString())
@@ -368,4 +376,19 @@ private fun readData(context: Context): ArrayList<Pair<String, ProductInformatio
         }
     }
     return list
+}
+
+@Composable
+private fun readDataFromDB(tableData: ArrayList<Pair<String, ProductInformation>>){
+    val dbManager = DBManager(LocalContext.current)
+    class ListenerImpl() : Listener<List<ProductInformation>>() {
+        override fun activate(input: List<ProductInformation>) {
+            for (product in input){
+                tableData.add(Pair(product.productId!!, product))
+            }
+        }
+    }
+    val listener = ListenerImpl()
+    dbManager.getProductsInformation(Singleton.userId, listener)
+    Thread.sleep(2000)
 }

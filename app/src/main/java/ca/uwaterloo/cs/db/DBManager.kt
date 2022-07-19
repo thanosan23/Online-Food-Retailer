@@ -1,5 +1,6 @@
 package ca.uwaterloo.cs.db
 
+import android.content.Context
 import ca.uwaterloo.cs.Listener
 import ca.uwaterloo.cs.bemodels.SignUpFarmer
 import ca.uwaterloo.cs.bemodels.SignUpWorker
@@ -7,11 +8,11 @@ import ca.uwaterloo.cs.bemodels.UserProfileFarmer
 import ca.uwaterloo.cs.harvest.HarvestInformation
 import ca.uwaterloo.cs.product.ProductInformation
 
-class DBManager {
+class DBManager(context: Context?) {
     private val idResolver = IdResolver()
     private val dbStoreDFCManager = DBStoreDFC()
-    private val dbStoreInternal = DBStoreInternal()
-    private val dbGetInternal = DBGetInternal()
+    private val dbStoreInternal = DBStoreInternal(context)
+    private val dbGetInternal = DBGetInternal(context)
 
     // returns true if there is no user with the username false otherwise
     fun storeSignUpFarmer(signUpFarmer: SignUpFarmer){
@@ -22,6 +23,10 @@ class DBManager {
     // returns true if the userName exists and it actually has that password
     fun authenticate(userName: String, password: String, listener: Listener<Boolean>){
         dbGetInternal.authenticate(userName, password, listener)
+    }
+
+    fun getUserType(userId: String){
+        dbGetInternal.getUserType(userId)
     }
 
     // returns true if the userName exists and it actually has that password
@@ -86,7 +91,7 @@ class DBManager {
 
 class DBManagerTest() {
     private val userId1 = "messinotcom"
-    private val dbManager = DBManager()
+    private val dbManager = DBManager(null)
 
     private fun testSignUp() {
         val signUpFarmer = SignUpFarmer(userId1,

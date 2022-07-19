@@ -11,7 +11,7 @@ import java.util.*
 
 @kotlinx.serialization.Serializable
 data class ProductInformation(
-    var productId: String? = UUID.randomUUID().toString(), // Internal id number of product, should we store this?
+    var productId: String? = null, // Internal id number of product, should we store this?
     var name: String = "",
     var description: String = "",
     var price: Int = 0,
