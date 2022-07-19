@@ -2,16 +2,18 @@ package ca.uwaterloo.cs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
-import androidx.compose.ui.text.font.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.form.Field
 import ca.uwaterloo.cs.form.Form
 import ca.uwaterloo.cs.form.FormState
@@ -20,7 +22,7 @@ import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@Destination(start = true)
+@Destination
 @Composable
 fun Signup(
     navigator: DestinationsNavigator

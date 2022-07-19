@@ -1,20 +1,25 @@
 package ca.uwaterloo.cs
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.speech.RecognizerIntent
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -26,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import ca.uwaterloo.cs.destinations.HarvestFormDestination
 import ca.uwaterloo.cs.destinations.MergeFormDestination
@@ -49,7 +55,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             OnlineFoodRetailTheme {
                 val context = LocalContext.current
-                generateMockData(1, context = context)
+                generateMockData(context = context)
                 DestinationsNavHost(navGraph = NavGraphs.root)
             }
         }
@@ -57,13 +63,69 @@ class MainActivity : ComponentActivity() {
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-@Destination
+@Destination(start = true)
 @Composable
 fun MainContent(nav: DestinationsNavigator) {
-    val useTemplate: Boolean = true //farmer:true,worker:false
+    val useTemplate = true //farmer:true,worker:false
+    val context = LocalContext.current
+    val startLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        val spokenText: String =
+            it.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS).let { results ->
+                results?.get(0) ?: ""
+            }
+        Toast.makeText(context, spokenText, Toast.LENGTH_SHORT).show()
+    }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+            intent.putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+            )
+            startLauncher.launch(intent)
+        } else {
+            Toast.makeText(context, "Permission Denied!", Toast.LENGTH_SHORT).show()
+        }
+    }
     Scaffold(
         content = { TableScreen(nav, useTemplate) },
-        bottomBar = { NavigationBar(nav) })
+        bottomBar = { NavigationBar(nav) },
+        floatingActionButton = {
+            FloatingActionButton(
+                modifier = Modifier
+                    .width(100.dp)
+                    .height(100.dp),
+                onClick = {
+                    when (PackageManager.PERMISSION_GRANTED) {
+                        ContextCompat.checkSelfPermission(
+                            context, Manifest.permission.RECORD_AUDIO
+                        ) -> {
+                            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                            intent.putExtra(
+                                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                            )
+                            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Talk")
+                            startLauncher.launch(intent)
+                        }
+                        else -> {
+                            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                        }
+                    }
+                }) {
+                Icon(
+                    imageVector = Icons.Filled.Mic,
+                    modifier = Modifier.fillMaxSize(0.5f),
+                    contentDescription = "Voice Search"
+                )
+            }
+        },
+    )
 }
 
 @Composable
@@ -209,7 +271,7 @@ private fun addItem(nav: DestinationsNavigator) {
     nav.navigate(ProductFormDestination())
 }
 
-private fun generateMockData(amount: Int = 7, context: Context) {
+private fun generateMockData(context: Context) {
     val dir = File("${context.filesDir}/out")
     if (dir.exists()) {
         dir.deleteRecursively()
