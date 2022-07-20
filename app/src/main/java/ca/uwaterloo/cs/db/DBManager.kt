@@ -60,8 +60,12 @@ class DBManager(context: Context?) {
         dbStoreInternal.removeProductFromFarmer(farmerId, productIdString)
     }
 
-    fun getProductsInformation(userId: String, beListener: Listener<List<ProductInformation>>){
-        dbGetInternal.getProductInformation(userId, beListener)
+    fun getProductsInformationFromFarmer(farmerId: String, beListener: Listener<List<ProductInformation>>){
+        dbGetInternal.getProductInformation(farmerId, beListener)
+    }
+
+    fun getProductsInformationFromWorker(workerId: String, beListener: Listener<List<ProductInformation>>){
+        dbGetInternal
     }
 
     // if the harvest is being created for the first time add harvestId to be null in the HarvestInformation
@@ -143,7 +147,7 @@ class DBManagerTest() {
             }
         }
         val listener = ListenerImpl()
-        dbManager.getProductsInformation(userId1, listener)
+        dbManager.getProductsInformationFromFarmer(userId1, listener)
     }
 
     fun part1ProductTest(){

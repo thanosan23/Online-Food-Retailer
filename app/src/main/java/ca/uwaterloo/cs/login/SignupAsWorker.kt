@@ -109,7 +109,7 @@ fun SignupAsWorker(
                         farmerUserId
                     )
                     dbManager.storeSignUpWorker(signUpWorker)
-                    navigator.navigate(MainContentDestination(true))
+                    navigator.navigate(MainContentDestination)
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {

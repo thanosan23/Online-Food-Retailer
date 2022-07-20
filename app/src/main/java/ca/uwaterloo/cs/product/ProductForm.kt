@@ -506,7 +506,7 @@ fun SendCancelDeleteWidgets(
             if (formState.validate() && platformState.validate()) {
                 saveProduct(data, formState.getData() + platformState.getData(), image, context)
                 saveProductToDB(creation, data, formState.getData() + platformState.getData(), image)
-                nav.navigate(MainContentDestination(false))
+                nav.navigate(MainContentDestination)
             }
         }) {
             Icon(
@@ -516,7 +516,7 @@ fun SendCancelDeleteWidgets(
             )
         }
         Button(onClick = {
-            nav.navigate(MainContentDestination(false))
+            nav.navigate(MainContentDestination)
         }) {
             Icon(
                 imageVector = Icons.Filled.Cancel,
@@ -595,7 +595,7 @@ private fun deleteProduct(data: ProductInformation, context: Context, nav: Desti
         ) { _, _ ->
             data.deleteDataFromDB(data)
             data.deleteData(context.filesDir.toString())
-            nav.navigate(MainContentDestination(false))
+            nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()
 }
@@ -621,7 +621,7 @@ private fun addProductNumber(
             AlertDialog.Builder(context)
                 .setMessage("Request has been sent").show()
             harvestRequest.exportData(context.filesDir.toString())
-            nav.navigate(MainContentDestination(false))
+            nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()
 }
@@ -647,7 +647,7 @@ private fun removeProductNumber(
             AlertDialog.Builder(context)
                 .setMessage("Request has been sent").show()
             harvestRequest.exportData(context.filesDir.toString())
-            nav.navigate(MainContentDestination(false))
+            nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()
 }

@@ -140,4 +140,8 @@ class DBGetInternal(context: Context?) {
 
         val listener2 = ListenerImpl2()
     }
+
+    fun getProductsInformationFromWorker(workerId: String, beListener: Listener<List<ProductInformation>>){
+
+    }
 }

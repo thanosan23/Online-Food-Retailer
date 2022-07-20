@@ -3,6 +3,7 @@ package ca.uwaterloo.cs
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.*
@@ -43,6 +44,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class MainActivity : ComponentActivity() {
@@ -92,33 +94,34 @@ class MainActivity : ComponentActivity() {
 @Destination
 @Composable
 fun MainContent(
-    nav: DestinationsNavigator,
-    user: Boolean) {
+    nav: DestinationsNavigator) {
     val useTemplate = Singleton.isFarmer
 
     Scaffold(
         content = {
-            val context = LocalContext.current
-            var tableData = remember {
-                ArrayList<Pair<String, ProductInformation>>()
+            val tableData = remember {
+                mutableStateOf(ArrayList<Pair<String, ProductInformation>>())
             }
+            tableData.value = readDataFromFiles(LocalContext.current)
             if (Singleton.readFromDB == 0) {
                 readDataFromDB(tableData, LocalContext.current)
             }
-            else {
-                tableData = readDataFromFiles(context)
+            if (!Singleton.jobScheduled){
+                Singleton.jobScheduled = true
+                scheduleJob(tableData, LocalContext.current)
             }
+
             TableScreen(nav, useTemplate, tableData)},
         bottomBar = { NavigationBar(nav) })
 }
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean, table: ArrayList<Pair<String, ProductInformation>>) {
+fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean, tableData: MutableState<ArrayList<Pair<String, ProductInformation>>>) {
     val context = LocalContext.current
-    val tableData = mutableStateListOf<Pair<String, ProductInformation>>()
-    for (item in table) {
-        tableData.add(item)
+    val table = mutableStateListOf<Pair<String, ProductInformation>>()
+    for (item in tableData.value) {
+        table.add(item)
     }
     if (useTemplate) {
         CenterAlignedTopAppBar(
@@ -188,9 +191,9 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean, table: ArrayLi
                         dismissButton = {
                             Button(
                                 onClick = {
-                                    tableData.clear()
+                                    table.clear()
                                     for (item in table) {
-                                        tableData.add(item)
+                                        table.add(item)
                                     }
                                     openDialog.value = false
                                     text = TextFieldValue("")
@@ -224,7 +227,7 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean, table: ArrayLi
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Here are all the lines of your table.
-            items(tableData, key = { it }) {
+            items(table, key = { it }) {
                 Spacer(Modifier.height(10.dp))
 
                 Row(
@@ -386,27 +389,78 @@ private fun readDataFromFiles(context: Context): ArrayList<Pair<String, ProductI
     return list
 }
 
-@Composable
 private fun readDataFromDB(
-        tableData: ArrayList<Pair<String, ProductInformation>>,
+        tableData: MutableState<ArrayList<Pair<String, ProductInformation>>>,
         context: Context){
-    val dir = File("${context.filesDir}/out2")
-    if (dir.exists()){
-        dir.deleteRecursively()
-    }
-    val dbManager = DBManager(LocalContext.current)
+    val dbManager = DBManager(context)
     class ListenerImpl() : Listener<List<ProductInformation>>() {
         override fun activate(input: List<ProductInformation>) {
-            for (product in input){
-                tableData.add(Pair(product.productId, product))
+            val fileProducts = readDataFromFiles(context)
+            if (!checkIfProductsChanged(input, fileProducts)){
+                return
             }
-            for (product in input){
+            val dir = File("${context.filesDir}/out2")
+            if (dir.exists()){
+                dir.deleteRecursively()
+            }
+            for (product in input) {
                 val product2 = copy(product)
                 product2.exportData(context.filesDir.toString())
             }
             Singleton.readFromDB += 1
+            tableData.value = readDataFromFiles(context)
         }
     }
     val listener = ListenerImpl()
-    dbManager.getProductsInformation(Singleton.userId, listener)
+        dbManager.getProductsInformationFromFarmer(Singleton.userId, listener)
+}
+
+private fun checkIfProductsChanged(
+    dbProducts: List<ProductInformation>,
+    filesProducts: ArrayList<Pair<String, ProductInformation>>,
+    ): Boolean{
+    val fileIds = mutableSetOf<String>()
+    val dbIds = mutableSetOf<String>()
+
+    for (dbProduct in dbProducts){
+        dbIds.add(dbProduct.productId)
+    }
+
+    for (fileProduct in filesProducts){
+        fileIds.add(fileProduct.second.productId)
+    }
+    return !(dbIds.containsAll(fileIds) and fileIds.containsAll(dbIds))
+}
+
+private fun scheduleJob(
+    tableData: MutableState<ArrayList<Pair<String, ProductInformation>>>,
+    context: Context){
+    val handler = Handler()
+    val delay = 15000 // 1000 milliseconds == 1 second
+
+    handler.postDelayed(object : Runnable {
+        override fun run() {
+            if (Singleton.forTesting){
+                createMockProduct(context)
+            }
+            Singleton.forTesting = false
+            println("job started")
+            readDataFromDB(tableData, context)
+            handler.postDelayed(this, delay.toLong())
+        }
+    }, delay.toLong())
+}
+
+
+fun createMockProduct(context: Context){
+    ProductInformation(
+        UUID.randomUUID().toString(),
+        "apple",
+        "apple description",
+        100,
+        100,
+        "",
+        platform1 = false,
+        platform2 = false
+    ).exportData(context.filesDir.toString())
 }

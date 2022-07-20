@@ -11,4 +11,6 @@ object Singleton
     var isFarmer = true
     var isNewUser = false
     var readFromDB = 0
+    var jobScheduled = false
+    var forTesting = true
 }

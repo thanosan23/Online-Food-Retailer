@@ -55,9 +55,9 @@ fun NavigationBar(nav: DestinationsNavigator) {
                 ) },
                 onClick = {
                     when (item.title) {
-                        "Catalogue" -> nav.navigate(MainContentDestination(false))
+                        "Catalogue" -> nav.navigate(MainContentDestination)
                         "Request" -> nav.navigate(MergeFormDestination())
-                        "History" -> nav.navigate(MainContentDestination(false))
+                        "History" -> nav.navigate(MainContentDestination)
                         "Profile" -> nav.navigate(ProfileContentDestination)
                     }
                 }

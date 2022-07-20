@@ -77,7 +77,7 @@ fun MergeScreen(nav: DestinationsNavigator) {
                 }
             },
             actions = {
-                IconButton(onClick = { nav.navigate(MainContentDestination(false)) }) {
+                IconButton(onClick = { nav.navigate(MainContentDestination) }) {
                     Icon(
                         imageVector = Icons.Filled.Home,
                         contentDescription = "Catalogue",
