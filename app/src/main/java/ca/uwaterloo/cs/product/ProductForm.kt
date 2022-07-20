@@ -30,6 +30,7 @@ import androidx.core.net.toUri
 import ca.uwaterloo.cs.NavigationBar
 import ca.uwaterloo.cs.db.DBClient
 import ca.uwaterloo.cs.db.DBManager
+import ca.uwaterloo.cs.destinations.simulateTransactionDestination
 import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.form.*
 import ca.uwaterloo.cs.harvest.HarvestInformation
@@ -337,6 +338,11 @@ fun ShowProductForm(
                     useTemplate = useTemplate
                 )
             }
+            Button(onClick = {
+                nav.navigate(simulateTransactionDestination)
+            }) {
+                Text(text = "Simulate Transaction")
+            }
         } else {
             Form(
                 state = formState,
@@ -442,6 +448,11 @@ fun ShowProductForm(
                 context = context,
                 useTemplate = useTemplate
             )
+            Button(onClick = {
+                nav.navigate(simulateTransactionDestination)
+            }) {
+                Text(text = "Simulate Transaction")
+            }
         }
     }
 }
