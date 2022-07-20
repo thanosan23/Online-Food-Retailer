@@ -61,11 +61,11 @@ class DBManager(context: Context?) {
     }
 
     fun getProductsInformationFromFarmer(farmerId: String, beListener: Listener<List<ProductInformation>>){
-        dbGetInternal.getProductInformation(farmerId, beListener)
+        dbGetInternal.getProductInformationFromFarmer(farmerId, beListener)
     }
 
     fun getProductsInformationFromWorker(workerId: String, beListener: Listener<List<ProductInformation>>){
-        dbGetInternal
+        dbGetInternal.getProductsInformationFromWorker(workerId, beListener)
     }
 
     // if the harvest is being created for the first time add harvestId to be null in the HarvestInformation

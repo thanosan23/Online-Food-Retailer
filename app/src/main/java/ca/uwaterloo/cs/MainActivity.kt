@@ -3,7 +3,6 @@ package ca.uwaterloo.cs
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.*
@@ -31,7 +30,6 @@ import ca.uwaterloo.cs.db.DBManagerTest
 import ca.uwaterloo.cs.destinations.HarvestFormDestination
 import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.product.ProductInformation
-import ca.uwaterloo.cs.product.copy
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import coil.compose.rememberImagePainter
@@ -40,9 +38,6 @@ import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
-import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -96,19 +91,20 @@ class MainActivity : ComponentActivity() {
 fun MainContent(
     nav: DestinationsNavigator) {
     val useTemplate = Singleton.isFarmer
+    val fileStorageDatabaseSynch = FileStorageDatabaseSynch(LocalContext.current)
 
     Scaffold(
         content = {
             val tableData = remember {
                 mutableStateOf(ArrayList<Pair<String, ProductInformation>>())
             }
-            tableData.value = readDataFromFiles(LocalContext.current)
+            tableData.value = fileStorageDatabaseSynch.readProductFromFiles()
             if (Singleton.readFromDB == 0) {
-                readDataFromDB(tableData, LocalContext.current)
+                fileStorageDatabaseSynch.readProductDataFromDB(tableData)
             }
             if (!Singleton.jobScheduled){
                 Singleton.jobScheduled = true
-                scheduleJob(tableData, LocalContext.current)
+                fileStorageDatabaseSynch.productInformationSynchJob(tableData)
             }
 
             TableScreen(nav, useTemplate, tableData)},
@@ -165,7 +161,7 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean, tableData: Mut
                         confirmButton = {
                             Button(
                                 onClick = {
-                                    val tableData = readDataFromFiles(context)
+                                    val tableData = FileStorageDatabaseSynch(context).readProductFromFiles()
                                     val tmpTable = ArrayList<Pair<String, ProductInformation>>()
                                     for (item in tableData) {
 //                                        Log.d("item", item.second.name)
@@ -359,96 +355,6 @@ fun generateMockData(amount: Int = 7, context: Context) {
 //        platform1 = false,
 //        platform2 = false
 //    ).exportData(context.filesDir.toString())
-}
-
-private fun readDataFromFiles(context: Context): ArrayList<Pair<String, ProductInformation>> {
-    // TODO: platform compatibility
-    // TODO: load from platform
-    val dir = File("${context.filesDir}/out2")
-    if (!dir.exists()) {
-        return ArrayList()
-    }
-    val list = ArrayList<Pair<String, ProductInformation>>()
-    for (saveFile in dir.walk()) {
-        if (saveFile.isFile && saveFile.canRead() && saveFile.name.contains("Product-")) {
-//            val fileIS = FileInputStream(saveFile)
-//            val inStream = ObjectInputStream(fileIS)
-//            val productInformation = inStream.readObject() as ProductInformation
-            try {
-                val productInformation =
-                    Json.decodeFromString<ProductInformation>(saveFile.readText())
-                list.add(Pair(productInformation.productId!!, productInformation))
-            }
-            catch (e: Throwable){
-
-            }
-//            inStream.close()
-//            fileIS.close()
-        }
-    }
-    return list
-}
-
-private fun readDataFromDB(
-        tableData: MutableState<ArrayList<Pair<String, ProductInformation>>>,
-        context: Context){
-    val dbManager = DBManager(context)
-    class ListenerImpl() : Listener<List<ProductInformation>>() {
-        override fun activate(input: List<ProductInformation>) {
-            val fileProducts = readDataFromFiles(context)
-            if (!checkIfProductsChanged(input, fileProducts)){
-                return
-            }
-            val dir = File("${context.filesDir}/out2")
-            if (dir.exists()){
-                dir.deleteRecursively()
-            }
-            for (product in input) {
-                val product2 = copy(product)
-                product2.exportData(context.filesDir.toString())
-            }
-            Singleton.readFromDB += 1
-            tableData.value = readDataFromFiles(context)
-        }
-    }
-    val listener = ListenerImpl()
-        dbManager.getProductsInformationFromFarmer(Singleton.userId, listener)
-}
-
-private fun checkIfProductsChanged(
-    dbProducts: List<ProductInformation>,
-    filesProducts: ArrayList<Pair<String, ProductInformation>>,
-    ): Boolean{
-    val fileIds = mutableSetOf<String>()
-    val dbIds = mutableSetOf<String>()
-
-    for (dbProduct in dbProducts){
-        dbIds.add(dbProduct.productId)
-    }
-
-    for (fileProduct in filesProducts){
-        fileIds.add(fileProduct.second.productId)
-    }
-    return !(dbIds.containsAll(fileIds) and fileIds.containsAll(dbIds))
-}
-
-private fun scheduleJob(
-    tableData: MutableState<ArrayList<Pair<String, ProductInformation>>>,
-    context: Context){
-    val handler = Handler()
-    val delay = 15000 // 1000 milliseconds == 1 second
-
-    handler.postDelayed(object : Runnable {
-        override fun run() {
-            if (Singleton.forTesting){
-                createMockProduct(context)
-            }
-            Singleton.forTesting = false
-            println("job started")
-            readDataFromDB(tableData, context)
-            handler.postDelayed(this, delay.toLong())
-        }
-    }, delay.toLong())
 }
 
 

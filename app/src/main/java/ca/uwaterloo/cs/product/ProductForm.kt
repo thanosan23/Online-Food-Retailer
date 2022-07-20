@@ -621,6 +621,7 @@ private fun addProductNumber(
             AlertDialog.Builder(context)
                 .setMessage("Request has been sent").show()
             harvestRequest.exportData(context.filesDir.toString())
+            storeHarvest(Singleton.userId, harvestRequest)
             nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()
@@ -647,7 +648,13 @@ private fun removeProductNumber(
             AlertDialog.Builder(context)
                 .setMessage("Request has been sent").show()
             harvestRequest.exportData(context.filesDir.toString())
+            storeHarvest(Singleton.userId, harvestRequest)
             nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()
+}
+
+private fun storeHarvest(workerUserIdString: String, harvestInformation: HarvestInformation){
+    val dbManager = DBManager(null)
+    dbManager.storeHarvestInformation(workerUserIdString, harvestInformation)
 }

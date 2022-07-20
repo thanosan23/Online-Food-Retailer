@@ -54,8 +54,21 @@ class DBGetInternal(context: Context?) {
         )
     }
 
+    fun getUserProfile(userIdString: String, listener: Listener<CompleteUserProfile>){
+        val id = Id(userIdString, IdType.CompleteUserProfileId)
+        class ListenerImpl1() : Listener<CompleteUserProfile>() {
+            override fun activate(input: CompleteUserProfile) {
+                listener.activate(input)
+            }
+        }
+        val listener1 = ListenerImpl1()
+        dbClient.get(
+            id.getPath(),
+            listener1
+        )
+    }
 
-    fun getProductInformation(userId: String, beListener: Listener<List<ProductInformation>>){
+    fun getProductInformationFromFarmer(farmerUserIdString: String, beListener: Listener<List<ProductInformation>>){
         val productsInformation = mutableListOf<ProductInformation>()
         var counter = 0
         var amount = 0
@@ -89,9 +102,19 @@ class DBGetInternal(context: Context?) {
 
         val listener2 = ListenerImpl2()
 
-        val id = Id(userId, IdType.CompleteUserProfileId)
+        val id = Id(farmerUserIdString, IdType.CompleteUserProfileId)
 
         dbClient.get(id.getPath(), listener2)
+    }
+
+    fun getProductsInformationFromWorker(workerIdString: String, beListener: Listener<List<ProductInformation>>){
+        class ListenerImpl1() : Listener<CompleteUserProfile>() {
+            override fun activate(input: CompleteUserProfile) {
+                getProductInformationFromFarmer(input.parentFarmerId, beListener)
+            }
+        }
+        val listener1 = ListenerImpl1()
+        getUserProfile(workerIdString, listener1)
     }
 
     fun getHarvestInformation(workerId: String, beListener: Listener<List<HarvestInformation>>){
@@ -139,9 +162,5 @@ class DBGetInternal(context: Context?) {
         }
 
         val listener2 = ListenerImpl2()
-    }
-
-    fun getProductsInformationFromWorker(workerId: String, beListener: Listener<List<ProductInformation>>){
-
     }
 }

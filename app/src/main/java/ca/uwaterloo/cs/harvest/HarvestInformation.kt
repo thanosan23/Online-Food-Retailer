@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream
 import java.io.Serializable
 import java.util.*
 
+@kotlinx.serialization.Serializable
 data class HarvestInformation (
     var harvestId: String?,
     val fromWorker: String,

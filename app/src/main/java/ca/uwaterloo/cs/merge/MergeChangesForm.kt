@@ -26,8 +26,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
-import ca.uwaterloo.cs.NavigationBar
-import ca.uwaterloo.cs.Singleton
+import ca.uwaterloo.cs.*
 import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.harvest.HarvestInformation
@@ -37,9 +36,6 @@ import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import coil.compose.rememberImagePainter
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import java.io.File
-import java.io.FileInputStream
-import java.io.ObjectInputStream
 
 
 private lateinit var saveDir: String
@@ -60,6 +56,7 @@ fun MergeForm(
 @Composable
 fun MergeScreen(nav: DestinationsNavigator) {
     val context = LocalContext.current
+    val fileStorageDatabaseSynch = FileStorageDatabaseSynch(context)
     saveDir = context.filesDir.toString()
 
     Column {
@@ -87,10 +84,14 @@ fun MergeScreen(nav: DestinationsNavigator) {
             },
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
         )
-        val productList = getProducts(saveDir)
+
+        val productListFromFiles = localCasting1(fileStorageDatabaseSynch.readProductFromFiles())
+        val harvestListFromFiles = fileStorageDatabaseSynch.readHarvestFromFiles()
         val processedData =
             remember { mutableStateMapOf<String, Pair<ProductInformation?, List<HarvestInformation>>>() }
-        for (entry in processData(readData(saveDir), productList)) {
+        val processedDataFromFiles = processData(harvestListFromFiles, productListFromFiles)
+
+        for (entry in processedDataFromFiles) {
             if (entry.key != "" && entry.value.first != null) {
                 processedData[entry.value.first!!.name] = entry.value
             } else {
@@ -105,8 +106,8 @@ fun MergeScreen(nav: DestinationsNavigator) {
         }
         var numberChangeVisible by remember { mutableStateOf(false) }
         var associationChangeVisible by remember { mutableStateOf(false) }
-        var linkedHarvests = remember { mutableStateListOf<String>() }
-        var unlinkedHarvests = remember { mutableStateListOf<String>() }
+        val linkedHarvests = remember { mutableStateListOf<String>() }
+        val unlinkedHarvests = remember { mutableStateListOf<String>() }
 
         @Composable
         fun MergeEntryHeader(productData: ProductInformation) {
@@ -427,7 +428,7 @@ fun MergeScreen(nav: DestinationsNavigator) {
                     title = { Text("Select Product") },
                     text = {
                         Column {
-                            productList.map { (_, v) -> Pair(v.name, v) }.sortedBy { (k, _) -> k }
+                            productListFromFiles.map { (_, v) -> Pair(v.name, v) }.sortedBy { (k, _) -> k }
                                 .forEach { item ->
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
@@ -486,7 +487,7 @@ fun MergeScreen(nav: DestinationsNavigator) {
                                     Pair(processedData[association]!!.first, updatedNextList)
                             } else {
                                 processedData[association] = Pair(
-                                    productList[associationId],
+                                    productListFromFiles[associationId],
                                     arrayListOf(selectedHarvest!!)
                                 )
                             }
@@ -589,6 +590,14 @@ fun MergeScreen(nav: DestinationsNavigator) {
     }
 }
 
+private fun localCasting1(it: ArrayList<Pair<String, ProductInformation>>): HashMap<String, ProductInformation>{
+    val map1 = mutableMapOf<String, ProductInformation>()
+    for (thing in it){
+        map1[thing.first] = thing.second
+    }
+    return HashMap(map1)
+}
+
 
 private fun processData(
     data: ArrayList<HarvestInformation>,
@@ -606,40 +615,21 @@ private fun processData(
     return processedData
 }
 
-private fun readData(saveDir: String): ArrayList<HarvestInformation> {
-    val dir = File("${saveDir}/out2")
-    if (!dir.exists()) {
-        return arrayListOf()
-    }
-    val list = ArrayList<HarvestInformation>()
-    for (saveFile in dir.walk()) {
-        if (saveFile.isFile && saveFile.canRead() && saveFile.name.contains("Harvest-")) {
-            val fileIS = FileInputStream(saveFile)
-            val inStream = ObjectInputStream(fileIS)
-            val harvestInformation = inStream.readObject() as HarvestInformation
-            list.add(harvestInformation)
-            inStream.close()
-            fileIS.close()
-        }
-    }
-    return list
-}
-
-private fun getProducts(saveDir: String): HashMap<String, ProductInformation> {
-    val dir = File("${saveDir}/out2")
-    if (!dir.exists()) {
-        return HashMap()
-    }
-    val products = HashMap<String, ProductInformation>()
-    for (saveFile in dir.walk()) {
-        if (saveFile.isFile && saveFile.canRead() && saveFile.name.contains("Product-")) {
-            val fileIS = FileInputStream(saveFile)
-            val inStream = ObjectInputStream(fileIS)
-            val productInformation = inStream.readObject() as ProductInformation
-            products[productInformation.productId!!] = productInformation
-            inStream.close()
-            fileIS.close()
-        }
-    }
-    return products
-}
+//private fun readData(saveDir: String): ArrayList<HarvestInformation> {
+//    val dir = File("${saveDir}/out2")
+//    if (!dir.exists()) {
+//        return arrayListOf()
+//    }
+//    val list = ArrayList<HarvestInformation>()
+//    for (saveFile in dir.walk()) {
+//        if (saveFile.isFile && saveFile.canRead() && saveFile.name.contains("Harvest-")) {
+//            val fileIS = FileInputStream(saveFile)
+//            val inStream = ObjectInputStream(fileIS)
+//            val harvestInformation = inStream.readObject() as HarvestInformation
+//            list.add(harvestInformation)
+//            inStream.close()
+//            fileIS.close()
+//        }
+//    }
+//    return list
+//}
