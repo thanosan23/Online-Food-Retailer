@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
     // Choose authentication providers
     private val providers = arrayListOf(
         //AuthUI.IdpConfig.EmailBuilder().build(),
-//        AuthUI.IdpConfig.PhoneBuilder().build(),
+//        AuthUI.IdpConfig.PhoneBuilder().build())
         AuthUI.IdpConfig.GoogleBuilder().build())
 
     // Create and launch sign-in intent

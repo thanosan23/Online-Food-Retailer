@@ -30,6 +30,7 @@ import androidx.core.net.toUri
 import ca.uwaterloo.cs.NavigationBar
 import ca.uwaterloo.cs.db.DBClient
 import ca.uwaterloo.cs.db.DBManager
+import ca.uwaterloo.cs.destinations.simulateTransactionDestination
 import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.form.*
 import ca.uwaterloo.cs.harvest.HarvestInformation
@@ -337,6 +338,15 @@ fun ShowProductForm(
                     useTemplate = useTemplate
                 )
             }
+            Button(
+                onClick = {
+                    nav.navigate(simulateTransactionDestination(data))
+                },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text(text = "Simulate Transaction")
+            }
+            Spacer(modifier = Modifier.height(20.dp))
         } else {
             Form(
                 state = formState,
@@ -442,6 +452,16 @@ fun ShowProductForm(
                 context = context,
                 useTemplate = useTemplate
             )
+            Button(
+                onClick = {
+                    nav.navigate(simulateTransactionDestination(data))
+                          },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+
+            ) {
+                Text(text = "Simulate Transaction")
+            }
+            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }
@@ -460,7 +480,7 @@ fun AddOrRemove(
         Button(onClick = {
             if (formState.validate()) {
                 addProductNumber(data, formState.getData(), context, nav)
-                //nav.navigate(MainContentDestination)
+                nav.navigate(MainContentDestination)
             }
         }) {
             Icon(
