@@ -338,11 +338,15 @@ fun ShowProductForm(
                     useTemplate = useTemplate
                 )
             }
-            Button(onClick = {
-                nav.navigate(simulateTransactionDestination)
-            }) {
+            Button(
+                onClick = {
+                    nav.navigate(simulateTransactionDestination(data))
+                },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
                 Text(text = "Simulate Transaction")
             }
+            Spacer(modifier = Modifier.height(20.dp))
         } else {
             Form(
                 state = formState,
@@ -448,11 +452,16 @@ fun ShowProductForm(
                 context = context,
                 useTemplate = useTemplate
             )
-            Button(onClick = {
-                nav.navigate(simulateTransactionDestination)
-            }) {
+            Button(
+                onClick = {
+                    nav.navigate(simulateTransactionDestination(data))
+                          },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+
+            ) {
                 Text(text = "Simulate Transaction")
             }
+            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }
@@ -471,7 +480,7 @@ fun AddOrRemove(
         Button(onClick = {
             if (formState.validate()) {
                 addProductNumber(data, formState.getData(), context, nav)
-                //nav.navigate(MainContentDestination)
+                nav.navigate(MainContentDestination)
             }
         }) {
             Icon(
