@@ -53,8 +53,7 @@ fun simulateTransaction(
             nav.navigate(MainContentDestination)
         }) {
 //            eventually this will call back end to reduce product amount by reduction amount
-//            for now, just edit mock data by reducing product amount by reduction amount,
-//            then return to product form
+//            for now, return to product form
 
             Text(text = "Confirm Simulate Transaction")
         }
