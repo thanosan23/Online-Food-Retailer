@@ -39,6 +39,7 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
 import com.google.android.exoplayer2.ui.StyledPlayerView
+import androidx.compose.ui.graphics.Color
 import java.io.File
 
 @Destination
@@ -85,7 +86,8 @@ fun Login(
                 Text(
                     text = "Online Food Retailer",
                     fontWeight = FontWeight.Bold,
-                    fontSize = 32.sp
+                    fontSize = 32.sp,
+                    color = Color.White
                 )
                 Spacer(modifier = Modifier.height(21.dp))
 
@@ -93,17 +95,19 @@ fun Login(
                     onClick = {
                         navigator.navigate(SignupAsManagerDestination)
                     },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
-                    Text(text = "Sign up as Manager")
+                    Text(text = "Sign up as Manager", color = Color.Black)
                 }
                 Button(
                     onClick = {
                         navigator.navigate(authenticateFarmerCodeDestination)
                     },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
-                    Text(text = "Sign up as Worker")
+                    Text(text = "Sign up as Worker", color = Color.Black)
                 }
             }
         }
