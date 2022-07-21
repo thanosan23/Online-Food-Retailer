@@ -37,14 +37,8 @@ class DBClient {
 
     inline fun <reified T> store(key: String, data: T){
         if (data is HasOneImage){
-            if ((data.image != "") and  (!data.image.contains("JPEG"))) {
                 storeImage(data.image.toUri())
-            }
-            else{
-                if (data.image.contains("JPEG")){
                     println("attempt to store JPEG image, can't do that")
-                }
-            }
         }
         val stringData = Json.encodeToString(data)
         db.child(key).setValue(stringData).addOnFailureListener{
@@ -58,12 +52,7 @@ class DBClient {
                 val stringData = it.value as String
                 val data = Json.decodeFromString<T>(stringData)
                 if (data is HasOneImage){
-                    if (data.image.contains("JPEG")){
-                        println("image with JPEG, we can't get it")
-                    }
-                    else {
                         data.image = getImage(data.image).toString()
-                    }
                 }
                 listener.activate(data!!)
             }
@@ -105,7 +94,7 @@ class DBClient {
         val timeStamp = SimpleDateFormat.getDateTimeInstance().format(Date())
         val localFile = File(context!!.filesDir, "JPEG_$timeStamp.jpg")
         ref.getFile(localFile).addOnFailureListener{
-            println("failure to get image $it")
+            println("failure to get image $it, $imageName")
         }
         Thread.sleep(1000)
         return FileProvider.getUriForFile(
