@@ -28,6 +28,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.window.PopupProperties
 
 class Field(
     val name: String,
@@ -113,16 +114,18 @@ class Field(
                     }
                 } else null
             )
-            if (dropdownList.isNotEmpty()) {
+            val filteredDropDown = dropdownList.filter { it.startsWith(text, ignoreCase = true)}
+            if (filteredDropDown.isNotEmpty()) {
                 DropdownMenu(
                     expanded = openMenu,
                     onDismissRequest = {
                         openMenu = false
                     },
                     modifier = Modifier
-                        .width(with(LocalDensity.current) { dropdownMenuSize.width.toDp() })
+                        .width(with(LocalDensity.current) { dropdownMenuSize.width.toDp() }),
+                    properties = PopupProperties(focusable = false)
                 ) {
-                    dropdownList.forEach { label ->
+                    filteredDropDown.forEach { label ->
                         DropdownMenuItem(onClick = {
                             text = label
                             openMenu = false
