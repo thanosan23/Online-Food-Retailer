@@ -137,7 +137,13 @@ fun ShowProductForm(
             .padding(20.dp),
     ) {
         if (useTemplate) {
-            platformState.platformsUI.PlatformsDropDown()
+            Row(verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                platformState.platformsUI.PlatformsDropDown()
+
+            }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -573,8 +579,15 @@ private fun saveProduct(
     data.image = newImage
     data.platform1 = newData["platform1"].toBoolean()
     data.platform2 = newData["platform2"].toBoolean()
+    if(data.platform1){
+        data.platform1_amount=newData["platform1_amount"]!!.toLong()
+        data.platform1_price=newData["platform1_price"]!!.toInt()
+    }
+    if(data.platform2){
+        data.platform2_amount=newData["platform2_amount"]!!.toLong()
+        data.platform2_price=newData["platform2_price"]!!.toInt()
+    }
     data.exportData(context.filesDir.toString())
-
     val dbClient = DBClient()
     dbClient.storeImage(data.image.toUri())
 }

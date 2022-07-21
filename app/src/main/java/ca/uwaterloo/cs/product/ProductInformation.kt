@@ -18,7 +18,11 @@ data class ProductInformation(
     var amount: Long = 0,
     override var image: String = "",
     var platform1: Boolean = false,
-    var platform2: Boolean = false
+    var platform2: Boolean = false,
+    var platform1_price: Int=0,
+    var platform2_price: Int=0,
+    var platform1_amount: Long=0,
+    var platform2_amount: Long=0
 ) : Serializable, Parcelable, HasOneImage {
 
     constructor(parcel: Parcel) : this(
@@ -29,7 +33,11 @@ data class ProductInformation(
         parcel.readLong(),
         parcel.readString() ?: "",
         parcel.readBoolean(),
-        parcel.readBoolean()
+        parcel.readBoolean(),
+        parcel.readInt(),
+        parcel.readInt(),
+        parcel.readLong(),
+        parcel.readLong()
     )
 
     fun exportData(fileDir: String) {
@@ -69,6 +77,10 @@ data class ProductInformation(
         parcel.writeString(image)
         parcel.writeBoolean(platform1)
         parcel.writeBoolean(platform2)
+        parcel.writeInt(platform1_price)
+        parcel.writeInt(platform2_price)
+        parcel.writeLong(platform1_amount)
+        parcel.writeLong(platform2_amount)
     }
 
     override fun describeContents(): Int {
