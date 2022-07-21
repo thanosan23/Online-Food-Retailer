@@ -341,8 +341,8 @@ fun TableScreen(
         floatingActionButton = {
             FloatingActionButton(
                 modifier = Modifier
-                    .width(100.dp)
-                    .height(100.dp),
+                    .width(80.dp)
+                    .height(80.dp),
                 onClick = {
                     when (PackageManager.PERMISSION_GRANTED) {
                         ContextCompat.checkSelfPermission(
