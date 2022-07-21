@@ -15,7 +15,8 @@ object Singleton
     var isFarmer = true
     var isNewUser = false
     var productReadFromDB = 0
-    var deletedHarvestIds = mutableListOf<String>()
+    var workerIdAndHarvestIdDeleted = mutableListOf<Pair<String, String>>()
+    // both of these lists should have the same size
 
     var harvestReadFromDB = 0
     var harvestJobScheduled = false

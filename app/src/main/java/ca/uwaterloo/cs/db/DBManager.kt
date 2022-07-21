@@ -73,9 +73,9 @@ class DBManager(context: Context?) {
         dbStoreInternal.newRemoveHarvestFromWorker(workerIdString, harvestToBeKeepIdString)
     }
 
-    fun removeHarvestFromWorker(workerId: String, harvest: HarvestInformation){
+    fun removeHarvestFromWorker(workerId: String, harvestId: String){
     dbStoreInternal.removeHarvestFromWorker(
-        harvest.fromWorker, harvest.harvestId
+        workerId, harvestId
         )
     }
 

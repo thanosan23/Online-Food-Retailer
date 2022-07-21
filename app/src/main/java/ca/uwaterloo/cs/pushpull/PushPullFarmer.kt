@@ -10,32 +10,32 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.io.File
 
-class PushFarmerPull(val context: Context) {
+class PushPullFarmer(val context: Context) {
     private val dbManager = DBManager(context)
-    fun run(){
+    fun harvestResolver(){
         class ListenerImpl() : Listener<List<HarvestInformation>>() {
             override fun activate(input: List<HarvestInformation>) {
                 val pullResult = input
-                val removedIds = Singleton.deletedHarvestIds
+                val removedIds = Singleton.workerIdAndHarvestIdDeleted
                 val result = mutableListOf<HarvestInformation>()
                 for (harvest in pullResult){
-                    if (harvest.harvestId in removedIds){
+                    if (harvest.harvestId !in removedIds.map { it.second }){
                         result.add(harvest)
                     }
                 }
-                for (harvest in pullResult) {
-                    dbManager.removeHarvestFromWorker(harvest.fromWorker, harvest)
+                for (workerIdAndHarvestIdDeleted in Singleton.workerIdAndHarvestIdDeleted) {
+                    dbManager.removeHarvestFromWorker(workerIdAndHarvestIdDeleted.first,
+                                    workerIdAndHarvestIdDeleted.second)
                 }
                 overrideHarvestsFiles(context, result)
             }
         }
         val listener = ListenerImpl()
         dbManager.getAllHarvestsFromFarmer(Singleton.userId, listener)
+    }
 
+    fun productResolver(){
         pushProductData(context, dbManager)
-        Thread.sleep(5000)
-        pullProductDataFromDB(context, dbManager, Singleton.isFarmer, )
-        pushHarvestData(context, dbManager)
     }
 }
 
@@ -92,7 +92,7 @@ fun pushHarvestData(context: Context, dbManager: DBManager){
                 harvest)
         }
         else{
-            dbManager.removeHarvestFromWorker(harvest.fromWorker, harvest)
+            dbManager.removeHarvestFromWorker(harvest.fromWorker, harvest.harvestId)
         }
     }
 }

@@ -93,6 +93,7 @@ data class HarvestInformation (
     }
 
     fun deleteData(fileDir: String) {
+        Singleton.workerIdAndHarvestIdDeleted.add(Pair(this.fromWorker, this.harvestId))
         // deleting in the database
         val file = File(fileDir, "Harvest-$harvestId.txt")
         if (file.exists())

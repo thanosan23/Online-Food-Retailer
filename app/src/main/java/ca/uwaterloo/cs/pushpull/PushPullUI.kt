@@ -24,16 +24,16 @@ fun PushPullUI(
 @Composable
 fun UI(navigator: DestinationsNavigator){
     val context = LocalContext.current
-    val pushFarmerPull = PushFarmerPull(context)
+    val pushPullFarmer = PushPullFarmer(context)
     val pushWorker = PushWorker(context)
     val pullWorker = PullWorker(context)
     Button(
         onClick = {
             Thread {
                 if (Singleton.isFarmer) {
-                    pushFarmerPull.run()
+                    pushPullFarmer.harvestResolver()
+                    pushPullFarmer.productResolver()
                     Thread.sleep(5000)
-//                    pullFarmer.run()
                 } else {
                     pullWorker.run()
                     Thread.sleep(10000)
