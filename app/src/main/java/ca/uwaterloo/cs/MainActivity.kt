@@ -251,21 +251,21 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean, table: ArrayLi
                                 .clickable { editItem(nav, it.second, useTemplate) }
                         )
                     }
-                    IconButton(
-                        onClick = {
-                            nav.navigate(HarvestFormDestination(it.second))
-                        },
-                        modifier = Modifier
-                            .width(60.dp)
-                            .height(60.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = "Catalogue",
-                            tint = Color.Green,
-                            modifier = Modifier.fillMaxSize(1.0f)
-                        )
-                    }
+//                    IconButton(
+//                        onClick = {
+//                            nav.navigate(HarvestFormDestination(it.second))
+//                        },
+//                        modifier = Modifier
+//                            .width(60.dp)
+//                            .height(60.dp)
+//                    ) {
+//                        Icon(
+//                            imageVector = Icons.Filled.Add,
+//                            contentDescription = "Catalogue",
+//                            tint = Color.Green,
+//                            modifier = Modifier.fillMaxSize(1.0f)
+//                        )
+//                    }
 
                 }
             }
