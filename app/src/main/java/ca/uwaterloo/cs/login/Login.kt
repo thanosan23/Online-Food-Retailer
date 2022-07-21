@@ -50,7 +50,7 @@ fun Login(
     OnlineFoodRetailTheme {
         var video_url = "https://cdn.videvo.net/videvo_files/video/free/2020-05/large_watermarked/3d_ocean_1590675653_preview.mp4"
         val mediaItem = MediaItem.fromUri(video_url)
-        val rawId = LocalContext.current.resources.getIdentifier("clouds", "raw", LocalContext.current.packageName)
+        val rawId = LocalContext.current.resources.getIdentifier("wheat", "raw", LocalContext.current.packageName)
         val video = "android.resource://$LocalContext.current.packageName/$rawId"
         val videoUri = Uri.parse(video)
         //val focusManager = LocalFocusManager.current
@@ -71,22 +71,16 @@ fun Login(
         ProvideWindowInsets {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    //.fillMaxWidth()
-                    //.background(MaterialTheme.colors.background)
-                    //.wrapContentSize(align = Alignment.Center)
                     .padding(20.dp)
-                    /*.pointerInput(Unit) {
-                        detectTapGestures(onTap = {
-                            focusManager.clearFocus()
-                        })
-                    }*/
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                //Spacer(modifier = Modifier.height(100.dp))
+                Spacer(modifier = Modifier.height(360.dp))
                 Text(
                     text = "Online Food Retailer",
                     fontWeight = FontWeight.Bold,
-                    fontSize = 32.sp,
+                    fontSize = 36.sp,
                     color = Color.White
                 )
                 Spacer(modifier = Modifier.height(21.dp))
