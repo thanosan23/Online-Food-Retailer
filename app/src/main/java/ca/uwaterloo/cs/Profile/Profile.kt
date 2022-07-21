@@ -157,7 +157,7 @@ fun ProfileList(nav: DestinationsNavigator) {
             Divider(startIndent = 56.dp, color = Color.Divider, thickness = 0.8f.dp)
             ProfileListItem(ca.uwaterloo.cs.R.drawable.swap, "Language", nav)
             Divider(startIndent = 56.dp, color = Color.Divider, thickness = 0.8f.dp)
-            ProfileListItem(ca.uwaterloo.cs.R.drawable.swap, "Test", nav)
+            ProfileListItem(ca.uwaterloo.cs.R.drawable.logout, "Log out", nav)
         }
     }
 }
