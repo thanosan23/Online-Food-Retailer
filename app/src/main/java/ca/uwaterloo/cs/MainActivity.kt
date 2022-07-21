@@ -25,6 +25,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
+import ca.uwaterloo.cs.db.DBClient
 import ca.uwaterloo.cs.db.DBManager
 import ca.uwaterloo.cs.db.DBManagerTest
 import ca.uwaterloo.cs.destinations.HarvestFormDestination
@@ -91,29 +92,24 @@ class MainActivity : ComponentActivity() {
 fun MainContent(
     nav: DestinationsNavigator) {
     val useTemplate = Singleton.isFarmer
-    val fileStorageDatabaseSynch = FileStorageDatabaseSynch(LocalContext.current)
+    val productFileStorageDatabaseSynch = ProductFileStorageDatabaseSynch(LocalContext.current)
+
+    val tableData = remember {
+        mutableStateOf(ArrayList<Pair<String, ProductInformation>>())
+    }
+    Singleton.productAttatch(tableData)
+    tableData.value = productFileStorageDatabaseSynch.readProductFromFiles()
 
     Scaffold(
         content = {
-            val tableData = remember {
-                mutableStateOf(ArrayList<Pair<String, ProductInformation>>())
-            }
-            tableData.value = fileStorageDatabaseSynch.readProductFromFiles()
-            if (Singleton.readFromDB == 0) {
-                fileStorageDatabaseSynch.readProductDataFromDB(tableData)
-            }
-            if (!Singleton.jobScheduled){
-                Singleton.jobScheduled = true
-                fileStorageDatabaseSynch.productInformationSynchJob(tableData)
-            }
-
             TableScreen(nav, useTemplate, tableData)},
         bottomBar = { NavigationBar(nav) })
 }
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean, tableData: MutableState<ArrayList<Pair<String, ProductInformation>>>) {
+fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean,
+                tableData: MutableState<ArrayList<Pair<String, ProductInformation>>>) {
     val context = LocalContext.current
     val table = mutableStateListOf<Pair<String, ProductInformation>>()
     for (item in tableData.value) {
@@ -161,9 +157,8 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean, tableData: Mut
                         confirmButton = {
                             Button(
                                 onClick = {
-                                    val tableData = FileStorageDatabaseSynch(context).readProductFromFiles()
                                     val tmpTable = ArrayList<Pair<String, ProductInformation>>()
-                                    for (item in tableData) {
+                                    for (item in table) {
 //                                        Log.d("item", item.second.name)
 //                                        Log.d("text", text.text)
                                         if (item.second.name.indexOf(text.text) != -1) {
@@ -173,9 +168,9 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean, tableData: Mut
                                             //editItem(nav, item.second, useTemplate)
                                         }
                                     }
-                                    tableData.clear()
+                                    table.clear()
                                     for (item in tmpTable) {
-                                        tableData.add(item)
+                                        table.add(item)
                                     }
                                     text = TextFieldValue("")
                                     openDialog.value = false

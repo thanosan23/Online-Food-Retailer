@@ -82,7 +82,7 @@ class DBManager(context: Context?) {
         )
     }
 
-    fun getHarvestInformation(workerUserId: String, beListener: Listener<List<HarvestInformation>>){
+    fun getHarvestInformationFromWorker(workerUserId: String, beListener: Listener<List<HarvestInformation>>){
         dbGetInternal.getHarvestInformation(workerUserId, beListener)
     }
 

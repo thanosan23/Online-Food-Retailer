@@ -56,7 +56,6 @@ fun MergeForm(
 @Composable
 fun MergeScreen(nav: DestinationsNavigator) {
     val context = LocalContext.current
-    val fileStorageDatabaseSynch = FileStorageDatabaseSynch(context)
     saveDir = context.filesDir.toString()
 
     Column {
@@ -85,8 +84,22 @@ fun MergeScreen(nav: DestinationsNavigator) {
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
         )
 
-        val productListFromFiles = localCasting1(fileStorageDatabaseSynch.readProductFromFiles())
-        val harvestListFromFiles = fileStorageDatabaseSynch.readHarvestFromFiles()
+        val productFileStorageDatabaseSynch = ProductFileStorageDatabaseSynch(context)
+        val productScreenBroadCaster = remember {
+            mutableStateOf(0)
+        }
+//        Singleton.productAttatch(productScreenBroadCaster)
+
+        val harvestFileStorageDatabaseSync = HarvestFileStorageDatabaseSync(context)
+        val harvestScreenBroadCaster = remember{
+            mutableStateOf(0)
+        }
+        Singleton.harvestAttatch(harvestScreenBroadCaster)
+
+        val productListFromFiles = localCasting1(productFileStorageDatabaseSynch.readProductFromFiles())
+
+        val harvestListFromFiles = harvestFileStorageDatabaseSync.readHarvestFromFiles()
+
         val processedData =
             remember { mutableStateMapOf<String, Pair<ProductInformation?, List<HarvestInformation>>>() }
         val processedDataFromFiles = processData(harvestListFromFiles, productListFromFiles)

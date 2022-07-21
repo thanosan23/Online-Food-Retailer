@@ -2,18 +2,25 @@ package ca.uwaterloo.cs
 
 import android.content.Context
 import android.os.Handler
-import androidx.compose.runtime.MutableState
 import ca.uwaterloo.cs.db.DBManager
-import ca.uwaterloo.cs.harvest.HarvestInformation
 import ca.uwaterloo.cs.product.ProductInformation
 import ca.uwaterloo.cs.product.copy
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.io.File
 
-class FileStorageDatabaseSynch(val context: Context) {
+class ProductFileStorageDatabaseSynch(val context: Context) {
     private val dbManager = DBManager(context)
 
+    init{
+        if (Singleton.productReadFromDB == 0) {
+            updateProductDataFromDB()
+        }
+        if (!Singleton.productJobScheduled){
+            Singleton.productJobScheduled = true
+            productInformationSyncJob()
+        }
+    }
     fun readProductFromFiles(): ArrayList<Pair<String, ProductInformation>> {
         // TODO: platform compatibility
         // TODO: load from platform
@@ -21,57 +28,23 @@ class FileStorageDatabaseSynch(val context: Context) {
         if (!dir.exists()) {
             return ArrayList()
         }
-        val list = ArrayList<Pair<String, ProductInformation>>()
+        val productList = ArrayList<Pair<String, ProductInformation>>()
         for (saveFile in dir.walk()) {
             if (saveFile.isFile && saveFile.canRead() && saveFile.name.contains("Product-")) {
-//            val fileIS = FileInputStream(saveFile)
-//            val inStream = ObjectInputStream(fileIS)
-//            val productInformation = inStream.readObject() as ProductInformation
                 try {
                     val productInformation =
                         Json.decodeFromString<ProductInformation>(saveFile.readText())
-                    list.add(Pair(productInformation.productId!!, productInformation))
+                    productList.add(Pair(productInformation.productId!!, productInformation))
                 }
                 catch (e: Throwable){
                     println("error deserializing the product")
                 }
-//            inStream.close()
-//            fileIS.close()
             }
         }
-        return list
+        return productList
     }
 
-    fun readHarvestFromFiles(): ArrayList<HarvestInformation>{
-        // TODO: platform compatibility
-        // TODO: load from platform
-        val dir = File("${context.filesDir}/out2")
-        if (!dir.exists()) {
-            return ArrayList()
-        }
-        val list = ArrayList<HarvestInformation>()
-        for (saveFile in dir.walk()) {
-            if (saveFile.isFile && saveFile.canRead() && saveFile.name.contains("Harvest-")) {
-//            val fileIS = FileInputStream(saveFile)
-//            val inStream = ObjectInputStream(fileIS)
-//            val productInformation = inStream.readObject() as ProductInformation
-                try {
-                    val harvestInformation =
-                        Json.decodeFromString<HarvestInformation>(saveFile.readText())
-                    list.add(harvestInformation)
-                }
-                catch (e: Throwable){
-                    println("error deserializing the product")
-                }
-//            inStream.close()
-//            fileIS.close()
-            }
-        }
-        return list
-    }
-
-    fun readProductDataFromDB(
-        tableData: MutableState<ArrayList<Pair<String, ProductInformation>>>){
+    fun updateProductDataFromDB(){
         class ListenerImpl() : Listener<List<ProductInformation>>() {
             override fun activate(input: List<ProductInformation>) {
                 val fileProducts = readProductFromFiles()
@@ -86,8 +59,8 @@ class FileStorageDatabaseSynch(val context: Context) {
                     val product2 = copy(product)
                     product2.exportData(context.filesDir.toString())
                 }
-                Singleton.readFromDB += 1
-                tableData.value = readProductFromFiles()
+                Singleton.productReadFromDB += 1
+                Singleton.productBroadCast(fileProducts)
             }
         }
         val listener = ListenerImpl()
@@ -99,37 +72,14 @@ class FileStorageDatabaseSynch(val context: Context) {
         }
     }
 
-    fun productInformationSynchJob(
-        tableData: MutableState<ArrayList<Pair<String, ProductInformation>>>){
+    private fun productInformationSyncJob(){
         val handler = Handler()
-        val delay = 15000 // 1000 milliseconds == 1 second
+        val delay = 8000 // 1000 milliseconds == 1 second
 
         handler.postDelayed(object : Runnable {
             override fun run() {
-//            if (Singleton.forTesting){
-//                createMockProduct(context)
-//            }
-//            Singleton.forTesting = false
                 println("job started")
-                readProductDataFromDB(tableData)
-                handler.postDelayed(this, delay.toLong())
-            }
-        }, delay.toLong())
-    }
-
-    fun HarvestInformationSynchJob(
-        tableData: MutableState<ArrayList<Pair<String, ProductInformation>>>){
-        val handler = Handler()
-        val delay = 15000 // 1000 milliseconds == 1 second
-
-        handler.postDelayed(object : Runnable {
-            override fun run() {
-//            if (Singleton.forTesting){
-//                createMockProduct(context)
-//            }
-//            Singleton.forTesting = false
-                println("harvest job started")
-
+                updateProductDataFromDB()
                 handler.postDelayed(this, delay.toLong())
             }
         }, delay.toLong())

@@ -91,7 +91,7 @@ class DBGetInternal(context: Context?) {
                 val productIds = input.productIds
                 amount = input.productIds.size
                 if (amount == 0){
-                    Singleton.readFromDB += 1
+                    Singleton.productReadFromDB += 1
                 }
                 for (productId in productIds){
                     val id = Id(productId, IdType.ProductId)

@@ -26,8 +26,13 @@ import java.util.*
 
 class DBClient {
     val db = Firebase.database.reference
-    private val storage = FirebaseStorage.getInstance("gs://cs446-project-2.appspot.com").reference
+    private val storage = FirebaseStorage.getInstance().reference
     var context: Context? = null
+
+    fun clearStorage(){
+        val sas = storage.bucket.filterNot { false }
+        println("sas")
+    }
 
     inline fun <reified T> store(key: String, data: T){
         if (data is HasOneImage){
@@ -36,7 +41,9 @@ class DBClient {
             }
         }
         val stringData = Json.encodeToString(data)
-        db.child(key).setValue(stringData)
+        db.child(key).setValue(stringData).addOnFailureListener{
+            println(it)
+        }
     }
 
     inline fun <reified T> get(key: String, listener: Listener<T>){
