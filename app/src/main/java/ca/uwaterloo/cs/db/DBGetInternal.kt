@@ -119,10 +119,16 @@ class DBGetInternal(context: Context?) {
 
     fun getHarvestInformation(workerId: String, beListener: Listener<List<HarvestInformation>>){
         val harvestsInformation = mutableListOf<HarvestInformation>()
+        var counter = 0
+        var amount = 0
 
         class ListenerImpl1() : Listener<HarvestInformation>() {
             override fun activate(input: HarvestInformation) {
                 harvestsInformation.add(input)
+                counter += 1
+                if (counter == amount){
+                    beListener.activate(harvestsInformation)
+                }
             }
         }
         val listener1 = ListenerImpl1()
@@ -130,6 +136,7 @@ class DBGetInternal(context: Context?) {
         class ListenerImpl2() : Listener<CompleteUserProfile>() {
             override fun activate(input: CompleteUserProfile) {
                 val harvestIds = input.harvestIds
+                amount = harvestIds.size
                 for (harvestId in harvestIds){
                     val id = Id(harvestId, IdType.HarvestId)
                     dbClient.get(id.getPath(), listener1)
@@ -139,28 +146,40 @@ class DBGetInternal(context: Context?) {
         }
 
         val listener2 = ListenerImpl2()
-
         val id = Id(workerId, IdType.CompleteUserProfileId)
-
         dbClient.get(id.getPath(), listener2)
     }
 
     fun getHarvestInformationFromFarmer(farmerUserId: String, beListener: Listener<List<HarvestInformation>>){
         val harvestsInformation = mutableListOf<HarvestInformation>()
+        var amount = 0
+        var counter = 0
 
         class ListenerImpl1() : Listener<List<HarvestInformation>>() {
             override fun activate(input: List<HarvestInformation>) {
                 harvestsInformation.addAll(input)
+                counter += 1
+                if (amount == counter){
+                    beListener.activate(input)
+                }
             }
         }
+
         val listener1 = ListenerImpl1()
 
-        class ListenerImpl2() : Listener<List<HarvestInformation>>() {
-            override fun activate(input: List<HarvestInformation>) {
-                harvestsInformation.addAll(input)
+        class ListenerImpl2() : Listener<CompleteUserProfile>() {
+            override fun activate(input: CompleteUserProfile) {
+                amount = input.workersIds.size
+                for (workerId in input.workersIds){
+                    getHarvestInformation(workerId, listener1)
+                }
             }
         }
 
         val listener2 = ListenerImpl2()
+        dbClient.get(
+            Id(farmerUserId, IdType.CompleteUserProfileId).getPath(),
+            listener2
+        )
     }
 }

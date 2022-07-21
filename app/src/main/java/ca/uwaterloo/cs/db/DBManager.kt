@@ -92,7 +92,7 @@ class DBManager(context: Context?) {
     }
 
     fun getAllHarvestsFromFarmer(farmerUserId: String, beListener: Listener<List<HarvestInformation>>){
-
+        dbGetInternal.getHarvestInformationFromFarmer(farmerUserId, beListener)
     }
 
     fun storeUserProfile(userProfileFarmer: UserProfileFarmer){
