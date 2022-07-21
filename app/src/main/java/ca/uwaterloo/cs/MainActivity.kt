@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -27,11 +26,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import ca.uwaterloo.cs.db.DBClient
+import ca.uwaterloo.cs.db.DBManager
 import ca.uwaterloo.cs.db.DBManagerTest
 import ca.uwaterloo.cs.destinations.HarvestFormDestination
-import ca.uwaterloo.cs.destinations.MergeFormDestination
 import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.product.ProductInformation
+import ca.uwaterloo.cs.pushpull.readProductFromFiles
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import coil.compose.rememberImagePainter
@@ -40,19 +40,15 @@ import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import java.io.File
-import java.io.FileInputStream
-import java.io.ObjectInputStream
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class MainActivity : ComponentActivity() {
-    // for testing
-
+    val dbManager = DBManager(null)
     fun logout(){
         AuthUI.getInstance().signOut(this)
     }
-    private val dbManagerTest = DBManagerTest()
     // See: https://developer.android.com/training/basics/intents/result
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
@@ -61,6 +57,7 @@ class MainActivity : ComponentActivity() {
         println("first time $userId")
         Singleton.userId = userId
         Singleton.isNewUser = res.idpResponse?.isNewUser!!
+        dbManager.getUserType(Singleton.userId)
         setContent {
             OnlineFoodRetailTheme {
                 val context = LocalContext.current
@@ -85,31 +82,35 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        logout()
-//        dbManagerTest.part2ProductTest()
         signInLauncher.launch(signInIntent)
     }
 }
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Destination
 @Composable
-fun MainContent(nav: DestinationsNavigator) {
-    val useTemplate: Boolean = true //farmer:true,worker:false
+fun MainContent(
+    nav: DestinationsNavigator) {
+    val useTemplate = Singleton.isFarmer
+
+    val tableData = remember {
+        mutableStateOf(ArrayList<Pair<String, ProductInformation>>())
+    }
+    tableData.value = readProductFromFiles(LocalContext.current)
+
     Scaffold(
         content = {
-            val context = LocalContext.current
-            val tableData = readData(context)
-            TableScreen(nav, useTemplate, tableData) },
+            TableScreen(nav, useTemplate, tableData)},
         bottomBar = { NavigationBar(nav) })
 }
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean, table: ArrayList<Pair<String, ProductInformation>>) {
+fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean,
+                tableData: MutableState<ArrayList<Pair<String, ProductInformation>>>) {
     val context = LocalContext.current
-    val tableData = mutableStateListOf<Pair<String, ProductInformation>>()
-    for (item in table) {
-        tableData.add(item)
+    val table = mutableStateListOf<Pair<String, ProductInformation>>()
+    for (item in tableData.value) {
+        table.add(item)
     }
     if (useTemplate) {
         CenterAlignedTopAppBar(
@@ -153,9 +154,8 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean, table: ArrayLi
                         confirmButton = {
                             Button(
                                 onClick = {
-                                    //val tableData = readData(context)
                                     val tmpTable = ArrayList<Pair<String, ProductInformation>>()
-                                    for (item in tableData) {
+                                    for (item in table) {
 //                                        Log.d("item", item.second.name)
 //                                        Log.d("text", text.text)
                                         if (item.second.name.indexOf(text.text) != -1) {
@@ -165,9 +165,9 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean, table: ArrayLi
                                             //editItem(nav, item.second, useTemplate)
                                         }
                                     }
-                                    tableData.clear()
+                                    table.clear()
                                     for (item in tmpTable) {
-                                        tableData.add(item)
+                                        table.add(item)
                                     }
                                     text = TextFieldValue("")
                                     openDialog.value = false
@@ -179,9 +179,9 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean, table: ArrayLi
                         dismissButton = {
                             Button(
                                 onClick = {
-                                    tableData.clear()
+                                    table.clear()
                                     for (item in table) {
-                                        tableData.add(item)
+                                        table.add(item)
                                     }
                                     openDialog.value = false
                                     text = TextFieldValue("")
@@ -202,7 +202,7 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean, table: ArrayLi
         )
     }
     // TODO: REMOVE / UPGRADE MOCK DATA GENERATION IN FINAL PRODUCT
-    // val tableData = readData(context)
+//    val tableData = readData(context)
     // Each cell of a column must have the same weight.
     // The LazyColumn will be our table. Notice the use of the weights below
     Row() {
@@ -215,7 +215,7 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean, table: ArrayLi
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Here are all the lines of your table.
-            items(tableData, key = { it }) {
+            items(table, key = { it }) {
                 Spacer(Modifier.height(10.dp))
 
                 Row(
@@ -306,66 +306,22 @@ private fun editItem(nav: DestinationsNavigator, data: ProductInformation, useTe
 }
 
 private fun addItem(nav: DestinationsNavigator) {
-    nav.navigate(ProductFormDestination())
+    nav.navigate(ProductFormDestination(creation = true))
 }
 @Composable
 fun generateMockData(amount: Int = 7, context: Context) {
-    val dir = File("${context.filesDir}/out")
-    if (dir.exists()) {
-        dir.deleteRecursively()
-    }
-    val dbClient = DBClient()
-    dbClient.context = LocalContext.current
+}
 
+
+fun createMockProduct(context: Context){
     ProductInformation(
         UUID.randomUUID().toString(),
         "apple",
         "apple description",
         100,
         100,
-        dbClient.getImage().toString(),
-        platform1 = false,
-        platform2 = false
-    ).exportData(context.filesDir.toString())
-    ProductInformation(
-        UUID.randomUUID().toString(),
-        "carrot",
-        "carrot description",
-        200,
-        200,
         "",
         platform1 = false,
         platform2 = false
     ).exportData(context.filesDir.toString())
-    ProductInformation(
-        UUID.randomUUID().toString(),
-        "banana",
-        "banana description",
-        300,
-        300,
-        "",
-        platform1 = false,
-        platform2 = false
-    ).exportData(context.filesDir.toString())
-}
-
-private fun readData(context: Context): ArrayList<Pair<String, ProductInformation>> {
-    // TODO: platform compatibility
-    // TODO: load from platform
-    val dir = File("${context.filesDir}/out")
-    if (!dir.exists()) {
-        return ArrayList()
-    }
-    val list = ArrayList<Pair<String, ProductInformation>>()
-    for (saveFile in dir.walk()) {
-        if (saveFile.isFile && saveFile.canRead() && saveFile.name.contains("Product-")) {
-            val fileIS = FileInputStream(saveFile)
-            val inStream = ObjectInputStream(fileIS)
-            val productInformation = inStream.readObject() as ProductInformation
-            list.add(Pair(productInformation.productId!!, productInformation))
-            inStream.close()
-            fileIS.close()
-        }
-    }
-    return list
 }

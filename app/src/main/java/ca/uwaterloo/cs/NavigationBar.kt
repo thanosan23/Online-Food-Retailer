@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.sp
 import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.destinations.MergeFormDestination
 import ca.uwaterloo.cs.destinations.ProfileContentDestination
+import ca.uwaterloo.cs.destinations.PushPullUIDestination
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -57,7 +58,7 @@ fun NavigationBar(nav: DestinationsNavigator) {
                     when (item.title) {
                         "Catalogue" -> nav.navigate(MainContentDestination)
                         "Request" -> nav.navigate(MergeFormDestination())
-                        "History" -> nav.navigate(MainContentDestination)
+                        "History" -> nav.navigate(PushPullUIDestination)
                         "Profile" -> nav.navigate(ProfileContentDestination)
                     }
                 }

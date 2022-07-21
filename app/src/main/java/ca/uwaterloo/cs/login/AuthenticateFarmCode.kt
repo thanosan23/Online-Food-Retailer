@@ -13,11 +13,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.uwaterloo.cs.Listener
-import ca.uwaterloo.cs.bemodels.SignUpFarmer
 import ca.uwaterloo.cs.db.DBManager
-import ca.uwaterloo.cs.destinations.LoginDestination
 import ca.uwaterloo.cs.destinations.SignupAsWorkerDestination
-import ca.uwaterloo.cs.form.FormState
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -27,7 +24,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 fun authenticateFarmerCode(
     navigator: DestinationsNavigator
 ){
-    val dbManager = DBManager()
+    val dbManager = DBManager(null)
     OnlineFoodRetailTheme {
         Column(
             modifier = Modifier
