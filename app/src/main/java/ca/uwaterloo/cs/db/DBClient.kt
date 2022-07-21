@@ -14,6 +14,7 @@ import ca.uwaterloo.cs.dbmodels.Address
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageException
 import com.google.firebase.storage.StorageReference
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -36,8 +37,13 @@ class DBClient {
 
     inline fun <reified T> store(key: String, data: T){
         if (data is HasOneImage){
-            if (data.image != "") {
+            if ((data.image != "") and  (!data.image.contains("JPEG"))) {
                 storeImage(data.image.toUri())
+            }
+            else{
+                if (data.image.contains("JPEG")){
+                    println("attempt to store JPEG image, can't do that")
+                }
             }
         }
         val stringData = Json.encodeToString(data)
@@ -52,7 +58,12 @@ class DBClient {
                 val stringData = it.value as String
                 val data = Json.decodeFromString<T>(stringData)
                 if (data is HasOneImage){
-                    data.image = getImage(data.image).toString()
+                    if (data.image.contains("JPEG")){
+                        println("image with JPEG, we can't get it")
+                    }
+                    else {
+                        data.image = getImage(data.image).toString()
+                    }
                 }
                 listener.activate(data!!)
             }
@@ -89,7 +100,7 @@ class DBClient {
         }
     }
 
-    fun getImage(imageName: String): Uri{
+    fun getImage(imageName: String): Uri?{
         val ref: StorageReference = storage.child(imageName)
         val timeStamp = SimpleDateFormat.getDateTimeInstance().format(Date())
         val localFile = File(context!!.filesDir, "JPEG_$timeStamp.jpg")
