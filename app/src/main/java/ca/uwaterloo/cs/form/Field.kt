@@ -39,7 +39,8 @@ class Field(
     val inputType: KeyboardType = KeyboardType.Text,
     val formatter: VisualTransformation = NoTransformation(),
     val readOnly: Boolean = false,
-    private val dropdownList: List<String> = emptyList()
+    private val dropdownList: List<String> = emptyList(),
+    private val onChange: (String) -> Unit = {}
 ) {
     var text: String by mutableStateOf(initValue)
     var lbl: String by mutableStateOf(label)
@@ -66,14 +67,16 @@ class Field(
         val keyboardController = LocalSoftwareKeyboardController.current
         val focusRequester = FocusRequester()
         var openMenu by remember { mutableStateOf(false) }
-        var dropdownMenuSize by remember { mutableStateOf(Size.Zero)}
+        var dropdownMenuSize by remember { mutableStateOf(Size.Zero) }
         val icon = if (openMenu)
             Icons.Filled.KeyboardArrowUp
         else
             Icons.Filled.KeyboardArrowDown
 
-        Box(modifier = Modifier
-            .fillMaxWidth()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
             OutlinedTextField(
                 value = text,
                 isError = hasError,
@@ -106,15 +109,16 @@ class Field(
                 onValueChange = { value ->
                     hideError()
                     text = value
+                    onChange(value)
                 },
                 readOnly = readOnly,
                 trailingIcon = if (dropdownList.isNotEmpty()) {
                     {
                         Icon(icon, "Description", Modifier.clickable { openMenu = !openMenu })
                     }
-                } else null
+                } else null,
             )
-            val filteredDropDown = dropdownList.filter { it.startsWith(text, ignoreCase = true)}
+            val filteredDropDown = dropdownList.filter { it.startsWith(text, ignoreCase = true) }
             if (filteredDropDown.isNotEmpty()) {
                 DropdownMenu(
                     expanded = openMenu,
@@ -164,11 +168,10 @@ class Field(
                     true
                 }
                 is IsNumber -> {
-                    try  {
+                    try {
                         text.toDouble()
                         return@map true
-                    }
-                    catch (e: NumberFormatException) {
+                    } catch (e: NumberFormatException) {
                         showError(it.message)
                         return@map false
                     }
