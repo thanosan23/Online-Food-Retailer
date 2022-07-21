@@ -55,15 +55,17 @@ import java.util.*
 class MainActivity : ComponentActivity() {
     // for testing
 
-    fun logout(){
+    fun logout() {
         AuthUI.getInstance().signOut(this)
     }
+
     private val dbManagerTest = DBManagerTest()
+
     // See: https://developer.android.com/training/basics/intents/result
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
     ) { res ->
-        val userId = res.idpResponse?.email?.replace(".","")?.replace("\"", "")!!
+        val userId = res.idpResponse?.email?.replace(".", "")?.replace("\"", "")!!
         println("first time $userId")
         Singleton.userId = userId
         Singleton.isNewUser = res.idpResponse?.isNewUser!!
@@ -163,222 +165,213 @@ fun TableScreen(
             Toast.makeText(context, "Permission Denied!", Toast.LENGTH_SHORT).show()
         }
     }
-    if (useTemplate) {
-        CenterAlignedTopAppBar(
-            title = { Text("Catalogue", color = Color.White) },
-            navigationIcon = {
-                IconButton(onClick = {
-                    addItem(nav)
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = "Catalogue",
-                        tint = Color.White
-                    )
-                }
-            },
-            actions = {
-                val openDialog = remember { mutableStateOf(false) }
-                var text by remember { mutableStateOf(TextFieldValue("")) }
-                IconButton(onClick = { openDialog.value = true }) {
-                    Icon(
-                        imageVector = Icons.Filled.Search,
-                        contentDescription = "Localized description",
-                        tint = Color.White
-                    )
-                }
-                if (openDialog.value) {
-                    AlertDialog(
-                        onDismissRequest = { openDialog.value = false },
-                        title = { Text(text = "Search") },
-                        text = {
-                            Column() {
-                                TextField(
-                                    value = text,
-                                    onValueChange = {
-                                        text = it
-                                    }
-                                )
-                                //Log.d("", text.toString())
-                            }
-                        },
-                        confirmButton = {
-                            Button(
-                                onClick = {
-                                    //val tableData = readData(context)
-                                    val tmpTable = ArrayList<Pair<String, ProductInformation>>()
-                                    for (item in tableData) {
-//                                        Log.d("item", item.second.name)
-//                                        Log.d("text", text.text)
-                                        if (item.second.name.indexOf(text.text) != -1) {
-//                                            Log.d("", "HI")
-                                            tmpTable.add(item)
-                                            //tableData.remove(item)
-                                            //editItem(nav, item.second, useTemplate)
-                                        }
-                                    }
-                                    tableData.clear()
-                                    for (item in tmpTable) {
-                                        tableData.add(item)
-                                    }
-                                    text = TextFieldValue("")
-                                    openDialog.value = false
-
-                                }) {
-                                Text("Filter")
-                            }
-                        },
-                        dismissButton = {
-                            Button(
-                                onClick = {
-                                    tableData.clear()
-                                    for (item in table) {
-                                        tableData.add(item)
-                                    }
-                                    openDialog.value = false
-                                    text = TextFieldValue("")
-                                }) {
-                                Text("Clear")
-                            }
-                        }
-                    )
-
-                }
-            },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
-        )
-    } else {
-        CenterAlignedTopAppBar(
-            title = { Text("Catalogue", color = Color.White) },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
-        )
-    }
-    // TODO: REMOVE / UPGRADE MOCK DATA GENERATION IN FINAL PRODUCT
-    // val tableData = readData(context)
-    // Each cell of a column must have the same weight.
-    // The LazyColumn will be our table. Notice the use of the weights below
-    Row() {
-        Spacer(Modifier.width(22.dp))
-        LazyColumn(
-            Modifier
-                .padding(66.dp)
-                .background(Color.White)
-                .heightIn(0.dp, 640.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Here are all the lines of your table.
-            items(tableData, key = { it }) {
-                Spacer(Modifier.height(10.dp))
-
-                Row(
-                    Modifier
-                        .height(IntrinsicSize.Min)
-                        .clickable { editItem(nav, it.second, useTemplate) }
-                        .border(BorderStroke(3.dp, Color.InstagramPurple)),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    if (it.second.image == "") {
-                        Box(
-                            modifier = Modifier
-                                .width(200.dp)
-                                .height(200.dp)
-                                .clickable { editItem(nav, it.second, useTemplate) },
-                            contentAlignment = Alignment.Center
-                        )
-                        {
-                            Text(
-                                text = it.second.name,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 32.sp
+    Scaffold(
+        content = {
+            if (useTemplate) {
+                CenterAlignedTopAppBar(
+                    title = { Text("Catalogue", color = Color.White) },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            addItem(nav)
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.Add,
+                                contentDescription = "Catalogue",
+                                tint = Color.White
                             )
                         }
-                    } else {
-                        Image(
-                            painter = rememberImagePainter(it.second.image.toUri()),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .width(200.dp)
-                                .height(200.dp)
-                                .clickable { editItem(nav, it.second, useTemplate) }
-                        )
-                    }
-//                    IconButton(
-//                        onClick = {
-//                            nav.navigate(HarvestFormDestination(it.second))
-//                        },
-//                        modifier = Modifier
-//                            .width(60.dp)
-//                            .height(60.dp)
-//                    ) {
-//                        Icon(
-//                            imageVector = Icons.Filled.Add,
-//                            contentDescription = "Catalogue",
-//                            tint = Color.Green,
-//                            modifier = Modifier.fillMaxSize(1.0f)
-//                        )
-//                    }
+                    },
+                    actions = {
+                        val openDialog = remember { mutableStateOf(false) }
+                        var text by remember { mutableStateOf(TextFieldValue("")) }
+                        IconButton(onClick = { openDialog.value = true }) {
+                            Icon(
+                                imageVector = Icons.Filled.Search,
+                                contentDescription = "Localized description",
+                                tint = Color.White
+                            )
+                        }
+                        if (openDialog.value) {
+                            AlertDialog(
+                                onDismissRequest = { openDialog.value = false },
+                                title = { Text(text = "Search") },
+                                text = {
+                                    Column() {
+                                        TextField(
+                                            value = text,
+                                            onValueChange = {
+                                                text = it
+                                            }
+                                        )
+                                        //Log.d("", text.toString())
+                                    }
+                                },
+                                confirmButton = {
+                                    Button(
+                                        onClick = {
+                                            //val tableData = readData(context)
+                                            val tmpTable =
+                                                ArrayList<Pair<String, ProductInformation>>()
+                                            for (item in tableData) {
+//                                        Log.d("item", item.second.name)
+//                                        Log.d("text", text.text)
+                                                if (item.second.name.indexOf(text.text) != -1) {
+//                                            Log.d("", "HI")
+                                                    tmpTable.add(item)
+                                                    //tableData.remove(item)
+                                                    //editItem(nav, item.second, useTemplate)
+                                                }
+                                            }
+                                            tableData.clear()
+                                            for (item in tmpTable) {
+                                                tableData.add(item)
+                                            }
+                                            text = TextFieldValue("")
+                                            openDialog.value = false
 
+                                        }) {
+                                        Text("Filter")
+                                    }
+                                },
+                                dismissButton = {
+                                    Button(
+                                        onClick = {
+                                            tableData.clear()
+                                            for (item in table) {
+                                                tableData.add(item)
+                                            }
+                                            openDialog.value = false
+                                            text = TextFieldValue("")
+                                        }) {
+                                        Text("Clear")
+                                    }
+                                }
+                            )
+
+                        }
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
+                )
+            } else {
+                CenterAlignedTopAppBar(
+                    title = { Text("Catalogue", color = Color.White) },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
+                )
+            }
+            // TODO: REMOVE / UPGRADE MOCK DATA GENERATION IN FINAL PRODUCT
+            // val tableData = readData(context)
+            // Each cell of a column must have the same weight.
+            // The LazyColumn will be our table. Notice the use of the weights below
+            Row() {
+                Spacer(Modifier.width(22.dp))
+                LazyColumn(
+                    Modifier
+                        .padding(66.dp)
+                        .background(Color.White)
+                        .heightIn(0.dp, 640.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Here are all the lines of your table.
+                    items(tableData, key = { it }) {
+                        Spacer(Modifier.height(10.dp))
+
+                        Row(
+                            Modifier
+                                .height(IntrinsicSize.Min)
+                                .clickable { editItem(nav, it.second, useTemplate) }
+                                .border(BorderStroke(3.dp, Color.InstagramPurple)),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            if (it.second.image == "") {
+                                Box(
+                                    modifier = Modifier
+                                        .width(200.dp)
+                                        .height(200.dp)
+                                        .clickable { editItem(nav, it.second, useTemplate) },
+                                    contentAlignment = Alignment.Center
+                                )
+                                {
+                                    Text(
+                                        text = it.second.name,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 32.sp
+                                    )
+                                }
+                            } else {
+                                Image(
+                                    painter = rememberImagePainter(it.second.image.toUri()),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .width(200.dp)
+                                        .height(200.dp)
+                                        .clickable { editItem(nav, it.second, useTemplate) }
+                                )
+                            }
+                        }
+                    }
+                    item() {
+                        Spacer(Modifier.height(10.dp))
+
+                        Row(
+                            Modifier
+                                .height(IntrinsicSize.Min)
+                                .border(BorderStroke(3.dp, Color.InstagramPurple)),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    nav.navigate(HarvestFormDestination())
+                                },
+                                modifier = Modifier
+                                    .width(60.dp)
+                                    .height(60.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Add,
+                                    contentDescription = "Catalogue",
+                                    tint = Color.Green,
+                                    modifier = Modifier.fillMaxSize(1.0f)
+                                )
+                            }
+                        }
+                    }
                 }
             }
-            item() {
-                Spacer(Modifier.height(10.dp))
-
-                Row(
-                    Modifier
-                        .height(IntrinsicSize.Min)
-                        .border(BorderStroke(3.dp, Color.InstagramPurple)),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    IconButton(
-                        onClick = {
-                            nav.navigate(HarvestFormDestination())
-                        },
-                        modifier = Modifier
-                            .width(60.dp)
-                            .height(60.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = "Catalogue",
-                            tint = Color.Green,
-                            modifier = Modifier.fillMaxSize(1.0f)
-                        )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                modifier = Modifier
+                    .width(100.dp)
+                    .height(100.dp),
+                onClick = {
+                    when (PackageManager.PERMISSION_GRANTED) {
+                        ContextCompat.checkSelfPermission(
+                            context, Manifest.permission.RECORD_AUDIO
+                        ) -> {
+                            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                            intent.putExtra(
+                                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                            )
+                            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Talk")
+                            startLauncher.launch(intent)
+                        }
+                        else -> {
+                            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                        }
                     }
-                }
+                }) {
+                Icon(
+                    imageVector = Icons.Filled.Mic,
+                    modifier = Modifier.fillMaxSize(0.5f),
+                    contentDescription = "Voice Search"
+                )
             }
         }
-    }
-    FloatingActionButton(
-        modifier = Modifier
-            .width(100.dp)
-            .height(100.dp),
-        onClick = {
-            when (PackageManager.PERMISSION_GRANTED) {
-                ContextCompat.checkSelfPermission(
-                    context, Manifest.permission.RECORD_AUDIO
-                ) -> {
-                    val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-                    intent.putExtra(
-                        RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-                    )
-                    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-                    intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Talk")
-                    startLauncher.launch(intent)
-                }
-                else -> {
-                    permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                }
-            }
-        }) {
-        Icon(
-            imageVector = Icons.Filled.Mic,
-            modifier = Modifier.fillMaxSize(0.5f),
-            contentDescription = "Voice Search"
-        )
-    }
+    )
 }
 
 
