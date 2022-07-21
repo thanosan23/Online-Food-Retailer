@@ -31,6 +31,8 @@ import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.harvest.HarvestInformation
 import ca.uwaterloo.cs.product.ProductInformation
+import ca.uwaterloo.cs.pushpull.readHarvestFromFiles
+import ca.uwaterloo.cs.pushpull.readProductFromFiles
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import coil.compose.rememberImagePainter
@@ -84,21 +86,14 @@ fun MergeScreen(nav: DestinationsNavigator) {
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
         )
 
-        val productFileStorageDatabaseSynch = ProductFileStorageDatabaseSynch(context)
-        val rawProductScreenBroadCaster = remember {
-            mutableStateOf(ArrayList<Pair<String, ProductInformation>>())
-        }
-        rawProductScreenBroadCaster.value = productFileStorageDatabaseSynch.readProductFromFiles()
-        Singleton.productAttatch(rawProductScreenBroadCaster)
 
-        val harvestFileStorageDatabaseSync = HarvestFileStorageDatabaseSync(context)
         val harvestListFromFiles = remember{
             mutableStateOf(ArrayList<HarvestInformation>())
         }
-        harvestListFromFiles.value = harvestFileStorageDatabaseSync.readHarvestFromFiles()
+        harvestListFromFiles.value = readHarvestFromFiles(LocalContext.current)
         Singleton.harvestAttatch(harvestListFromFiles)
 
-        val productListFromFiles = localCasting1(rawProductScreenBroadCaster.value)
+        val productListFromFiles = localCasting1(readProductFromFiles(LocalContext.current))
 
         val processedData =
             remember { mutableStateMapOf<String, Pair<ProductInformation?, List<HarvestInformation>>>() }
@@ -627,22 +622,3 @@ private fun processData(
     }
     return processedData
 }
-
-//private fun readData(saveDir: String): ArrayList<HarvestInformation> {
-//    val dir = File("${saveDir}/out2")
-//    if (!dir.exists()) {
-//        return arrayListOf()
-//    }
-//    val list = ArrayList<HarvestInformation>()
-//    for (saveFile in dir.walk()) {
-//        if (saveFile.isFile && saveFile.canRead() && saveFile.name.contains("Harvest-")) {
-//            val fileIS = FileInputStream(saveFile)
-//            val inStream = ObjectInputStream(fileIS)
-//            val harvestInformation = inStream.readObject() as HarvestInformation
-//            list.add(harvestInformation)
-//            inStream.close()
-//            fileIS.close()
-//        }
-//    }
-//    return list
-//}

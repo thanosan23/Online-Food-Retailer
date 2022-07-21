@@ -29,8 +29,6 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import ca.uwaterloo.cs.NavigationBar
 import ca.uwaterloo.cs.Singleton
-import ca.uwaterloo.cs.db.DBClient
-import ca.uwaterloo.cs.db.DBManager
 import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.form.*
 import ca.uwaterloo.cs.harvest.HarvestInformation
@@ -569,7 +567,6 @@ private fun saveProductToDB(
     newData: Map<String, String>,
     newImage: String,
 ){
-    val dbManager = DBManager(null)
     data.name = newData["Name"]!!
     data.description = newData["Description"]!!
     data.price = (newData["Price"]!!.toDouble() * 100).toInt()
@@ -577,10 +574,6 @@ private fun saveProductToDB(
     data.image = newImage
     data.platform1 = newData["platform1"].toBoolean()
     data.platform2 = newData["platform2"].toBoolean()
-    dbManager.storeProductInformation(
-        Singleton.userId,
-        data
-    )
 }
 
 private fun deleteProduct(data: ProductInformation, context: Context, nav: DestinationsNavigator) {

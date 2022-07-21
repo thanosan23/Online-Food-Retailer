@@ -109,6 +109,24 @@ class DBStoreInternal(context: Context?) {
         )
     }
 
+    fun newRemoveProductFromFarmer(farmerIdString: String, productsToKeepIdString: List<String>){
+        val userId = Id(farmerIdString, IdType.CompleteUserProfileId)
+        class ListenerImpl() : Listener<CompleteUserProfile>() {
+            override fun activate(input: CompleteUserProfile) {
+                input.productIds = productsToKeepIdString as MutableList<String>
+                dbClient.store(
+                    userId.getPath(),
+                    input
+                )
+            }
+        }
+        val listener = ListenerImpl()
+        dbClient.get(
+            userId.getPath(),
+            listener
+        )
+    }
+
     fun removeHarvestFromWorker(workerIdString: String, harvestIdString: String){
         val userId = Id(workerIdString, IdType.CompleteUserProfileId)
         val harvestId = Id(harvestIdString, IdType.HarvestId)
@@ -128,7 +146,25 @@ class DBStoreInternal(context: Context?) {
         )
     }
 
-    private fun addHarvestToWorker(workerIdString: String, harvestId: Id){
+    fun newRemoveHarvestFromWorker(workerIdString: String, harvestToBeKeepIdString: List<String>){
+        val userId = Id(workerIdString, IdType.CompleteUserProfileId)
+        class ListenerImpl() : Listener<CompleteUserProfile>() {
+            override fun activate(input: CompleteUserProfile) {
+                input.harvestIds = harvestToBeKeepIdString as MutableList<String>
+                dbClient.store(
+                    userId.getPath(),
+                    input
+                )
+            }
+        }
+        val listener = ListenerImpl()
+        dbClient.get(
+            userId.getPath(),
+            listener
+        )
+    }
+
+        private fun addHarvestToWorker(workerIdString: String, harvestId: Id){
         val userId = Id(workerIdString, IdType.CompleteUserProfileId)
         class ListenerImpl() : Listener<CompleteUserProfile>() {
             override fun activate(input: CompleteUserProfile) {

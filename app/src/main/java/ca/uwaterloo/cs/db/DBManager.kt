@@ -67,9 +67,17 @@ class DBManager(context: Context?) {
         dbStoreInternal.removeProductFromFarmer(farmerId, productIdString)
     }
 
+    fun newRemoveProductFromFarmer(farmerIdString: String, productsToBeKeepIdString: List<String>){
+        dbStoreInternal.newRemoveProductFromFarmer(farmerIdString, productsToBeKeepIdString)
+    }
+
+    fun newRemoveHarvestFromWorker(workerIdString: String, harvestToBeKeepIdString: List<String>){
+        dbStoreInternal.newRemoveHarvestFromWorker(workerIdString, harvestToBeKeepIdString)
+    }
+
     fun deleteHarvestInformation(workerId: String, harvest: HarvestInformation){
-        dbStoreInternal.removeHarvestFromWorker(
-            harvest.fromWorker, harvest.harvestId
+    dbStoreInternal.removeHarvestFromWorker(
+        harvest.fromWorker, harvest.harvestId
         )
     }
 

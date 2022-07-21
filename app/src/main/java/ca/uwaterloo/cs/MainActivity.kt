@@ -31,6 +31,7 @@ import ca.uwaterloo.cs.db.DBManagerTest
 import ca.uwaterloo.cs.destinations.HarvestFormDestination
 import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.product.ProductInformation
+import ca.uwaterloo.cs.pushpull.readProductFromFiles
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import coil.compose.rememberImagePainter
@@ -48,7 +49,6 @@ class MainActivity : ComponentActivity() {
     fun logout(){
         AuthUI.getInstance().signOut(this)
     }
-    private val dbManagerTest = DBManagerTest()
     // See: https://developer.android.com/training/basics/intents/result
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
@@ -82,7 +82,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        logout()
-//        dbManagerTest.part2ProductTest()
         signInLauncher.launch(signInIntent)
     }
 }
@@ -92,13 +91,11 @@ class MainActivity : ComponentActivity() {
 fun MainContent(
     nav: DestinationsNavigator) {
     val useTemplate = Singleton.isFarmer
-    val productFileStorageDatabaseSynch = ProductFileStorageDatabaseSynch(LocalContext.current)
 
     val tableData = remember {
         mutableStateOf(ArrayList<Pair<String, ProductInformation>>())
     }
-    Singleton.productAttatch(tableData)
-    tableData.value = productFileStorageDatabaseSynch.readProductFromFiles()
+    tableData.value = readProductFromFiles(LocalContext.current)
 
     Scaffold(
         content = {

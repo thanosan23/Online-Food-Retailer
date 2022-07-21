@@ -2,9 +2,7 @@ package ca.uwaterloo.cs.product
 
 import android.os.Parcel
 import android.os.Parcelable
-import ca.uwaterloo.cs.Singleton
 import ca.uwaterloo.cs.bemodels.HasOneImage
-import ca.uwaterloo.cs.db.DBManager
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -37,28 +35,21 @@ data class ProductInformation(
     fun exportData(fileDir: String) {
         // TODO: platform compatibility
         // TODO: save to platform
-        val dbManager = DBManager(null)
-        dbManager.storeProductInformation(Singleton.userId, this)
         val dir = File(fileDir)
         if (!dir.exists()) {
             dir.mkdir()
         }
         val file = File(dir, "Product-$productId.txt")
-        if (!file.exists())
-        {
-            file.createNewFile()
-        }
+
+        file.createNewFile()
         val stringData = Json.encodeToString(this)
         file.writeText(stringData)
     }
 
     fun deleteData(fileDir: String) {
-        DBManager(null).deleteProductInformation(Singleton.userId, productId)
-        val file = File("${fileDir}/out2", "Product-$productId.txt")
-        if (file.exists())
-        {
-            file.delete()
-        }
+        val file = File(fileDir, "Product-$productId.txt")
+        val boolean = file.delete()
+        println("file deleted ${boolean}")
     }
 
 

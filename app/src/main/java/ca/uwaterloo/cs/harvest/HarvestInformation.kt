@@ -4,7 +4,6 @@ import android.os.Parcel
 import android.os.Parcelable
 import ca.uwaterloo.cs.Singleton
 import ca.uwaterloo.cs.bemodels.HasOneImage
-import ca.uwaterloo.cs.db.DBManager
 import ca.uwaterloo.cs.product.ProductInformation
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -80,8 +79,6 @@ data class HarvestInformation (
 
     fun exportData(fileDir: String) {
         // saving in the database
-        val dbManager = DBManager(null)
-        dbManager.storeHarvestInformation(true, Singleton.userId, this)
         val dir = File(fileDir)
         if (!dir.exists()) {
             dir.mkdir()
@@ -97,11 +94,6 @@ data class HarvestInformation (
 
     fun deleteData(fileDir: String) {
         // deleting in the database
-        DBManager(null).deleteHarvestInformation(
-            Singleton.userId,
-            this
-        )
-        val dbManager = DBManager(null)
         val file = File("${fileDir}/outharvest", "Harvest-$harvestId.txt")
         if (file.exists())
         {

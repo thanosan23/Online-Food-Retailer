@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.sp
 import ca.uwaterloo.cs.Singleton
 import ca.uwaterloo.cs.bemodels.SignUpWorker
 import ca.uwaterloo.cs.db.DBManager
-import ca.uwaterloo.cs.destinations.LoginDestination
 import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import com.ramcosta.composedestinations.annotation.Destination
@@ -34,7 +33,6 @@ fun SignupAsWorker(
     farmerUserId: String,
 ) {
     println("did the navigation do any damage? $farmerUserId")
-    val dbManager = DBManager(null)
     OnlineFoodRetailTheme {
         val focusManager = LocalFocusManager.current
         Column(
@@ -101,14 +99,13 @@ fun SignupAsWorker(
 
             Button(
                 onClick = {
-                    println("is it here the problem $farmerUserId")
                     val signUpWorker = SignUpWorker(
                         Singleton.userId,
                         firstName,
                         familyName,
                         farmerUserId
                     )
-                    dbManager.storeSignUpWorker(signUpWorker)
+                    DBManager(null).storeSignUpWorker(signUpWorker)
                     navigator.navigate(MainContentDestination)
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
