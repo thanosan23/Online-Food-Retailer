@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import ca.uwaterloo.cs.NavigationBar
 import ca.uwaterloo.cs.Singleton
-import ca.uwaterloo.cs.destinations.SignupAsManagerDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -25,22 +24,22 @@ fun PushPullUI(
 @Composable
 fun UI(navigator: DestinationsNavigator){
     val context = LocalContext.current
-    val pushFarmer = PushFarmer(context)
-    val pullFarmer = PullFarmer(context)
+    val pushFarmerPull = PushFarmerPull(context)
     val pushWorker = PushWorker(context)
     val pullWorker = PullWorker(context)
     Button(
         onClick = {
-            if (Singleton.isFarmer){
-                pushFarmer.run()
-                Thread.sleep(3000)
-                pullFarmer.run()
-            }
-            else{
-                pullWorker.run()
-                Thread.sleep(3000)
-                pushWorker.run()
-            }
+            Thread {
+                if (Singleton.isFarmer) {
+                    pushFarmerPull.run()
+                    Thread.sleep(5000)
+//                    pullFarmer.run()
+                } else {
+                    pullWorker.run()
+                    Thread.sleep(10000)
+                    pushWorker.run()
+                }
+            }.start()
         },
     ) {
         Text(text = "Update")

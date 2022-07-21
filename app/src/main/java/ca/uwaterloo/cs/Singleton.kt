@@ -15,6 +15,8 @@ object Singleton
     var isFarmer = true
     var isNewUser = false
     var productReadFromDB = 0
+    var deletedHarvestIds = mutableListOf<String>()
+
     var harvestReadFromDB = 0
     var harvestJobScheduled = false
     var productJobScheduled = false

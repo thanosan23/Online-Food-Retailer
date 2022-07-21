@@ -2,6 +2,7 @@ package ca.uwaterloo.cs.pushpull
 
 import ca.uwaterloo.cs.product.ProductInformation
 import android.content.Context
+import ca.uwaterloo.cs.Listener
 import ca.uwaterloo.cs.Singleton
 import ca.uwaterloo.cs.db.DBManager
 import ca.uwaterloo.cs.harvest.HarvestInformation
@@ -9,25 +10,50 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.io.File
 
-class PushFarmer(val context: Context) {
+class PushFarmerPull(val context: Context) {
     private val dbManager = DBManager(context)
     fun run(){
+        class ListenerImpl() : Listener<List<HarvestInformation>>() {
+            override fun activate(input: List<HarvestInformation>) {
+                val pullResult = input
+                val removedIds = Singleton.deletedHarvestIds
+                val result = mutableListOf<HarvestInformation>()
+                for (harvest in pullResult){
+                    if (harvest.harvestId in removedIds){
+                        result.add(harvest)
+                    }
+                }
+                for (harvest in pullResult) {
+                    dbManager.removeHarvestFromWorker(harvest.fromWorker, harvest)
+                }
+                overrideHarvestsFiles(context, result)
+            }
+        }
+        val listener = ListenerImpl()
+        dbManager.getAllHarvestsFromFarmer(Singleton.userId, listener)
+
         pushProductData(context, dbManager)
+        Thread.sleep(5000)
+        pullProductDataFromDB(context, dbManager, Singleton.isFarmer, )
         pushHarvestData(context, dbManager)
     }
 }
 
 fun pushProductData(context: Context, dbManager: DBManager){
-    val productList = readProductFromFiles(context)
-    val productsListIds = mutableListOf<String>()
+    val productList = localCasting(readProductFromFiles(context))
     if (Singleton.isFarmer){
-        dbManager.newRemoveProductFromFarmer(Singleton.userId, productsListIds)
-        Thread.sleep(5000)
-        for (product in productList) {
-            productsListIds.add(product.second.productId)
-            dbManager.storeProductInformation(Singleton.userId, product.second)
-        }
+        dbManager.storeProductsInformation(Singleton.userId, productList)
+//        dbManager.newRemoveProductFromFarmer(Singleton.userId, productsListIds)
     }
+}
+
+private fun localCasting(products: ArrayList<Pair<String, ProductInformation>>): List<ProductInformation>{
+    val avs = mutableListOf<ProductInformation>()
+    for (product in products){
+        avs.add(product.second)
+    }
+    return avs
+
 }
 
 fun readProductFromFiles(context: Context): ArrayList<Pair<String, ProductInformation>> {
@@ -66,7 +92,7 @@ fun pushHarvestData(context: Context, dbManager: DBManager){
                 harvest)
         }
         else{
-            // TODO needs to be implemented
+            dbManager.removeHarvestFromWorker(harvest.fromWorker, harvest)
         }
     }
 }

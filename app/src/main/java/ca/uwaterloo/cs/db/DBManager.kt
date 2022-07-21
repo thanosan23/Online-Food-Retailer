@@ -45,19 +45,17 @@ class DBManager(context: Context?) {
     }
 
     // if the product is being created for the first time add productIdString to be null
-    fun storeProductInformation(userId: String, productInformation: ProductInformation){
+    fun storeProductsInformation(userId: String, productsInformation: List<ProductInformation>){
         if (!Singleton.isFarmer){
             return
         }
-        val productIdString = productInformation.productId
 
         // DFC storage
-        val DFCSuppliedProductId = idResolver.standardResolver(productIdString, IdType.DFCSuppliedProductId)
-        dbStoreDFCManager.storeProductInformation(true, DFCSuppliedProductId, productInformation)
+//        val DFCSuppliedProductId = idResolver.standardResolver(productIdString, IdType.DFCSuppliedProductId)
+//        dbStoreDFCManager.storeProductInformation(true, DFCSuppliedProductId, productInformation)
 
         // Internal storage
-        val productId = Id(DFCSuppliedProductId.idValue, IdType.ProductId)
-        dbStoreInternal.storeProductInformation(userId, productId, productInformation)
+        dbStoreInternal.storeProductsInformation(userId, productsInformation)
     }
 
     fun deleteProductInformation(farmerId: String, productIdString: String){
@@ -75,7 +73,7 @@ class DBManager(context: Context?) {
         dbStoreInternal.newRemoveHarvestFromWorker(workerIdString, harvestToBeKeepIdString)
     }
 
-    fun deleteHarvestInformation(workerId: String, harvest: HarvestInformation){
+    fun removeHarvestFromWorker(workerId: String, harvest: HarvestInformation){
     dbStoreInternal.removeHarvestFromWorker(
         harvest.fromWorker, harvest.harvestId
         )
@@ -145,7 +143,7 @@ class DBManagerTest() {
                 platform1 = true,
                 platform2 = false
             )
-        dbManager.storeProductInformation(userId1, productInformation)
+//        dbManager.storeProductInformation(userId1, productInformation)
     }
 
     private fun simple2StoreProductTest() {
@@ -160,7 +158,7 @@ class DBManagerTest() {
                 platform1 = true,
                 platform2 = false
             )
-        dbManager.storeProductInformation(userId1, productInformation)
+//        dbManager.storeProductInformation(userId1, productInformation)
     }
 
     private fun simpleGetProductTest(){

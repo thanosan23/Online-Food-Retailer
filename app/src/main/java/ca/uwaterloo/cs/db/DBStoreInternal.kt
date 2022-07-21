@@ -15,15 +15,16 @@ class DBStoreInternal(context: Context?) {
         dbClient.context = context
     }
 
-    fun storeProductInformation(userId: String,
-                                productId: Id,
-                                productInformation: ProductInformation){
-            addProductToFarmer(userId, productId)
-        productInformation.productId = productId.idValue
-        dbClient.store(
-            productId.getPath(),
-            productInformation
-        )
+    fun storeProductsInformation(userId: String,
+                                productsInformation: List<ProductInformation>){
+            addProductsToFarmer(userId, productsInformation)
+        for (product in productsInformation) {
+            val id = Id(product.productId, IdType.ProductId)
+            dbClient.store(
+                id.getPath(),
+                product
+            )
+        }
     }
 
     fun storeHarvestInformation(harvestCreation: Boolean,
@@ -67,16 +68,15 @@ class DBStoreInternal(context: Context?) {
         attachWorkerToFarmer(workerId, farmerId)
     }
 
-    private fun addProductToFarmer(farmerIdString: String, productId: Id){
+    private fun addProductsToFarmer(farmerIdString: String, products: List<ProductInformation>){
         val userId = Id(farmerIdString, IdType.CompleteUserProfileId)
+        val productsIds = mutableListOf<String>()
+        for (product in products){
+            productsIds.add(product.productId)
+        }
         class ListenerImpl() : Listener<CompleteUserProfile>() {
             override fun activate(input: CompleteUserProfile) {
-                for (storedProductId in input.productIds){
-                    if (storedProductId == productId.idValue){
-                        return
-                    }
-                }
-                input.productIds.add(productId.idValue)
+                input.productIds = productsIds
                 dbClient.store(
                     userId.getPath(),
                     input
