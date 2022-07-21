@@ -105,7 +105,6 @@ class MainActivity : ComponentActivity() {
 fun MainContent(nav: DestinationsNavigator) {
     val useTemplate = true //farmer:true,worker:false
     val context = LocalContext.current
-    val context = LocalContext.current
     val tableData = readData(context)
     TableScreen(nav, useTemplate, tableData)
 }
