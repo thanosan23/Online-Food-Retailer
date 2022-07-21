@@ -561,7 +561,7 @@ private fun saveProduct(
     data.image = newImage
     data.platform1 = newData["platform1"].toBoolean()
     data.platform2 = newData["platform2"].toBoolean()
-    data.exportData(context.filesDir.toString())
+    data.exportData("${context.filesDir}/out2")
 }
 
 private fun saveProductToDB(
@@ -594,7 +594,7 @@ private fun deleteProduct(data: ProductInformation, context: Context, nav: Desti
             android.R.string.yes
         ) { _, _ ->
             data.deleteDataFromDB(data)
-            data.deleteData(context.filesDir.toString())
+            data.deleteData("${context.filesDir}/out2")
             nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()
@@ -620,7 +620,7 @@ private fun addProductNumber(
             )
             AlertDialog.Builder(context)
                 .setMessage("Request has been sent").show()
-            harvestRequest.exportData(context.filesDir.toString())
+            harvestRequest.exportData("${context.filesDir}/outharvest")
             storeHarvest(Singleton.userId, harvestRequest)
             nav.navigate(MainContentDestination)
         }
@@ -647,7 +647,7 @@ private fun removeProductNumber(
             )
             AlertDialog.Builder(context)
                 .setMessage("Request has been sent").show()
-            harvestRequest.exportData(context.filesDir.toString())
+            harvestRequest.exportData("${context.filesDir}/outharvest")
             storeHarvest(Singleton.userId, harvestRequest)
             nav.navigate(MainContentDestination)
         }
@@ -656,5 +656,5 @@ private fun removeProductNumber(
 
 private fun storeHarvest(workerUserIdString: String, harvestInformation: HarvestInformation){
     val dbManager = DBManager(null)
-    dbManager.storeHarvestInformation(workerUserIdString, harvestInformation)
+    dbManager.storeHarvestInformation(true, workerUserIdString, harvestInformation)
 }

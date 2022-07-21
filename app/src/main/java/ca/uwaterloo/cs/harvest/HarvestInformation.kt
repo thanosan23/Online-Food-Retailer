@@ -2,8 +2,12 @@ package ca.uwaterloo.cs.harvest
 
 import android.os.Parcel
 import android.os.Parcelable
+import ca.uwaterloo.cs.Singleton
 import ca.uwaterloo.cs.bemodels.HasOneImage
+import ca.uwaterloo.cs.db.DBManager
 import ca.uwaterloo.cs.product.ProductInformation
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileOutputStream
 import java.io.ObjectOutputStream
@@ -12,7 +16,7 @@ import java.util.*
 
 @kotlinx.serialization.Serializable
 data class HarvestInformation (
-    var harvestId: String?,
+    var harvestId: String,
     val fromWorker: String,
     var productId: String?,
     val name: String,
@@ -75,25 +79,31 @@ data class HarvestInformation (
     }
 
     fun exportData(fileDir: String) {
-        val dir = File("${fileDir}/out2")
+        // saving in the database
+        val dbManager = DBManager(null)
+        dbManager.storeHarvestInformation(true, Singleton.userId, this)
+        val dir = File(fileDir)
         if (!dir.exists()) {
             dir.mkdir()
         }
         val file = File(dir, "Harvest-$harvestId.txt")
-        if (file.exists())
+        if (!file.exists())
         {
-            file.delete()
+            file.createNewFile()
         }
-        file.createNewFile()
-        val fileOS = FileOutputStream(file)
-        val outStream = ObjectOutputStream(fileOS)
-        outStream.writeObject(this)
-        outStream.close()
-        fileOS.close()
+        val stringData = Json.encodeToString(this)
+        file.writeText(stringData)
     }
 
     fun deleteData(fileDir: String) {
-        val file = File("${fileDir}/out2", "Harvest-$harvestId.txt")
+        // deleting in the database
+        DBManager(null).deleteHarvestInformation(
+            Singleton.userId,
+            harvestId!!
+        )
+        val dbManager = DBManager(null)
+        dbManager.storeHarvestInformation(true, Singleton.userId, this)
+        val file = File("${fileDir}/outharvest", "Harvest-$harvestId.txt")
         if (file.exists())
         {
             file.delete()

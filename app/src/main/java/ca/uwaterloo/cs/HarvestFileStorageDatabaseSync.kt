@@ -11,7 +11,6 @@ import java.io.File
 
 class HarvestFileStorageDatabaseSync(val context: Context) {
     private val dbManager = DBManager(context)
-    private val screenBroadcasts = mutableListOf<MutableState<Int>>()
 
     init{
         if (Singleton.harvestReadFromDB == 0) {
@@ -26,16 +25,13 @@ class HarvestFileStorageDatabaseSync(val context: Context) {
     fun readHarvestFromFiles(): ArrayList<HarvestInformation>{
         // TODO: platform compatibility
         // TODO: load from platform
-        val dir = File("${context.filesDir}/out2")
+        val dir = File("${context.filesDir}/outharvest")
         if (!dir.exists()) {
             return ArrayList()
         }
         val list = ArrayList<HarvestInformation>()
         for (saveFile in dir.walk()) {
             if (saveFile.isFile && saveFile.canRead() && saveFile.name.contains("Harvest-")) {
-//            val fileIS = FileInputStream(saveFile)
-//            val inStream = ObjectInputStream(fileIS)
-//            val productInformation = inStream.readObject() as ProductInformation
                 try {
                     val harvestInformation =
                         Json.decodeFromString<HarvestInformation>(saveFile.readText())
@@ -44,8 +40,6 @@ class HarvestFileStorageDatabaseSync(val context: Context) {
                 catch (e: Throwable){
                     println("error deserializing the product")
                 }
-//            inStream.close()
-//            fileIS.close()
             }
         }
         return list
@@ -54,19 +48,20 @@ class HarvestFileStorageDatabaseSync(val context: Context) {
     private fun updateHarvestDataFromDB(){
             class ListenerImpl() : Listener<List<HarvestInformation>>() {
                 override fun activate(input: List<HarvestInformation>) {
+                    return
                     val fileHarvests = readHarvestFromFiles()
                     if (!checkIfHarvestsChanged(input, fileHarvests)){
-                        return
+//                        return
                     }
-                    val dir = File("${context.filesDir}/out2")
+                    val dir = File("${context.filesDir}/outharvest")
                     if (dir.exists()){
                         dir.deleteRecursively()
                     }
                     for (product in input) {
-                        product.exportData(context.filesDir.toString())
+                        product.exportData("${context.filesDir}/outharvest")
                     }
                     Singleton.harvestReadFromDB += 1
-                    Singleton.harvestBroadCast()
+                    Singleton.harvestBroadCast(input)
                 }
             }
             val listener = ListenerImpl()

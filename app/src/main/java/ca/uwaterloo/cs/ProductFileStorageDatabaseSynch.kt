@@ -11,6 +11,7 @@ import java.io.File
 
 class ProductFileStorageDatabaseSynch(val context: Context) {
     private val dbManager = DBManager(context)
+    private var badCodeCounter = 3
 
     init{
         if (Singleton.productReadFromDB == 0) {
@@ -48,8 +49,7 @@ class ProductFileStorageDatabaseSynch(val context: Context) {
         class ListenerImpl() : Listener<List<ProductInformation>>() {
             override fun activate(input: List<ProductInformation>) {
                 val fileProducts = readProductFromFiles()
-                if (!checkIfProductsChanged(input, fileProducts)){
-//                    return
+                if (checkIfProductsChanged(input, fileProducts) and (Singleton.productReadFromDB != 0)){
                 }
                 val dir = File("${context.filesDir}/out2")
                 if (dir.exists()){
@@ -57,7 +57,7 @@ class ProductFileStorageDatabaseSynch(val context: Context) {
                 }
                 for (product in input) {
                     val product2 = copy(product)
-                    product2.exportData(context.filesDir.toString())
+                    product2.exportData("${context.filesDir}/out2")
                 }
                 Singleton.productReadFromDB += 1
                 Singleton.productBroadCast(fileProducts)

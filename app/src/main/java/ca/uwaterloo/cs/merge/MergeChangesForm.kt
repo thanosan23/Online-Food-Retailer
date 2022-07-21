@@ -56,7 +56,7 @@ fun MergeForm(
 @Composable
 fun MergeScreen(nav: DestinationsNavigator) {
     val context = LocalContext.current
-    saveDir = context.filesDir.toString()
+    saveDir = "${context.filesDir}/outharvest"
 
     Column {
         CenterAlignedTopAppBar(
@@ -85,24 +85,24 @@ fun MergeScreen(nav: DestinationsNavigator) {
         )
 
         val productFileStorageDatabaseSynch = ProductFileStorageDatabaseSynch(context)
-        val productScreenBroadCaster = remember {
-            mutableStateOf(0)
+        val rawProductScreenBroadCaster = remember {
+            mutableStateOf(ArrayList<Pair<String, ProductInformation>>())
         }
-//        Singleton.productAttatch(productScreenBroadCaster)
+        rawProductScreenBroadCaster.value = productFileStorageDatabaseSynch.readProductFromFiles()
+        Singleton.productAttatch(rawProductScreenBroadCaster)
 
         val harvestFileStorageDatabaseSync = HarvestFileStorageDatabaseSync(context)
-        val harvestScreenBroadCaster = remember{
-            mutableStateOf(0)
+        val harvestListFromFiles = remember{
+            mutableStateOf(ArrayList<HarvestInformation>())
         }
-        Singleton.harvestAttatch(harvestScreenBroadCaster)
+        harvestListFromFiles.value = harvestFileStorageDatabaseSync.readHarvestFromFiles()
+        Singleton.harvestAttatch(harvestListFromFiles)
 
-        val productListFromFiles = localCasting1(productFileStorageDatabaseSynch.readProductFromFiles())
-
-        val harvestListFromFiles = harvestFileStorageDatabaseSync.readHarvestFromFiles()
+        val productListFromFiles = localCasting1(rawProductScreenBroadCaster.value)
 
         val processedData =
             remember { mutableStateMapOf<String, Pair<ProductInformation?, List<HarvestInformation>>>() }
-        val processedDataFromFiles = processData(harvestListFromFiles, productListFromFiles)
+        val processedDataFromFiles = processData(harvestListFromFiles.value, productListFromFiles)
 
         for (entry in processedDataFromFiles) {
             if (entry.key != "" && entry.value.first != null) {

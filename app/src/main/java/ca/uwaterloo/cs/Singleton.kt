@@ -1,6 +1,7 @@
 package ca.uwaterloo.cs
 
 import androidx.compose.runtime.MutableState
+import ca.uwaterloo.cs.harvest.HarvestInformation
 import ca.uwaterloo.cs.product.ProductInformation
 
 object Singleton
@@ -18,7 +19,7 @@ object Singleton
     var harvestJobScheduled = false
     var productJobScheduled = false
     private val productScreenBroadCasters = mutableListOf<MutableState<ArrayList<Pair<String, ProductInformation>>>>()
-    private val harvestScreenBroadCasters = mutableListOf<MutableState<Int>>()
+    private val harvestScreenBroadCasters = mutableListOf<MutableState<ArrayList<HarvestInformation>>>()
 
     fun productBroadCast(product: ArrayList<Pair<String, ProductInformation>>){
         for (screenBroadcast in productScreenBroadCasters){
@@ -26,9 +27,9 @@ object Singleton
         }
     }
 
-    fun harvestBroadCast(){
+    fun harvestBroadCast(harvest: List<HarvestInformation>){
         for (screenBroadcast in harvestScreenBroadCasters){
-            screenBroadcast.value = screenBroadcast.value + 1
+            screenBroadcast.value = harvest as ArrayList<HarvestInformation>
         }
     }
 
@@ -39,7 +40,7 @@ object Singleton
         productScreenBroadCasters.add(updateVariables)
     }
 
-    fun harvestAttatch(updateVariables: MutableState<Int>){
+    fun harvestAttatch(updateVariables: MutableState<ArrayList<HarvestInformation>>){
         if (updateVariables in harvestScreenBroadCasters){
             return
         }

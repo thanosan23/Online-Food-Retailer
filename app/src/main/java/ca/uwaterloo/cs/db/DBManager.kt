@@ -60,6 +60,10 @@ class DBManager(context: Context?) {
         dbStoreInternal.removeProductFromFarmer(farmerId, productIdString)
     }
 
+    fun deleteHarvestInformation(workerId: String, harvestIdString: String){
+        dbStoreInternal.removeHarvestFromWorker(workerId, harvestIdString)
+    }
+
     fun getProductsInformationFromFarmer(farmerId: String, beListener: Listener<List<ProductInformation>>){
         dbGetInternal.getProductInformationFromFarmer(farmerId, beListener)
     }
@@ -69,9 +73,10 @@ class DBManager(context: Context?) {
     }
 
     // if the harvest is being created for the first time add harvestId to be null in the HarvestInformation
-    fun storeHarvestInformation(userId: String, harvestInformation: HarvestInformation){
+    fun storeHarvestInformation(harvestCreation: Boolean,
+                                userId: String,
+                                harvestInformation: HarvestInformation){
         val harvestIdString = harvestInformation.harvestId
-        val harvestCreation = harvestIdString == null
 
         val harvestId = idResolver.standardResolver(harvestIdString, IdType.HarvestId)
         dbStoreInternal.storeHarvestInformation(

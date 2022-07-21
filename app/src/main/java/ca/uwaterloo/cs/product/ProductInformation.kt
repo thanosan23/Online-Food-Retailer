@@ -37,24 +37,17 @@ data class ProductInformation(
     fun exportData(fileDir: String) {
         // TODO: platform compatibility
         // TODO: save to platform
-        val dir = File("${fileDir}/out2")
+        val dir = File(fileDir)
         if (!dir.exists()) {
             dir.mkdir()
         }
         val file = File(dir, "Product-$productId.txt")
-//        if (file.exists())
-//        {
-//            file.delete()
-//        }
+        if (!file.exists())
+        {
+            file.createNewFile()
+        }
         val stringData = Json.encodeToString(this)
         file.writeText(stringData)
-        println(file.readText())
-//        file.createNewFile()
-//        val fileOS = FileOutputStream(file)
-//        val outStream = ObjectOutputStream(fileOS)
-//        outStream.writeObject(this)
-//        outStream.close()
-//        fileOS.close()
     }
 
     fun deleteData(fileDir: String) {

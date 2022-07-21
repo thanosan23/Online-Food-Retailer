@@ -107,6 +107,25 @@ class DBStoreInternal(context: Context?) {
         )
     }
 
+    fun removeHarvestFromWorker(workerIdString: String, harvestIdString: String){
+        val userId = Id(workerIdString, IdType.CompleteUserProfileId)
+        val harvestId = Id(harvestIdString, IdType.HarvestId)
+        class ListenerImpl() : Listener<CompleteUserProfile>() {
+            override fun activate(input: CompleteUserProfile) {
+                input.harvestIds.remove(harvestId.idValue)
+                dbClient.store(
+                    userId.getPath(),
+                    input
+                )
+            }
+        }
+        val listener = ListenerImpl()
+        dbClient.get(
+            userId.getPath(),
+            listener
+        )
+    }
+
     private fun addHarvestToWorker(workerIdString: String, harvestId: Id){
         val userId = Id(workerIdString, IdType.CompleteUserProfileId)
         class ListenerImpl() : Listener<CompleteUserProfile>() {

@@ -313,43 +313,6 @@ private fun addItem(nav: DestinationsNavigator) {
 }
 @Composable
 fun generateMockData(amount: Int = 7, context: Context) {
-//    val dir = File("${context.filesDir}/out2")
-//    if (dir.exists()) {
-//        dir.deleteRecursively()
-//    }
-//    val dbClient = DBClient()
-//    dbClient.context = LocalContext.current
-//
-//    ProductInformation(
-//        UUID.randomUUID().toString(),
-//        "apple",
-//        "apple description",
-//        100,
-//        100,
-//        "",
-//        platform1 = false,
-//        platform2 = false
-//    ).exportData(context.filesDir.toString())
-//    ProductInformation(
-//        UUID.randomUUID().toString(),
-//        "carrot",
-//        "carrot description",
-//        200,
-//        200,
-//        "",
-//        platform1 = false,
-//        platform2 = false
-//    ).exportData(context.filesDir.toString())
-//    ProductInformation(
-//        UUID.randomUUID().toString(),
-//        "banana",
-//        "banana description",
-//        300,
-//        300,
-//        "",
-//        platform1 = false,
-//        platform2 = false
-//    ).exportData(context.filesDir.toString())
 }
 
 
