@@ -618,6 +618,11 @@ private fun processData(
     }
     processedData[""] = Pair(null, arrayListOf())
     for (harvest in data) {
+        if (processedData[harvest.productId] == null){
+            println("null pointer exception in processed data")
+            println("arguments, $data,  $products")
+            continue
+        }
         processedData[harvest.productId]!!.second.add(harvest)
     }
     return processedData

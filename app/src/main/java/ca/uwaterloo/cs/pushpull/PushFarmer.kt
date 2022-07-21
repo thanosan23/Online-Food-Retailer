@@ -21,11 +21,12 @@ fun pushProductData(context: Context, dbManager: DBManager){
     val productList = readProductFromFiles(context)
     val productsListIds = mutableListOf<String>()
     if (Singleton.isFarmer){
+        dbManager.newRemoveProductFromFarmer(Singleton.userId, productsListIds)
+        Thread.sleep(5000)
         for (product in productList) {
             productsListIds.add(product.second.productId)
             dbManager.storeProductInformation(Singleton.userId, product.second)
         }
-        dbManager.newRemoveProductFromFarmer(Singleton.userId, productsListIds)
     }
 }
 
@@ -57,11 +58,12 @@ fun pushHarvestData(context: Context, dbManager: DBManager){
     val harvestListIds = mutableListOf<String>()
     for (harvest in harvestList) {
         if (!Singleton.isFarmer){
+            dbManager.newRemoveHarvestFromWorker(Singleton.userId, harvestListIds)
+            Thread.sleep(5000)
             dbManager.storeHarvestInformation(
                 true,
                 Singleton.userId,
                 harvest)
-            dbManager.newRemoveHarvestFromWorker(Singleton.userId, harvestListIds)
         }
         else{
             // TODO needs to be implemented

@@ -83,9 +83,15 @@ class DBClient {
     }
 
     fun storeImage(file: Uri){
+        println(file.toString())
         val ref: StorageReference = storage.child(file.toString())
-        ref.putFile(file).addOnFailureListener{
-            println("failure to store image $it")
+        try {
+            ref.putFile(file).addOnFailureListener {
+                println("failure to store image $it")
+            }
+        }
+        catch (e: SecurityException){
+            println("fail to store image")
         }
     }
 

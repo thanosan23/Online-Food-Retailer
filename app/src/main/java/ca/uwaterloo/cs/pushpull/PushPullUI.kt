@@ -33,11 +33,13 @@ fun UI(navigator: DestinationsNavigator){
         onClick = {
             if (Singleton.isFarmer){
                 pushFarmer.run()
+                Thread.sleep(3000)
                 pullFarmer.run()
             }
             else{
-                pushWorker.run()
                 pullWorker.run()
+                Thread.sleep(3000)
+                pushWorker.run()
             }
         },
     ) {
