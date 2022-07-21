@@ -91,6 +91,9 @@ class DBGetInternal(context: Context?) {
                 val productIds = input.productIds
                 amount = input.productIds.size
                 if (amount == 0){
+                    beListener.activate(listOf())
+                }
+                if (amount == 0){
                     Singleton.productReadFromDB += 1
                 }
                 for (productId in productIds){
@@ -137,11 +140,13 @@ class DBGetInternal(context: Context?) {
             override fun activate(input: CompleteUserProfile) {
                 val harvestIds = input.harvestIds
                 amount = harvestIds.size
+                if (amount == 0){
+                    beListener.activate(listOf())
+                }
                 for (harvestId in harvestIds){
                     val id = Id(harvestId, IdType.HarvestId)
                     dbClient.get(id.getPath(), listener1)
                 }
-                beListener.activate(harvestsInformation)
             }
         }
 
@@ -170,6 +175,9 @@ class DBGetInternal(context: Context?) {
         class ListenerImpl2() : Listener<CompleteUserProfile>() {
             override fun activate(input: CompleteUserProfile) {
                 amount = input.workersIds.size
+                if (amount == 0){
+                    beListener.activate(listOf())
+                }
                 for (workerId in input.workersIds){
                     getHarvestInformation(workerId, listener1)
                 }

@@ -23,12 +23,20 @@ object Singleton
 
     fun productBroadCast(product: ArrayList<Pair<String, ProductInformation>>){
         for (screenBroadcast in productScreenBroadCasters){
+            if (product.isEmpty()){
+                screenBroadcast.value = ArrayList()
+                continue
+            }
             screenBroadcast.value = product
         }
     }
 
     fun harvestBroadCast(harvest: List<HarvestInformation>){
         for (screenBroadcast in harvestScreenBroadCasters){
+            if (harvest.isEmpty()){
+                screenBroadcast.value = ArrayList()
+                continue
+            }
             screenBroadcast.value = harvest as ArrayList<HarvestInformation>
         }
     }

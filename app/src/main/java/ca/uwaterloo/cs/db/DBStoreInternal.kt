@@ -130,6 +130,11 @@ class DBStoreInternal(context: Context?) {
         val userId = Id(workerIdString, IdType.CompleteUserProfileId)
         class ListenerImpl() : Listener<CompleteUserProfile>() {
             override fun activate(input: CompleteUserProfile) {
+                for (storedHarvestIdString in input.harvestIds){
+                    if (storedHarvestIdString == harvestId.idValue){
+                        return
+                    }
+                }
                 input.harvestIds.add(harvestId.idValue)
                 dbClient.store(
                     userId.getPath(),
