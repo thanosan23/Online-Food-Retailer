@@ -13,10 +13,10 @@ data class CompleteUserProfile (
     // parentFarmer should be empty if isFarmer is true
     val parentFarmerId: String,
     // harvestIds should be empty if isFarmer is true
-    val harvestIds: MutableList<String>,
+    var harvestIds: MutableList<String>,
 
     // productIds should be empty if isFarmer is false
-    val productIds: MutableList<String>,
+    var productIds: MutableList<String>,
     // workersIds should be empty if isFarmer is false
     val workersIds: MutableList<String>
 )

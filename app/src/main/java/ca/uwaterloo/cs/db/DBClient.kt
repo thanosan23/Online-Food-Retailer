@@ -14,6 +14,7 @@ import ca.uwaterloo.cs.dbmodels.Address
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageException
 import com.google.firebase.storage.StorageReference
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -26,17 +27,23 @@ import java.util.*
 
 class DBClient {
     val db = Firebase.database.reference
-    private val storage = FirebaseStorage.getInstance("gs://cs446-project-2.appspot.com").reference
+    private val storage = FirebaseStorage.getInstance().reference
     var context: Context? = null
+
+    fun clearStorage(){
+        val sas = storage.bucket.filterNot { false }
+        println("sas")
+    }
 
     inline fun <reified T> store(key: String, data: T){
         if (data is HasOneImage){
-            if (data.image != "") {
                 storeImage(data.image.toUri())
-            }
+                    println("attempt to store JPEG image, can't do that")
         }
         val stringData = Json.encodeToString(data)
-        db.child(key).setValue(stringData)
+        db.child(key).setValue(stringData).addOnFailureListener{
+            println("failure storing data $it")
+        }
     }
 
     inline fun <reified T> get(key: String, listener: Listener<T>){
@@ -45,15 +52,18 @@ class DBClient {
                 val stringData = it.value as String
                 val data = Json.decodeFromString<T>(stringData)
                 if (data is HasOneImage){
-                    data.image = getImage().toString()
+                        data.image = getImage(data.image).toString()
                 }
                 listener.activate(data!!)
             }
             else{
                 println("attempt to get something that does not exist, key: $key")
-                assert(false)
+                assert(true)
             }
         }
+            .addOnFailureListener{
+                println("failure to get $it")
+            }
     }
 
     fun getIfExists(key: String, listener: Listener<String?>){
@@ -73,16 +83,24 @@ class DBClient {
     }
 
     fun storeImage(file: Uri){
-        val ref: StorageReference = storage.child("messi image")
-        ref.putFile(file)
+        println(file.toString())
+        val ref: StorageReference = storage.child(file.toString())
+        try {
+            ref.putFile(file).addOnFailureListener {
+                println("failure to store image $it")
+            }
+        }
+        catch (e: SecurityException){
+            println("fail to store image")
+        }
     }
 
-    fun getImage(): Uri{
-        val ref: StorageReference = storage.child("messi lost.jpg")
+    fun getImage(imageName: String): Uri?{
+        val ref: StorageReference = storage.child(imageName)
         val timeStamp = SimpleDateFormat.getDateTimeInstance().format(Date())
         val localFile = File(context!!.filesDir, "JPEG_$timeStamp.jpg")
         ref.getFile(localFile).addOnFailureListener{
-            println("failture to get image $it")
+            println("failure to get image $it, $imageName")
         }
         Thread.sleep(1000)
         return FileProvider.getUriForFile(

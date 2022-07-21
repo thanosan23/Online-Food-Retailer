@@ -33,7 +33,6 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 fun SignupAsManager(
     navigator: DestinationsNavigator
 ) {
-    val dbManager = DBManager()
     val formState by remember { mutableStateOf(FormState()) }
     OnlineFoodRetailTheme {
         val focusManager = LocalFocusManager.current
@@ -122,7 +121,7 @@ fun SignupAsManager(
                         familyName,
                         farmName
                     )
-                    dbManager.storeSignUpFarmer(signUpFarmer)
+                    DBManager(null).storeSignUpFarmer(signUpFarmer)
                     navigator.navigate(MainContentDestination)
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)

@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import ca.uwaterloo.cs.Singleton
 import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.form.*
 import ca.uwaterloo.cs.product.ProductInformation
@@ -162,7 +163,7 @@ fun SendCancelDeleteWidgets(
     nav: DestinationsNavigator,
 ) {
     val context = LocalContext.current
-    val saveDir = context.filesDir.toString()
+    val saveDir = "${context.filesDir}/outharvest"
     Row {
         Button(onClick = {
             if (formState.validate()) {
@@ -201,7 +202,7 @@ private fun saveHarvestRequestWithProduct(
 ) {
     val harvestInformation =
         HarvestInformation(
-            fromWorker = "Test Worker",
+            fromWorker = Singleton.userId,
             product = data,
             amount = newData["Amount"]!!.toInt()
         )
@@ -215,7 +216,7 @@ private fun saveHarvestRequestNoProduct(
 ) {
     val harvestInformation =
         HarvestInformation(
-            fromWorker = "Test Worker",
+            fromWorker = Singleton.userId,
             name = newData["Name"]!!,
             description = newData["Description"]!!,
             image = image,

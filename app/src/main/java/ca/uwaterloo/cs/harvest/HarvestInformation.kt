@@ -2,16 +2,20 @@ package ca.uwaterloo.cs.harvest
 
 import android.os.Parcel
 import android.os.Parcelable
+import ca.uwaterloo.cs.Singleton
 import ca.uwaterloo.cs.bemodels.HasOneImage
 import ca.uwaterloo.cs.product.ProductInformation
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileOutputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
 import java.util.*
 
+@kotlinx.serialization.Serializable
 data class HarvestInformation (
-    var harvestId: String?,
+    var harvestId: String,
     val fromWorker: String,
     var productId: String?,
     val name: String,
@@ -74,25 +78,24 @@ data class HarvestInformation (
     }
 
     fun exportData(fileDir: String) {
-        val dir = File("${fileDir}/out")
+        // saving in the database
+        val dir = File(fileDir)
         if (!dir.exists()) {
             dir.mkdir()
         }
         val file = File(dir, "Harvest-$harvestId.txt")
-        if (file.exists())
+        if (!file.exists())
         {
-            file.delete()
+            file.createNewFile()
         }
-        file.createNewFile()
-        val fileOS = FileOutputStream(file)
-        val outStream = ObjectOutputStream(fileOS)
-        outStream.writeObject(this)
-        outStream.close()
-        fileOS.close()
+        val stringData = Json.encodeToString(this)
+        file.writeText(stringData)
     }
 
     fun deleteData(fileDir: String) {
-        val file = File("${fileDir}/out", "Harvest-$harvestId.txt")
+        Singleton.workerIdAndHarvestIdDeleted.add(Pair(this.fromWorker, this.harvestId))
+        // deleting in the database
+        val file = File(fileDir, "Harvest-$harvestId.txt")
         if (file.exists())
         {
             file.delete()

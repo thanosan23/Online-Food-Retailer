@@ -3,15 +3,15 @@ package ca.uwaterloo.cs.product
 import android.os.Parcel
 import android.os.Parcelable
 import ca.uwaterloo.cs.bemodels.HasOneImage
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.io.File
-import java.io.FileOutputStream
-import java.io.ObjectOutputStream
 import java.io.Serializable
 import java.util.*
 
 @kotlinx.serialization.Serializable
 data class ProductInformation(
-    var productId: String? = UUID.randomUUID().toString(), // Internal id number of product, should we store this?
+    var productId: String = UUID.randomUUID().toString(), // Internal id number of product, should we store this?
     var name: String = "",
     var description: String = "",
     var price: Int = 0,
@@ -35,30 +35,23 @@ data class ProductInformation(
     fun exportData(fileDir: String) {
         // TODO: platform compatibility
         // TODO: save to platform
-        val dir = File("${fileDir}/out")
+        val dir = File(fileDir)
         if (!dir.exists()) {
             dir.mkdir()
         }
         val file = File(dir, "Product-$productId.txt")
-        if (file.exists())
-        {
-            file.delete()
-        }
+
         file.createNewFile()
-        val fileOS = FileOutputStream(file)
-        val outStream = ObjectOutputStream(fileOS)
-        outStream.writeObject(this)
-        outStream.close()
-        fileOS.close()
+        val stringData = Json.encodeToString(this)
+        file.writeText(stringData)
     }
 
     fun deleteData(fileDir: String) {
-        val file = File("${fileDir}/out", "Product-$productId.txt")
-        if (file.exists())
-        {
-            file.delete()
-        }
+        val file = File(fileDir, "Product-$productId.txt")
+        val boolean = file.delete()
+        println("file deleted ${boolean}")
     }
+
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(productId)
@@ -84,4 +77,17 @@ data class ProductInformation(
             return arrayOfNulls(size)
         }
     }
+}
+
+fun copy(productInformation: ProductInformation): ProductInformation{
+    return ProductInformation(
+        productInformation.productId,
+        productInformation.name,
+        productInformation.description,
+        productInformation.price,
+        productInformation.amount,
+        productInformation.image,
+        productInformation.platform1,
+        productInformation.platform2
+    )
 }
