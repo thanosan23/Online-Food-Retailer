@@ -505,7 +505,6 @@ fun SendCancelDeleteWidgets(
         Button(onClick = {
             if (formState.validate() && platformState.validate()) {
                 saveProduct(data, formState.getData() + platformState.getData(), image, context)
-                saveProductToDB(creation, data, formState.getData() + platformState.getData(), image)
                 nav.navigate(MainContentDestination)
             }
         }) {
@@ -579,7 +578,6 @@ private fun saveProductToDB(
     data.platform1 = newData["platform1"].toBoolean()
     data.platform2 = newData["platform2"].toBoolean()
     dbManager.storeProductInformation(
-        creation,
         Singleton.userId,
         data
     )
@@ -593,7 +591,6 @@ private fun deleteProduct(data: ProductInformation, context: Context, nav: Desti
         .setPositiveButton(
             android.R.string.yes
         ) { _, _ ->
-            data.deleteDataFromDB(data)
             data.deleteData("${context.filesDir}/out2")
             nav.navigate(MainContentDestination)
         }
@@ -614,7 +611,7 @@ private fun addProductNumber(
             android.R.string.yes
         ) { _, _ ->
             val harvestRequest = HarvestInformation(
-                fromWorker = "Test Worker",
+                fromWorker = Singleton.userId,
                 product = data,
                 amount = newData["Amount Editor"]!!.toInt()
             )
@@ -640,7 +637,7 @@ private fun removeProductNumber(
             android.R.string.yes
         ) { _, _ ->
             val harvestRequest = HarvestInformation(
-                fromWorker = "Test Worker",
+                fromWorker = Singleton.userId,
                 product = data,
                 amount = -newData["Amount Editor"]!!.toInt()
             )

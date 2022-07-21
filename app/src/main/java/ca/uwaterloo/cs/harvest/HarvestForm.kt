@@ -202,7 +202,7 @@ private fun saveHarvestRequestWithProduct(
 ) {
     val harvestInformation =
         HarvestInformation(
-            fromWorker = "Test Worker",
+            fromWorker = Singleton.userId,
             product = data,
             amount = newData["Amount"]!!.toInt()
         )
@@ -216,7 +216,7 @@ private fun saveHarvestRequestNoProduct(
 ) {
     val harvestInformation =
         HarvestInformation(
-            fromWorker = "Test Worker",
+            fromWorker = Singleton.userId,
             name = newData["Name"]!!,
             description = newData["Description"]!!,
             image = image,

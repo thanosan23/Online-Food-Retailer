@@ -2,6 +2,7 @@ package ca.uwaterloo.cs.db
 
 import android.content.Context
 import ca.uwaterloo.cs.Listener
+import ca.uwaterloo.cs.Singleton
 import ca.uwaterloo.cs.bemodels.SignUpFarmer
 import ca.uwaterloo.cs.bemodels.SignUpWorker
 import ca.uwaterloo.cs.bemodels.UserProfileFarmer
@@ -44,24 +45,32 @@ class DBManager(context: Context?) {
     }
 
     // if the product is being created for the first time add productIdString to be null
-    fun storeProductInformation(productCreation: Boolean, userId: String, productInformation: ProductInformation){
+    fun storeProductInformation(userId: String, productInformation: ProductInformation){
+        if (!Singleton.isFarmer){
+            return
+        }
         val productIdString = productInformation.productId
 
         // DFC storage
         val DFCSuppliedProductId = idResolver.standardResolver(productIdString, IdType.DFCSuppliedProductId)
-        dbStoreDFCManager.storeProductInformation(productCreation, DFCSuppliedProductId, productInformation)
+        dbStoreDFCManager.storeProductInformation(true, DFCSuppliedProductId, productInformation)
 
         // Internal storage
         val productId = Id(DFCSuppliedProductId.idValue, IdType.ProductId)
-        dbStoreInternal.storeProductInformation(productCreation, userId, productId, productInformation)
+        dbStoreInternal.storeProductInformation(userId, productId, productInformation)
     }
 
     fun deleteProductInformation(farmerId: String, productIdString: String){
+        if (!Singleton.isFarmer){
+            return
+        }
         dbStoreInternal.removeProductFromFarmer(farmerId, productIdString)
     }
 
-    fun deleteHarvestInformation(workerId: String, harvestIdString: String){
-        dbStoreInternal.removeHarvestFromWorker(workerId, harvestIdString)
+    fun deleteHarvestInformation(workerId: String, harvest: HarvestInformation){
+        dbStoreInternal.removeHarvestFromWorker(
+            harvest.fromWorker, harvest.harvestId
+        )
     }
 
     fun getProductsInformationFromFarmer(farmerId: String, beListener: Listener<List<ProductInformation>>){
@@ -128,7 +137,7 @@ class DBManagerTest() {
                 platform1 = true,
                 platform2 = false
             )
-        dbManager.storeProductInformation(true, userId1, productInformation)
+        dbManager.storeProductInformation(userId1, productInformation)
     }
 
     private fun simple2StoreProductTest() {
@@ -143,7 +152,7 @@ class DBManagerTest() {
                 platform1 = true,
                 platform2 = false
             )
-        dbManager.storeProductInformation(true, userId1, productInformation)
+        dbManager.storeProductInformation(userId1, productInformation)
     }
 
     private fun simpleGetProductTest(){

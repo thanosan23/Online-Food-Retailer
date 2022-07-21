@@ -15,13 +15,10 @@ class DBStoreInternal(context: Context?) {
         dbClient.context = context
     }
 
-    fun storeProductInformation(productCreation: Boolean,
-                                userId: String,
+    fun storeProductInformation(userId: String,
                                 productId: Id,
                                 productInformation: ProductInformation){
-        if (productCreation){
             addProductToFarmer(userId, productId)
-        }
         productInformation.productId = productId.idValue
         dbClient.store(
             productId.getPath(),
@@ -74,6 +71,11 @@ class DBStoreInternal(context: Context?) {
         val userId = Id(farmerIdString, IdType.CompleteUserProfileId)
         class ListenerImpl() : Listener<CompleteUserProfile>() {
             override fun activate(input: CompleteUserProfile) {
+                for (storedProductId in input.productIds){
+                    if (storedProductId == productId.idValue){
+                        return
+                    }
+                }
                 input.productIds.add(productId.idValue)
                 dbClient.store(
                     userId.getPath(),

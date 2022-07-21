@@ -37,6 +37,8 @@ data class ProductInformation(
     fun exportData(fileDir: String) {
         // TODO: platform compatibility
         // TODO: save to platform
+        val dbManager = DBManager(null)
+        dbManager.storeProductInformation(Singleton.userId, this)
         val dir = File(fileDir)
         if (!dir.exists()) {
             dir.mkdir()
@@ -51,6 +53,7 @@ data class ProductInformation(
     }
 
     fun deleteData(fileDir: String) {
+        DBManager(null).deleteProductInformation(Singleton.userId, productId)
         val file = File("${fileDir}/out2", "Product-$productId.txt")
         if (file.exists())
         {
@@ -58,10 +61,6 @@ data class ProductInformation(
         }
     }
 
-    fun deleteDataFromDB(data: ProductInformation){
-        val dbManager = DBManager(null)
-        dbManager.deleteProductInformation(Singleton.userId, data.productId)
-    }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(productId)

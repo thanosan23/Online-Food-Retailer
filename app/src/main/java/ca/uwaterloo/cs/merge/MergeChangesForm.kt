@@ -175,7 +175,7 @@ fun MergeScreen(nav: DestinationsNavigator) {
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = harvestData.fromWorker)
+                    Text(text = harvestData.fromWorker.dropLast(9))
                 }
                 Spacer(modifier = Modifier.width(20.dp).fillMaxHeight())
                 Column(
@@ -315,7 +315,7 @@ fun MergeScreen(nav: DestinationsNavigator) {
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = harvestData.fromWorker)
+                    Text(text = harvestData.fromWorker.dropLast(9))
                 }
                 Spacer(modifier = Modifier.width(20.dp))
                 Column(
