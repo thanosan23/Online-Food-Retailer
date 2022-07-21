@@ -227,26 +227,6 @@ fun ShowProductForm(
                                     contentAlignment = Alignment.Center
                                 )
                                 {
-                                    /* TODO: FIX PERMISSION ISSUE
-                                imageUri?.let {
-                                    val btm = if (Build.VERSION.SDK_INT < 28) {
-                                        MediaStore.Images.Media.getBitmap(context.contentResolver, it)
-                                    } else {
-                                        val source = ImageDecoder.createSource(context.contentResolver, it)
-                                        ImageDecoder.decodeBitmap(source)
-                                    }
-                                    Image(
-                                        bitmap = btm.asImageBitmap(),
-                                        contentDescription = "Image",
-                                        alignment = Alignment.TopCenter,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .fillMaxHeight(0.45f)
-                                            .padding(top = 10.dp),
-                                        contentScale = ContentScale.Fit
-                                    )
-                                }
-                                 */
                                     Image(
                                         painter = rememberImagePainter(image.toUri()),
                                         contentDescription = null,
