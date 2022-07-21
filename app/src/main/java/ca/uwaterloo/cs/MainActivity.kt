@@ -20,7 +20,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -38,7 +37,6 @@ import androidx.core.net.toUri
 import ca.uwaterloo.cs.db.DBClient
 import ca.uwaterloo.cs.db.DBManagerTest
 import ca.uwaterloo.cs.destinations.HarvestFormDestination
-import ca.uwaterloo.cs.destinations.MergeFormDestination
 import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.product.ProductInformation
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
@@ -53,7 +51,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.ObjectInputStream
 import java.util.*
-
 
 class MainActivity : ComponentActivity() {
     // for testing
@@ -83,7 +80,8 @@ class MainActivity : ComponentActivity() {
     private val providers = arrayListOf(
         //AuthUI.IdpConfig.EmailBuilder().build(),
 //        AuthUI.IdpConfig.PhoneBuilder().build())
-        AuthUI.IdpConfig.GoogleBuilder().build())
+        AuthUI.IdpConfig.GoogleBuilder().build()
+    )
 
     // Create and launch sign-in intent
     private val signInIntent = AuthUI.getInstance()
@@ -105,6 +103,28 @@ class MainActivity : ComponentActivity() {
 fun MainContent(nav: DestinationsNavigator) {
     val useTemplate = true //farmer:true,worker:false
     val context = LocalContext.current
+    Scaffold(
+        content = {
+            val context = LocalContext.current
+            val tableData = readData(context)
+            TableScreen(nav, useTemplate, tableData)
+        },
+        bottomBar = { NavigationBar(nav) },
+    )
+}
+
+@SuppressLint("UnrememberedMutableState")
+@Composable
+fun TableScreen(
+    nav: DestinationsNavigator,
+    useTemplate: Boolean,
+    table: ArrayList<Pair<String, ProductInformation>>
+) {
+    val context = LocalContext.current
+    val tableData = mutableStateListOf<Pair<String, ProductInformation>>()
+    for (item in table) {
+        tableData.add(item)
+    }
     val startLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
@@ -113,6 +133,21 @@ fun MainContent(nav: DestinationsNavigator) {
                 results?.get(0) ?: ""
             }
         Toast.makeText(context, spokenText, Toast.LENGTH_SHORT).show()
+        val tmpTable = ArrayList<Pair<String, ProductInformation>>()
+        for (item in tableData) {
+//                                        Log.d("item", item.second.name)
+//                                        Log.d("text", text.text)
+            if (item.second.name.indexOf(spokenText) != -1) {
+//                                            Log.d("", "HI")
+                tmpTable.add(item)
+                //tableData.remove(item)
+                //editItem(nav, item.second, useTemplate)
+            }
+        }
+        tableData.clear()
+        for (item in tmpTable) {
+            tableData.add(item)
+        }
     }
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -127,53 +162,6 @@ fun MainContent(nav: DestinationsNavigator) {
         } else {
             Toast.makeText(context, "Permission Denied!", Toast.LENGTH_SHORT).show()
         }
-    }
-    Scaffold(
-        content = {
-            val context = LocalContext.current
-            val tableData = readData(context)
-            TableScreen(nav, useTemplate, tableData) },
-        bottomBar = { NavigationBar(nav) }),
-        floatingActionButton = {
-            FloatingActionButton(
-                modifier = Modifier
-                    .width(100.dp)
-                    .height(100.dp),
-                onClick = {
-                    when (PackageManager.PERMISSION_GRANTED) {
-                        ContextCompat.checkSelfPermission(
-                            context, Manifest.permission.RECORD_AUDIO
-                        ) -> {
-                            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-                            intent.putExtra(
-                                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-                            )
-                            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-                            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Talk")
-                            startLauncher.launch(intent)
-                        }
-                        else -> {
-                            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                        }
-                    }
-                }) {
-                Icon(
-                    imageVector = Icons.Filled.Mic,
-                    modifier = Modifier.fillMaxSize(0.5f),
-                    contentDescription = "Voice Search"
-                )
-            }
-        },
-}
-
-@SuppressLint("UnrememberedMutableState")
-@Composable
-fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean, table: ArrayList<Pair<String, ProductInformation>>) {
-    val context = LocalContext.current
-    val tableData = mutableStateListOf<Pair<String, ProductInformation>>()
-    for (item in table) {
-        tableData.add(item)
     }
     if (useTemplate) {
         CenterAlignedTopAppBar(
@@ -362,6 +350,35 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean, table: ArrayLi
             }
         }
     }
+    FloatingActionButton(
+        modifier = Modifier
+            .width(100.dp)
+            .height(100.dp),
+        onClick = {
+            when (PackageManager.PERMISSION_GRANTED) {
+                ContextCompat.checkSelfPermission(
+                    context, Manifest.permission.RECORD_AUDIO
+                ) -> {
+                    val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                    intent.putExtra(
+                        RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                    )
+                    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                    intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Talk")
+                    startLauncher.launch(intent)
+                }
+                else -> {
+                    permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                }
+            }
+        }) {
+        Icon(
+            imageVector = Icons.Filled.Mic,
+            modifier = Modifier.fillMaxSize(0.5f),
+            contentDescription = "Voice Search"
+        )
+    }
 }
 
 
@@ -379,7 +396,7 @@ private fun generateMockData(context: Context) {
         dir.deleteRecursively()
     }
     val dbClient = DBClient()
-    dbClient.context = LocalContext.current
+    dbClient.context = context
 
     ProductInformation(
         UUID.randomUUID().toString(),
