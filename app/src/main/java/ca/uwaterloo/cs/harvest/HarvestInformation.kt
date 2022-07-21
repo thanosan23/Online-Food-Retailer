@@ -99,10 +99,9 @@ data class HarvestInformation (
         // deleting in the database
         DBManager(null).deleteHarvestInformation(
             Singleton.userId,
-            harvestId!!
+            harvestId
         )
         val dbManager = DBManager(null)
-        dbManager.storeHarvestInformation(true, Singleton.userId, this)
         val file = File("${fileDir}/outharvest", "Harvest-$harvestId.txt")
         if (file.exists())
         {

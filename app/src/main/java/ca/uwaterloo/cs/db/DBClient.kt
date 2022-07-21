@@ -42,7 +42,7 @@ class DBClient {
         }
         val stringData = Json.encodeToString(data)
         db.child(key).setValue(stringData).addOnFailureListener{
-            println(it)
+            println("failure storing data $it")
         }
     }
 
@@ -61,6 +61,9 @@ class DBClient {
                 assert(true)
             }
         }
+            .addOnFailureListener{
+                println("failure to get $it")
+            }
     }
 
     fun getIfExists(key: String, listener: Listener<String?>){
@@ -81,7 +84,9 @@ class DBClient {
 
     fun storeImage(file: Uri){
         val ref: StorageReference = storage.child(file.toString())
-        ref.putFile(file)
+        ref.putFile(file).addOnFailureListener{
+            println("failure to store image $it")
+        }
     }
 
     fun getImage(imageName: String): Uri{

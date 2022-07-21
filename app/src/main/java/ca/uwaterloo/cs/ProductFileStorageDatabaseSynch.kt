@@ -74,7 +74,7 @@ class ProductFileStorageDatabaseSynch(val context: Context) {
 
     private fun productInformationSyncJob(){
         val handler = Handler()
-        val delay = 8000 // 1000 milliseconds == 1 second
+        val delay = 30000 // 1000 milliseconds == 1 second
 
         handler.postDelayed(object : Runnable {
             override fun run() {

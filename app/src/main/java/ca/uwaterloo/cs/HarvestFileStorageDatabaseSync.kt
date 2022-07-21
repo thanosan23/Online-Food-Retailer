@@ -48,8 +48,8 @@ class HarvestFileStorageDatabaseSync(val context: Context) {
     private fun updateHarvestDataFromDB(){
             class ListenerImpl() : Listener<List<HarvestInformation>>() {
                 override fun activate(input: List<HarvestInformation>) {
-                    return
                     val fileHarvests = readHarvestFromFiles()
+                    return
                     if (!checkIfHarvestsChanged(input, fileHarvests)){
 //                        return
                     }
