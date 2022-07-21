@@ -49,7 +49,7 @@ class ProductFileStorageDatabaseSynch(val context: Context) {
             override fun activate(input: List<ProductInformation>) {
                 val fileProducts = readProductFromFiles()
                 if (!checkIfProductsChanged(input, fileProducts)){
-                    return
+//                    return
                 }
                 val dir = File("${context.filesDir}/out2")
                 if (dir.exists()){
