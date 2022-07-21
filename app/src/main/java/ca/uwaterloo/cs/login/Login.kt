@@ -50,12 +50,12 @@ fun Login(
     OnlineFoodRetailTheme {
         var video_url = "https://cdn.videvo.net/videvo_files/video/free/2020-05/large_watermarked/3d_ocean_1590675653_preview.mp4"
         val mediaItem = MediaItem.fromUri(video_url)
-        /*val rawId = resources.getIdentifier("clouds", "raw", packageName)
-        val video = "android.resource://$packageName/$rawId"
-        val videoUri = Uri.parse(rawId)*/
+        val rawId = LocalContext.current.resources.getIdentifier("clouds", "raw", LocalContext.current.packageName)
+        val video = "android.resource://$LocalContext.current.packageName/$rawId"
+        val videoUri = Uri.parse(video)
         //val focusManager = LocalFocusManager.current
         val context = LocalContext.current
-        val exoPlayer = remember { context.buildExoPlayer(mediaItem) }
+        val exoPlayer = remember { context.buildExoPlayer(videoUri) }
 
         DisposableEffect(
             AndroidView(
@@ -114,9 +114,9 @@ fun Login(
     }
 }
 
-private fun Context.buildExoPlayer(mediaItem: MediaItem) =
+private fun Context.buildExoPlayer(uri: Uri) =
     ExoPlayer.Builder(this).build().apply {
-        setMediaItem(mediaItem)
+        setMediaItem(MediaItem.fromUri(uri))
         repeatMode = Player.REPEAT_MODE_ALL
         playWhenReady = true
         prepare()
