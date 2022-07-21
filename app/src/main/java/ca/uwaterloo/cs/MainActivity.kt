@@ -1,10 +1,17 @@
 package ca.uwaterloo.cs
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.speech.RecognizerIntent
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -24,10 +32,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import ca.uwaterloo.cs.db.DBClient
 import ca.uwaterloo.cs.db.DBManager
-import ca.uwaterloo.cs.db.DBManagerTest
 import ca.uwaterloo.cs.destinations.HarvestFormDestination
 import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.product.ProductInformation
@@ -41,19 +48,19 @@ import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class MainActivity : ComponentActivity() {
     val dbManager = DBManager(null)
-    fun logout(){
+    fun logout() {
         AuthUI.getInstance().signOut(this)
     }
+
     // See: https://developer.android.com/training/basics/intents/result
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
     ) { res ->
-        val userId = res.idpResponse?.email?.replace(".","")?.replace("\"", "")!!
+        val userId = res.idpResponse?.email?.replace(".", "")?.replace("\"", "")!!
         println("first time $userId")
         Singleton.userId = userId
         Singleton.isNewUser = res.idpResponse?.isNewUser!!
@@ -71,7 +78,8 @@ class MainActivity : ComponentActivity() {
     private val providers = arrayListOf(
         //AuthUI.IdpConfig.EmailBuilder().build(),
 //        AuthUI.IdpConfig.PhoneBuilder().build())
-        AuthUI.IdpConfig.GoogleBuilder().build())
+        AuthUI.IdpConfig.GoogleBuilder().build()
+    )
 
     // Create and launch sign-in intent
     private val signInIntent = AuthUI.getInstance()
@@ -89,168 +97,198 @@ class MainActivity : ComponentActivity() {
 @Destination
 @Composable
 fun MainContent(
-    nav: DestinationsNavigator) {
+    nav: DestinationsNavigator
+) {
     val useTemplate = Singleton.isFarmer
 
     val tableData = remember {
         mutableStateOf(ArrayList<Pair<String, ProductInformation>>())
     }
     tableData.value = readProductFromFiles(LocalContext.current)
-
-    Scaffold(
-        content = {
-            TableScreen(nav, useTemplate, tableData)},
-        bottomBar = { NavigationBar(nav) })
+    TableScreen(nav, useTemplate, tableData)
 }
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean,
-                tableData: MutableState<ArrayList<Pair<String, ProductInformation>>>) {
+fun TableScreen(
+    nav: DestinationsNavigator, useTemplate: Boolean,
+    tableData: MutableState<ArrayList<Pair<String, ProductInformation>>>
+) {
     val context = LocalContext.current
     val table = mutableStateListOf<Pair<String, ProductInformation>>()
     for (item in tableData.value) {
         table.add(item)
     }
-    if (useTemplate) {
-        CenterAlignedTopAppBar(
-            title = { Text("Catalogue", color = Color.White) },
-            navigationIcon = {
-                IconButton(onClick = {
-                    addItem(nav)
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = "Catalogue",
-                        tint = Color.White
-                    )
-                }
-            },
-            actions = {
-                val openDialog = remember { mutableStateOf(false) }
-                var text by remember { mutableStateOf(TextFieldValue("")) }
-                IconButton(onClick = { openDialog.value = true }) {
-                    Icon(
-                        imageVector = Icons.Filled.Search,
-                        contentDescription = "Localized description",
-                        tint = Color.White
-                    )
-                }
-                if (openDialog.value) {
-                    AlertDialog(
-                        onDismissRequest = { openDialog.value = false },
-                        title = { Text(text = "Search") },
-                        text = {
-                            Column() {
-                                TextField(
-                                    value = text,
-                                    onValueChange = {
-                                        text = it
-                                    }
-                                )
-                                //Log.d("", text.toString())
-                            }
-                        },
-                        confirmButton = {
-                            Button(
-                                onClick = {
-                                    val tmpTable = ArrayList<Pair<String, ProductInformation>>()
-                                    for (item in table) {
-//                                        Log.d("item", item.second.name)
-//                                        Log.d("text", text.text)
-                                        if (item.second.name.indexOf(text.text) != -1) {
-//                                            Log.d("", "HI")
-                                            tmpTable.add(item)
-                                            //tableData.remove(item)
-                                            //editItem(nav, item.second, useTemplate)
-                                        }
-                                    }
-                                    table.clear()
-                                    for (item in tmpTable) {
-                                        table.add(item)
-                                    }
-                                    text = TextFieldValue("")
-                                    openDialog.value = false
-
-                                }) {
-                                Text("Filter")
-                            }
-                        },
-                        dismissButton = {
-                            Button(
-                                onClick = {
-                                    table.clear()
-                                    for (item in table) {
-                                        table.add(item)
-                                    }
-                                    openDialog.value = false
-                                    text = TextFieldValue("")
-                                }) {
-                                Text("Clear")
-                            }
-                        }
-                    )
-
-                }
-            },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
-        )
-    } else {
-        CenterAlignedTopAppBar(
-            title = { Text("Catalogue", color = Color.White) },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
-        )
+    val startLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { it ->
+        val spokenText: String =
+            it.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS).let { results ->
+                results?.get(0) ?: ""
+            }
+        val tmpTable = ArrayList<Pair<String, ProductInformation>>()
+        for (item in table.filter { entry -> entry.second.name.indexOf(spokenText) != -1 }) {
+                tmpTable.add(item)
+        }
+        table.clear()
+        for (item in tmpTable) {
+            table.add(item)
+        }
     }
-    // TODO: REMOVE / UPGRADE MOCK DATA GENERATION IN FINAL PRODUCT
-//    val tableData = readData(context)
-    // Each cell of a column must have the same weight.
-    // The LazyColumn will be our table. Notice the use of the weights below
-    Row() {
-        Spacer(Modifier.width(22.dp))
-        LazyColumn(
-            Modifier
-                .padding(66.dp)
-                .background(Color.White)
-                .heightIn(0.dp, 640.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Here are all the lines of your table.
-            items(table, key = { it }) {
-                Spacer(Modifier.height(10.dp))
-
-                Row(
-                    Modifier
-                        .height(IntrinsicSize.Min)
-                        .clickable { editItem(nav, it.second, useTemplate) }
-                        .border(BorderStroke(3.dp, Color.InstagramPurple)),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    if (it.second.image == "") {
-                        Box(
-                            modifier = Modifier
-                                .width(200.dp)
-                                .height(200.dp)
-                                .clickable { editItem(nav, it.second, useTemplate) },
-                            contentAlignment = Alignment.Center
-                        )
-                        {
-                            Text(
-                                text = it.second.name,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 32.sp
-                            )
-                        }
-                    } else {
-                        Image(
-                            painter = rememberImagePainter(it.second.image.toUri()),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .width(200.dp)
-                                .height(200.dp)
-                                .clickable { editItem(nav, it.second, useTemplate) }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+            intent.putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+            )
+            startLauncher.launch(intent)
+        } else {
+            Toast.makeText(context, "Permission Denied!", Toast.LENGTH_SHORT).show()
+        }
+    }
+    Scaffold(content = {
+        if (useTemplate) {
+            CenterAlignedTopAppBar(
+                title = { Text("Catalogue", color = Color.White) },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        addItem(nav)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = "Catalogue",
+                            tint = Color.White
                         )
                     }
+                },
+                actions = {
+                    val openDialog = remember { mutableStateOf(false) }
+                    var text by remember { mutableStateOf(TextFieldValue("")) }
+                    IconButton(onClick = { openDialog.value = true }) {
+                        Icon(
+                            imageVector = Icons.Filled.Search,
+                            contentDescription = "Localized description",
+                            tint = Color.White
+                        )
+                    }
+                    if (openDialog.value) {
+                        AlertDialog(
+                            onDismissRequest = { openDialog.value = false },
+                            title = { Text(text = "Search") },
+                            text = {
+                                Column() {
+                                    TextField(
+                                        value = text,
+                                        onValueChange = {
+                                            text = it
+                                        }
+                                    )
+                                    //Log.d("", text.toString())
+                                }
+                            },
+                            confirmButton = {
+                                Button(
+                                    onClick = {
+                                        val tmpTable = ArrayList<Pair<String, ProductInformation>>()
+                                        for (item in table) {
+//                                        Log.d("item", item.second.name)
+//                                        Log.d("text", text.text)
+                                            if (item.second.name.indexOf(text.text) != -1) {
+//                                            Log.d("", "HI")
+                                                tmpTable.add(item)
+                                                //tableData.remove(item)
+                                                //editItem(nav, item.second, useTemplate)
+                                            }
+                                        }
+                                        table.clear()
+                                        for (item in tmpTable) {
+                                            table.add(item)
+                                        }
+                                        text = TextFieldValue("")
+                                        openDialog.value = false
+
+                                    }) {
+                                    Text("Filter")
+                                }
+                            },
+                            dismissButton = {
+                                Button(
+                                    onClick = {
+                                        table.clear()
+                                        for (item in table) {
+                                            table.add(item)
+                                        }
+                                        openDialog.value = false
+                                        text = TextFieldValue("")
+                                    }) {
+                                    Text("Clear")
+                                }
+                            }
+                        )
+
+                    }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
+            )
+        } else {
+            CenterAlignedTopAppBar(
+                title = { Text("Catalogue", color = Color.White) },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
+            )
+        }
+        // TODO: REMOVE / UPGRADE MOCK DATA GENERATION IN FINAL PRODUCT
+//    val tableData = readData(context)
+        // Each cell of a column must have the same weight.
+        // The LazyColumn will be our table. Notice the use of the weights below
+        Row() {
+            Spacer(Modifier.width(22.dp))
+            LazyColumn(
+                Modifier
+                    .padding(66.dp)
+                    .background(Color.White)
+                    .heightIn(0.dp, 640.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Here are all the lines of your table.
+                items(table, key = { it }) {
+                    Spacer(Modifier.height(10.dp))
+
+                    Row(
+                        Modifier
+                            .height(IntrinsicSize.Min)
+                            .clickable { editItem(nav, it.second, useTemplate) }
+                            .border(BorderStroke(3.dp, Color.InstagramPurple)),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        if (it.second.image == "") {
+                            Box(
+                                modifier = Modifier
+                                    .width(200.dp)
+                                    .height(200.dp)
+                                    .clickable { editItem(nav, it.second, useTemplate) },
+                                contentAlignment = Alignment.Center
+                            )
+                            {
+                                Text(
+                                    text = it.second.name,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 32.sp
+                                )
+                            }
+                        } else {
+                            Image(
+                                painter = rememberImagePainter(it.second.image.toUri()),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .width(200.dp)
+                                    .height(200.dp)
+                                    .clickable { editItem(nav, it.second, useTemplate) }
+                            )
+                        }
 //                    IconButton(
 //                        onClick = {
 //                            nav.navigate(HarvestFormDestination(it.second))
@@ -267,39 +305,72 @@ fun TableScreen(nav: DestinationsNavigator, useTemplate: Boolean,
 //                        )
 //                    }
 
+                    }
                 }
-            }
-            item() {
-                Spacer(Modifier.height(10.dp))
+                item() {
+                    Spacer(Modifier.height(10.dp))
 
-                Row(
-                    Modifier
-                        .height(IntrinsicSize.Min)
-                        .border(BorderStroke(3.dp, Color.InstagramPurple)),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    IconButton(
-                        onClick = {
-                            nav.navigate(HarvestFormDestination())
-                        },
-                        modifier = Modifier
-                            .width(60.dp)
-                            .height(60.dp)
+                    Row(
+                        Modifier
+                            .height(IntrinsicSize.Min)
+                            .border(BorderStroke(3.dp, Color.InstagramPurple)),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
                     ) {
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = "Catalogue",
-                            tint = Color.Green,
-                            modifier = Modifier.fillMaxSize(1.0f)
-                        )
+                        IconButton(
+                            onClick = {
+                                nav.navigate(HarvestFormDestination())
+                            },
+                            modifier = Modifier
+                                .width(60.dp)
+                                .height(60.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Add,
+                                contentDescription = "Catalogue",
+                                tint = Color.Green,
+                                modifier = Modifier.fillMaxSize(1.0f)
+                            )
+                        }
                     }
                 }
             }
         }
-    }
+    },
+        bottomBar = { NavigationBar(nav) },
+        floatingActionButton = {
+            FloatingActionButton(
+                modifier = Modifier
+                    .width(100.dp)
+                    .height(100.dp),
+                onClick = {
+                    when (PackageManager.PERMISSION_GRANTED) {
+                        ContextCompat.checkSelfPermission(
+                            context, Manifest.permission.RECORD_AUDIO
+                        ) -> {
+                            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                            intent.putExtra(
+                                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                            )
+                            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Talk")
+                            startLauncher.launch(intent)
+                        }
+                        else -> {
+                            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                        }
+                    }
+                }) {
+                Icon(
+                    imageVector = Icons.Filled.Mic,
+                    modifier = Modifier.fillMaxSize(0.5f),
+                    contentDescription = "Voice Search"
+                )
+            }
+        }
+    )
 }
-
 
 private fun editItem(nav: DestinationsNavigator, data: ProductInformation, useTemplate: Boolean) {
     nav.navigate(ProductFormDestination(data, useTemplate))
@@ -308,12 +379,13 @@ private fun editItem(nav: DestinationsNavigator, data: ProductInformation, useTe
 private fun addItem(nav: DestinationsNavigator) {
     nav.navigate(ProductFormDestination(creation = true))
 }
+
 @Composable
 fun generateMockData(amount: Int = 7, context: Context) {
 }
 
 
-fun createMockProduct(context: Context){
+fun createMockProduct(context: Context) {
     ProductInformation(
         UUID.randomUUID().toString(),
         "apple",
