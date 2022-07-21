@@ -1,26 +1,34 @@
 package ca.uwaterloo.cs.form
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.window.PopupProperties
 
 class Field(
     val name: String,
@@ -30,7 +38,8 @@ class Field(
     val validators: List<Validator>,
     val inputType: KeyboardType = KeyboardType.Text,
     val formatter: VisualTransformation = NoTransformation(),
-    val readOnly: Boolean = false
+    val readOnly: Boolean = false,
+    private val dropdownList: List<String> = emptyList()
 ) {
     var text: String by mutableStateOf(initValue)
     var lbl: String by mutableStateOf(label)
@@ -56,33 +65,77 @@ class Field(
         val focusManager = LocalFocusManager.current
         val keyboardController = LocalSoftwareKeyboardController.current
         val focusRequester = FocusRequester()
-        OutlinedTextField(
-            value = text,
-            isError = hasError,
-            label = { Text(text = lbl) },
-            placeholder = { Text(text = prompt) },
-            modifier = Modifier
-                .focusRequester(focusRequester)
-                .onFocusChanged {
-                    if (!it.isFocused) {
-                        keyboardController?.hide()
+        var openMenu by remember { mutableStateOf(false) }
+        var dropdownMenuSize by remember { mutableStateOf(Size.Zero)}
+        val icon = if (openMenu)
+            Icons.Filled.KeyboardArrowUp
+        else
+            Icons.Filled.KeyboardArrowDown
+
+        Box(modifier = Modifier
+            .fillMaxWidth()) {
+            OutlinedTextField(
+                value = text,
+                isError = hasError,
+                label = { Text(text = lbl) },
+                placeholder = { Text(text = prompt) },
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .onFocusChanged {
+                        if (!it.isFocused) {
+                            keyboardController?.hide()
+                        }
                     }
-                }
-                .padding(10.dp),
-            keyboardOptions = KeyboardOptions(keyboardType = inputType, imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                    .padding(10.dp)
+                    .onGloballyPositioned { coordinates ->
+                        dropdownMenuSize = coordinates.size.toSize()
+                    },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = inputType,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
 //            keyboardActions = KeyboardActions(
 //                onDone = {keyboardController?.hide()}),
-            //colors = TextFieldDefaults.textFieldColors(cursorColor = Color.Black),
-            colors = TextFieldDefaults.outlinedTextFieldColors(cursorColor = Color.Black,
-                backgroundColor = Color.LightGray),
-            visualTransformation = formatter,
-            onValueChange = { value ->
-                hideError()
-                text = value
-            },
-            readOnly = readOnly
-        )
+                //colors = TextFieldDefaults.textFieldColors(cursorColor = Color.Black),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    cursorColor = Color.Black,
+                    backgroundColor = Color.LightGray
+                ),
+                visualTransformation = formatter,
+                onValueChange = { value ->
+                    hideError()
+                    text = value
+                },
+                readOnly = readOnly,
+                trailingIcon = if (dropdownList.isNotEmpty()) {
+                    {
+                        Icon(icon, "Description", Modifier.clickable { openMenu = !openMenu })
+                    }
+                } else null
+            )
+            val filteredDropDown = dropdownList.filter { it.startsWith(text, ignoreCase = true)}
+            if (filteredDropDown.isNotEmpty()) {
+                DropdownMenu(
+                    expanded = openMenu,
+                    onDismissRequest = {
+                        openMenu = false
+                    },
+                    modifier = Modifier
+                        .width(with(LocalDensity.current) { dropdownMenuSize.width.toDp() }),
+                    properties = PopupProperties(focusable = false)
+                ) {
+                    filteredDropDown.forEach { label ->
+                        DropdownMenuItem(onClick = {
+                            text = label
+                            openMenu = false
+                        }) {
+                            Text(text = label)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     fun setValue(newValue: String) {

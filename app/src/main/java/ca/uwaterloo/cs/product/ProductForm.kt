@@ -28,6 +28,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import ca.uwaterloo.cs.NavigationBar
+import ca.uwaterloo.cs.db.DBClient
+import ca.uwaterloo.cs.db.DBManager
+import ca.uwaterloo.cs.destinations.simulateTransactionDestination
 import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.form.*
 import ca.uwaterloo.cs.harvest.HarvestInformation
@@ -148,7 +151,8 @@ fun ShowProductForm(
                                 .getOrDefault("Name", if (data.name == "") "" else data.name),
                             prompt = "Enter product name",
                             label = "Product Name",
-                            validators = listOf(Required())
+                            validators = listOf(Required()),
+                            dropdownList = listOf("Apple", "Banana", "Carrot")
                         ),
                         Field(
                             name = "Description",
@@ -182,6 +186,7 @@ fun ShowProductForm(
                             label = "Product Price",
                             validators = listOf(Required(), IsNumber(), NonZero()),
                             inputType = KeyboardType.Number,
+                            dropdownList = listOf("0.50", "1.00", "2.00", "5.00")
                         ),
                     )
                 )
@@ -313,6 +318,15 @@ fun ShowProductForm(
                     useTemplate = useTemplate
                 )
             }
+            Button(
+                onClick = {
+                    nav.navigate(simulateTransactionDestination(data))
+                },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text(text = "Simulate Transaction")
+            }
+            Spacer(modifier = Modifier.height(20.dp))
         } else {
             Form(
                 state = formState,
@@ -418,6 +432,16 @@ fun ShowProductForm(
                 context = context,
                 useTemplate = useTemplate
             )
+            Button(
+                onClick = {
+                    nav.navigate(simulateTransactionDestination(data))
+                          },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+
+            ) {
+                Text(text = "Simulate Transaction")
+            }
+            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }
@@ -436,7 +460,7 @@ fun AddOrRemove(
         Button(onClick = {
             if (formState.validate()) {
                 addProductNumber(data, formState.getData(), context, nav)
-                //nav.navigate(MainContentDestination)
+                nav.navigate(MainContentDestination)
             }
         }) {
             Icon(
@@ -530,6 +554,9 @@ private fun saveProduct(
     data.platform1 = newData["platform1"].toBoolean()
     data.platform2 = newData["platform2"].toBoolean()
     data.exportData(context.filesDir.toString())
+
+    val dbClient = DBClient()
+    dbClient.storeImage(data.image.toUri())
 }
 
 private fun deleteProduct(data: ProductInformation, context: Context, nav: DestinationsNavigator) {

@@ -64,7 +64,13 @@ dependencies {
   implementation 'androidx.appcompat:appcompat:1.4.2'
   implementation 'com.google.firebase:firebase-database-ktx:20.0.0'
   implementation 'com.google.firebase:firebase-firestore-ktx:23.0.2'
-  ksp 'io.github.raamcosta.compose-destinations:ksp:1.1.2-beta'
+    implementation 'com.google.firebase:firebase-storage:19.1.1'
+    ksp 'io.github.raamcosta.compose-destinations:ksp:1.1.2-beta'
 
   implementation platform('com.google.firebase:firebase-bom:30.2.0')
+
+  implementation 'com.firebaseui:firebase-ui-auth:7.2.0'
+
+  // Required only if Facebook login support is required
+  // Find the latest Facebook SDK releases here: https://goo.gl/Ce5L94
 }
