@@ -14,7 +14,7 @@ fun newstart(
         nav.navigate(LoginDestination)
     }
     else{
-        nav.navigate(LoginDestination)
-//        nav.navigate(MainContentDestination)
+//        nav.navigate(LoginDestination)
+        nav.navigate(MainContentDestination)
     }
 }

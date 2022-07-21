@@ -1,17 +1,21 @@
 package ca.uwaterloo.cs.db
 
+import android.content.Context
 import ca.uwaterloo.cs.Listener
+import ca.uwaterloo.cs.Singleton
 import ca.uwaterloo.cs.bemodels.SignUpFarmer
 import ca.uwaterloo.cs.bemodels.SignUpWorker
 import ca.uwaterloo.cs.bemodels.UserProfileFarmer
 import ca.uwaterloo.cs.harvest.HarvestInformation
 import ca.uwaterloo.cs.product.ProductInformation
+import java.util.*
 
-class DBManager {
+class DBManager(context: Context?) {
+    // it is important to pass the context if you are getting images
     private val idResolver = IdResolver()
     private val dbStoreDFCManager = DBStoreDFC()
-    private val dbStoreInternal = DBStoreInternal()
-    private val dbGetInternal = DBGetInternal()
+    private val dbStoreInternal = DBStoreInternal(context)
+    private val dbGetInternal = DBGetInternal(context)
 
     // returns true if there is no user with the username false otherwise
     fun storeSignUpFarmer(signUpFarmer: SignUpFarmer){
@@ -22,6 +26,10 @@ class DBManager {
     // returns true if the userName exists and it actually has that password
     fun authenticate(userName: String, password: String, listener: Listener<Boolean>){
         dbGetInternal.authenticate(userName, password, listener)
+    }
+
+    fun getUserType(userId: String){
+        dbGetInternal.getUserType(userId)
     }
 
     // returns true if the userName exists and it actually has that password
@@ -37,27 +45,53 @@ class DBManager {
     }
 
     // if the product is being created for the first time add productIdString to be null
-    fun storeProductInformation(userId: String, productInformation: ProductInformation){
-        val productIdString = productInformation.productId
-        val productCreation = productIdString == null
+    fun storeProductsInformation(userId: String, productsInformation: List<ProductInformation>){
+        if (!Singleton.isFarmer){
+            return
+        }
 
         // DFC storage
-        val DFCSuppliedProductId = idResolver.standardResolver(productIdString, IdType.DFCSuppliedProductId)
-        dbStoreDFCManager.storeProductInformation(productCreation, DFCSuppliedProductId, productInformation)
+//        val DFCSuppliedProductId = idResolver.standardResolver(productIdString, IdType.DFCSuppliedProductId)
+//        dbStoreDFCManager.storeProductInformation(true, DFCSuppliedProductId, productInformation)
 
         // Internal storage
-        val productId = Id(DFCSuppliedProductId.idValue, IdType.ProductId)
-        dbStoreInternal.storeProductInformation(productCreation, userId, productId, productInformation)
+        dbStoreInternal.storeProductsInformation(userId, productsInformation)
     }
 
-    fun getProductsInformation(userId: String, belistener: Listener<List<ProductInformation>>){
-        dbGetInternal.getProductInformation(userId, belistener)
+    fun deleteProductInformation(farmerId: String, productIdString: String){
+        if (!Singleton.isFarmer){
+            return
+        }
+        dbStoreInternal.removeProductFromFarmer(farmerId, productIdString)
+    }
+
+    fun newRemoveProductFromFarmer(farmerIdString: String, productsToBeKeepIdString: List<String>){
+        dbStoreInternal.newRemoveProductFromFarmer(farmerIdString, productsToBeKeepIdString)
+    }
+
+    fun newRemoveHarvestFromWorker(workerIdString: String, harvestToBeKeepIdString: List<String>){
+        dbStoreInternal.newRemoveHarvestFromWorker(workerIdString, harvestToBeKeepIdString)
+    }
+
+    fun removeHarvestFromWorker(workerId: String, harvestId: String){
+    dbStoreInternal.removeHarvestFromWorker(
+        workerId, harvestId
+        )
+    }
+
+    fun getProductsInformationFromFarmer(farmerId: String, beListener: Listener<List<ProductInformation>>){
+        dbGetInternal.getProductInformationFromFarmer(farmerId, beListener)
+    }
+
+    fun getProductsInformationFromWorker(workerId: String, beListener: Listener<List<ProductInformation>>){
+        dbGetInternal.getProductsInformationFromWorker(workerId, beListener)
     }
 
     // if the harvest is being created for the first time add harvestId to be null in the HarvestInformation
-    fun storeHarvestInformation(userId: String, harvestInformation: HarvestInformation){
+    fun storeHarvestInformation(harvestCreation: Boolean,
+                                userId: String,
+                                harvestInformation: HarvestInformation){
         val harvestIdString = harvestInformation.harvestId
-        val harvestCreation = harvestIdString == null
 
         val harvestId = idResolver.standardResolver(harvestIdString, IdType.HarvestId)
         dbStoreInternal.storeHarvestInformation(
@@ -68,12 +102,12 @@ class DBManager {
         )
     }
 
-    fun getHarvestInformation(workerUserId: String, beListener: Listener<List<HarvestInformation>>){
+    fun getHarvestInformationFromWorker(workerUserId: String, beListener: Listener<List<HarvestInformation>>){
         dbGetInternal.getHarvestInformation(workerUserId, beListener)
     }
 
     fun getAllHarvestsFromFarmer(farmerUserId: String, beListener: Listener<List<HarvestInformation>>){
-
+        dbGetInternal.getHarvestInformationFromFarmer(farmerUserId, beListener)
     }
 
     fun storeUserProfile(userProfileFarmer: UserProfileFarmer){
@@ -86,7 +120,7 @@ class DBManager {
 
 class DBManagerTest() {
     private val userId1 = "messinotcom"
-    private val dbManager = DBManager()
+    private val dbManager = DBManager(null)
 
     private fun testSignUp() {
         val signUpFarmer = SignUpFarmer(userId1,
@@ -100,7 +134,7 @@ class DBManagerTest() {
     private fun simple1StoreProductTest() {
         val productInformation =
             ProductInformation(
-                null,
+                UUID.randomUUID().toString(),
                 "new name",
                 "vamos fugis",
                 13,
@@ -109,13 +143,13 @@ class DBManagerTest() {
                 platform1 = true,
                 platform2 = false
             )
-        dbManager.storeProductInformation(userId1, productInformation)
+//        dbManager.storeProductInformation(userId1, productInformation)
     }
 
     private fun simple2StoreProductTest() {
         val productInformation =
             ProductInformation(
-                null,
+                UUID.randomUUID().toString(),
                 "not new name",
                 "nao vamos fugir",
                 13,
@@ -124,7 +158,7 @@ class DBManagerTest() {
                 platform1 = true,
                 platform2 = false
             )
-        dbManager.storeProductInformation(userId1, productInformation)
+//        dbManager.storeProductInformation(userId1, productInformation)
     }
 
     private fun simpleGetProductTest(){
@@ -133,7 +167,7 @@ class DBManagerTest() {
             }
         }
         val listener = ListenerImpl()
-        dbManager.getProductsInformation(userId1, listener)
+        dbManager.getProductsInformationFromFarmer(userId1, listener)
     }
 
     fun part1ProductTest(){

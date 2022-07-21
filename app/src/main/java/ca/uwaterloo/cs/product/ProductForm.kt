@@ -28,6 +28,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import ca.uwaterloo.cs.NavigationBar
+import ca.uwaterloo.cs.Singleton
 import ca.uwaterloo.cs.db.DBClient
 import ca.uwaterloo.cs.db.DBManager
 import ca.uwaterloo.cs.destinations.simulateTransactionDestination
@@ -49,7 +50,8 @@ import java.util.*
 fun ProductForm(
     navigator: DestinationsNavigator,
     data: ProductInformation?,
-    useTemplate: Boolean = true  //worker:false, farmer:true
+    useTemplate: Boolean = true,  //worker:false, farmer:true
+    creation: Boolean = false
 ) {
     OnlineFoodRetailTheme {
         Scaffold(
@@ -68,7 +70,10 @@ fun ProductForm(
                         },
                 ) {
                     Text(if (data == null) "ADD PRODUCT" else "EDIT PRODUCT")
-                    ShowProductForm(navigator, data ?: ProductInformation(), useTemplate)
+                    ShowProductForm(navigator,
+                        data ?: ProductInformation(),
+                        useTemplate,
+                        creation)
                 }
             },
             bottomBar = { NavigationBar(navigator) }
@@ -81,6 +86,7 @@ fun ShowProductForm(
     nav: DestinationsNavigator,
     data: ProductInformation,
     useTemplate: Boolean,
+    creation: Boolean,
 ) {
     val formState by remember { mutableStateOf(FormState()) }
     val platformState by remember { mutableStateOf(PlatformState(data)) }
@@ -137,7 +143,13 @@ fun ShowProductForm(
             .padding(20.dp),
     ) {
         if (useTemplate) {
-            platformState.platformsUI.PlatformsDropDown()
+            Row(verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                platformState.platformsUI.PlatformsDropDown()
+
+            }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -315,8 +327,8 @@ fun ShowProductForm(
                     image = image,
                     nav = nav,
                     context = context,
-                    useTemplate = useTemplate
-                )
+                    useTemplate = useTemplate,
+                    creation = creation)
             }
             Button(
                 onClick = {
@@ -492,8 +504,9 @@ fun SendCancelDeleteWidgets(
     image: String,
     nav: DestinationsNavigator,
     context: Context,
-    useTemplate: Boolean
-) {
+    useTemplate: Boolean,
+    creation: Boolean
+    ) {
     Row {
         Button(onClick = {
             if (formState.validate() && platformState.validate()) {
@@ -553,10 +566,38 @@ private fun saveProduct(
     data.image = newImage
     data.platform1 = newData["platform1"].toBoolean()
     data.platform2 = newData["platform2"].toBoolean()
-    data.exportData(context.filesDir.toString())
+    if(data.platform1){
+        data.platform1_amount=newData["platform1_amount"]!!.toLong()
+        data.platform1_price=newData["platform1_price"]!!.toInt()
+    }
+    if(data.platform2){
+        data.platform2_amount=newData["platform2_amount"]!!.toLong()
+        data.platform2_price=newData["platform2_price"]!!.toInt()
+    }
+    data.exportData("${context.filesDir}/out2")
+}
 
-    val dbClient = DBClient()
-    dbClient.storeImage(data.image.toUri())
+private fun saveProductToDB(
+    creation: Boolean,
+    data: ProductInformation,
+    newData: Map<String, String>,
+    newImage: String,
+){
+    data.name = newData["Name"]!!
+    data.description = newData["Description"]!!
+    data.price = (newData["Price"]!!.toDouble() * 100).toInt()
+    data.amount = newData["Amount"]!!.toLong()
+    data.image = newImage
+    data.platform1 = newData["platform1"].toBoolean()
+    data.platform2 = newData["platform2"].toBoolean()
+    if(data.platform1){
+        data.platform1_amount=newData["platform1_amount"]!!.toLong()
+        data.platform1_price=newData["platform1_price"]!!.toInt()
+    }
+    if(data.platform2){
+        data.platform2_amount=newData["platform2_amount"]!!.toLong()
+        data.platform2_price=newData["platform2_price"]!!.toInt()
+    }
 }
 
 private fun deleteProduct(data: ProductInformation, context: Context, nav: DestinationsNavigator) {
@@ -567,7 +608,7 @@ private fun deleteProduct(data: ProductInformation, context: Context, nav: Desti
         .setPositiveButton(
             android.R.string.yes
         ) { _, _ ->
-            data.deleteData(context.filesDir.toString())
+            data.deleteData("${context.filesDir}/out2")
             nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()
@@ -587,13 +628,13 @@ private fun addProductNumber(
             android.R.string.yes
         ) { _, _ ->
             val harvestRequest = HarvestInformation(
-                fromWorker = "Test Worker",
+                fromWorker = Singleton.userId,
                 product = data,
                 amount = newData["Amount Editor"]!!.toInt()
             )
             AlertDialog.Builder(context)
                 .setMessage("Request has been sent").show()
-            harvestRequest.exportData(context.filesDir.toString())
+            harvestRequest.exportData("${context.filesDir}/outharvest")
             nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()
@@ -613,13 +654,13 @@ private fun removeProductNumber(
             android.R.string.yes
         ) { _, _ ->
             val harvestRequest = HarvestInformation(
-                fromWorker = "Test Worker",
+                fromWorker = Singleton.userId,
                 product = data,
                 amount = -newData["Amount Editor"]!!.toInt()
             )
             AlertDialog.Builder(context)
                 .setMessage("Request has been sent").show()
-            harvestRequest.exportData(context.filesDir.toString())
+            harvestRequest.exportData("${context.filesDir}/outharvest")
             nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()
