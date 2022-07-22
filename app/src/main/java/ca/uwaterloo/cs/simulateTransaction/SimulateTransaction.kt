@@ -64,6 +64,7 @@ fun simulateTransaction(
                 onValueChange = { reductionAmount = it },
                 label = { Text("Reduction Amount") },
                 isError = reductionAmountIsError,
+                singleLine = true,
                 modifier = androidx.compose.ui.Modifier.align(Alignment.CenterHorizontally),
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
             )
@@ -94,9 +95,11 @@ private fun updateProductAfterTransactionIsError(data: ProductInformation, reduc
         return true
     }
     if (data.platform1) {
+        if (data.platform1_amount < reductionAmount) { return true }
         data.platform1_amount -= reductionAmount
     }
     if (data.platform2) {
+        if (data.platform2_amount < reductionAmount) { return true }
         data.platform2_amount -= reductionAmount
     }
     data.amount -= reductionAmount
