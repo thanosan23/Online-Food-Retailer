@@ -40,7 +40,8 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 
-private lateinit var saveDir: String
+private lateinit var saveDirHarvest: String
+private lateinit var saveDirProduct: String
 
 @Destination
 @Composable
@@ -58,7 +59,8 @@ fun MergeForm(
 @Composable
 fun MergeScreen(nav: DestinationsNavigator) {
     val context = LocalContext.current
-    saveDir = "${context.filesDir}/outharvest"
+    saveDirHarvest = "${context.filesDir}/outharvest"
+    saveDirProduct = "${context.filesDir}/out2"
 
     Column {
         CenterAlignedTopAppBar(
@@ -183,8 +185,8 @@ fun MergeScreen(nav: DestinationsNavigator) {
                 Spacer(modifier = Modifier.width(20.dp).fillMaxHeight())
                 IconButton(onClick = {
                     productData.amount += harvestData.amount
-                    productData.exportData(saveDir)
-                    harvestData.deleteData(saveDir)
+                    productData.exportData(saveDirProduct)
+                    harvestData.deleteData(saveDirHarvest)
                     val harvestList = processedData[productData.name]!!.second
                     val updatedList = harvestList.toMutableList()
                     updatedList.remove(harvestData)
@@ -200,7 +202,7 @@ fun MergeScreen(nav: DestinationsNavigator) {
                 }
                 Spacer(modifier = Modifier.width(5.dp).fillMaxHeight())
                 IconButton(onClick = {
-                    harvestData.deleteData(saveDir)
+                    harvestData.deleteData(saveDirHarvest)
                     val harvestList = processedData[productData.name]!!.second
                     val updatedList = harvestList.toMutableList()
                     updatedList.remove(harvestData)
@@ -358,7 +360,7 @@ fun MergeScreen(nav: DestinationsNavigator) {
                 }
                 Spacer(modifier = Modifier.width(5.dp))
                 IconButton(onClick = {
-                    harvestData.deleteData(saveDir)
+                    harvestData.deleteData(saveDirHarvest)
                     val harvestList = processedData[""]!!.second
                     val updatedList = harvestList.toMutableList()
                     updatedList.remove(harvestData)
@@ -402,7 +404,7 @@ fun MergeScreen(nav: DestinationsNavigator) {
                     confirmButton = {
                         TextButton(onClick = {
                             selectedHarvest!!.amount = amount
-                            selectedHarvest!!.exportData(saveDir)
+                            selectedHarvest!!.exportData(saveDirHarvest)
                             processedData[selectedEntry!!.first] =
                                 processedData[selectedEntry!!.first]!!
                             numberChangeVisible = false
@@ -485,7 +487,7 @@ fun MergeScreen(nav: DestinationsNavigator) {
                             }
 
                             selectedHarvest!!.productId = associationId
-                            selectedHarvest!!.exportData(saveDir)
+                            selectedHarvest!!.exportData(saveDirHarvest)
 
                             if (processedData.containsKey(association)) {
                                 val nextList = processedData[association]!!.second

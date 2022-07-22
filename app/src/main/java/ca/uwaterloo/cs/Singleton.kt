@@ -18,9 +18,7 @@ object Singleton
     var workerIdAndHarvestIdDeleted = mutableListOf<Pair<String, String>>()
     // both of these lists should have the same size
 
-    var harvestReadFromDB = 0
-    var harvestJobScheduled = false
-    var productJobScheduled = false
+    var syncInProgress = false
     private val productScreenBroadCasters = mutableListOf<MutableState<ArrayList<Pair<String, ProductInformation>>>>()
     private val harvestScreenBroadCasters = mutableListOf<MutableState<ArrayList<HarvestInformation>>>()
 

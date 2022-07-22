@@ -1,10 +1,13 @@
 package ca.uwaterloo.cs.pushpull
 
-import androidx.compose.material.Button
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import ca.uwaterloo.cs.NavigationBar
 import ca.uwaterloo.cs.Singleton
 import com.ramcosta.composedestinations.annotation.Destination
@@ -15,33 +18,68 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 fun PushPullUI(
     navigator: DestinationsNavigator
 ){
-    Scaffold(
-        content = {UI(navigator)},
-        bottomBar = { NavigationBar(navigator)}
-    )
+        Scaffold(
+            content = { toSynchUI() },
+            bottomBar = { NavigationBar(navigator) }
+        )
 }
 
 @Composable
-fun UI(navigator: DestinationsNavigator){
+fun toSynchUI(){
     val context = LocalContext.current
     val pushPullFarmer = PushPullFarmer(context)
     val pushWorker = PushWorker(context)
     val pullWorker = PullWorker(context)
-    Button(
-        onClick = {
-            Thread {
-                if (Singleton.isFarmer) {
-                    pushPullFarmer.harvestResolver()
-                    pushPullFarmer.productResolver()
-                    Thread.sleep(5000)
-                } else {
-                    pullWorker.run()
-                    Thread.sleep(10000)
-                    pushWorker.run()
-                }
-            }.start()
-        },
+    val synchInProgress = remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Update")
+        if (!synchInProgress.value and !Singleton.syncInProgress) {
+        Button(
+            onClick = {
+                Singleton.syncInProgress = true
+                synchInProgress.value = true
+                Thread {
+                    if (Singleton.isFarmer) {
+                        pushPullFarmer.harvestResolver()
+                        pushPullFarmer.productResolver()
+                    } else {
+                        pullWorker.run()
+                        pushWorker.run()
+                    }
+                    Thread.sleep(5000)
+                    Singleton.syncInProgress = false
+                    synchInProgress.value = false
+                }.start()
+            },
+        ){
+            Text(text = "Sync")
+        }
+        }
+        else{
+            progressBar()
+        }
+    }
+}
+
+@Composable
+fun progressBar(){
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(100.dp),
+            color = Color.Green,
+            strokeWidth = 10.dp
+        )
     }
 }
