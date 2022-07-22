@@ -402,7 +402,7 @@ fun ShowProductForm(
                             initValue = "0",
                             prompt = "Enter amount available",
                             label = "Change Amount",
-                            validators = listOf(Required(), IsNumber()),
+                            validators = listOf(Required(), IsNumber(), NonZero()),
                             inputType = KeyboardType.Number,
                             formatter = NumberTransformation()
                         )
@@ -621,24 +621,13 @@ private fun addProductNumber(
     context: Context,
     nav: DestinationsNavigator
 ) {
-    AlertDialog.Builder(context)
-        .setTitle("Edit Product Number")
-        .setMessage("Are you sure to edit this product number? This will send a request to your manager.")
-        //.setIcon(android.R.drawable.ic_dialog_alert)
-        .setPositiveButton(
-            android.R.string.yes
-        ) { _, _ ->
-            val harvestRequest = HarvestInformation(
-                fromWorker = Singleton.userId,
-                product = data,
-                amount = newData["Amount Editor"]!!.toInt()
-            )
-            AlertDialog.Builder(context)
-                .setMessage("Request has been sent").show()
-            harvestRequest.exportData("${context.filesDir}/outharvest")
-            nav.navigate(MainContentDestination)
-        }
-        .setNegativeButton(android.R.string.no, null).show()
+    val harvestRequest = HarvestInformation(
+        fromWorker = Singleton.userId,
+        product = data,
+        amount = newData["Amount Editor"]!!.toInt()
+    )
+    harvestRequest.exportData("${context.filesDir}/outharvest")
+    nav.navigate(MainContentDestination)
 }
 
 private fun removeProductNumber(

@@ -27,7 +27,7 @@ sealed class NavItem(
     // https://www.flaticon.com/free-icons
     object Catalogue: NavItem("Catalogue", R.drawable.catalogue_icon)
     object Request: NavItem("Request", R.drawable.logistics_icon)
-    object History: NavItem("History", R.drawable.history_icon)
+    object Sync: NavItem("Sync", R.drawable.ic_baseline_cloud_queue_24)
     object Profile: NavItem("Profile", R.drawable.profile_icon)
 }
 
@@ -37,7 +37,7 @@ fun NavigationBar(nav: DestinationsNavigator) {
     val items = listOf(
         NavItem.Catalogue,
         NavItem.Request,
-        NavItem.History,
+        NavItem.Sync,
         NavItem.Profile
     )
     val context = LocalContext.current
@@ -58,7 +58,7 @@ fun NavigationBar(nav: DestinationsNavigator) {
                     when (item.title) {
                         "Catalogue" -> nav.navigate(MainContentDestination)
                         "Request" -> nav.navigate(MergeFormDestination())
-                        "History" -> nav.navigate(PushPullUIDestination)
+                        "Sync" -> nav.navigate(PushPullUIDestination)
                         "Profile" -> nav.navigate(ProfileContentDestination)
                     }
                 }

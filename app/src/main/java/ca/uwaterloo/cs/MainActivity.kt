@@ -239,12 +239,8 @@ fun TableScreen(
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
             )
         }
-        // TODO: REMOVE / UPGRADE MOCK DATA GENERATION IN FINAL PRODUCT
-//    val tableData = readData(context)
-        // Each cell of a column must have the same weight.
-        // The LazyColumn will be our table. Notice the use of the weights below
         Row() {
-            Spacer(Modifier.width(22.dp))
+            Spacer(Modifier.width(30.dp))
             LazyColumn(
                 Modifier
                     .padding(66.dp)
