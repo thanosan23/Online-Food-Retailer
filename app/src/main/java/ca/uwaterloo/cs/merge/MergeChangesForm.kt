@@ -183,22 +183,24 @@ fun MergeScreen(nav: DestinationsNavigator) {
                     Text(harvestData.amount.toString())
                 }
                 Spacer(modifier = Modifier.width(20.dp).fillMaxHeight())
-                IconButton(onClick = {
-                    productData.amount += harvestData.amount
-                    productData.exportData(saveDirProduct)
-                    harvestData.deleteData(saveDirHarvest)
-                    val harvestList = processedData[productData.name]!!.second
-                    val updatedList = harvestList.toMutableList()
-                    updatedList.remove(harvestData)
-                    linkedHarvests.remove(harvestData.harvestId)
-                    processedData[productData.name] = Pair(productData, updatedList)
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.Check,
-                        contentDescription = "Accept change",
-                        tint = Color.Green,
-                        modifier = Modifier
-                    )
+                if (Singleton.isFarmer) {
+                    IconButton(onClick = {
+                        productData.amount += harvestData.amount
+                        productData.exportData(saveDirProduct)
+                        harvestData.deleteData(saveDirHarvest)
+                        val harvestList = processedData[productData.name]!!.second
+                        val updatedList = harvestList.toMutableList()
+                        updatedList.remove(harvestData)
+                        linkedHarvests.remove(harvestData.harvestId)
+                        processedData[productData.name] = Pair(productData, updatedList)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = "Accept change",
+                            tint = Color.Green,
+                            modifier = Modifier
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.width(5.dp).fillMaxHeight())
                 IconButton(onClick = {
