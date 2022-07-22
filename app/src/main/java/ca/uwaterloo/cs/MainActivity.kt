@@ -303,33 +303,33 @@ fun TableScreen(
 
                     }
                 }
-                item() {
-                    Spacer(Modifier.height(10.dp))
-
-                    Row(
-                        Modifier
-                            .height(IntrinsicSize.Min)
-                            .border(BorderStroke(3.dp, Color.InstagramPurple)),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        IconButton(
-                            onClick = {
-                                nav.navigate(HarvestFormDestination())
-                            },
-                            modifier = Modifier
-                                .width(60.dp)
-                                .height(60.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Add,
-                                contentDescription = "Catalogue",
-                                tint = Color.Green,
-                                modifier = Modifier.fillMaxSize(1.0f)
-                            )
-                        }
-                    }
-                }
+//                item() {
+//                    Spacer(Modifier.height(10.dp))
+//
+//                    Row(
+//                        Modifier
+//                            .height(IntrinsicSize.Min)
+//                            .border(BorderStroke(3.dp, Color.InstagramPurple)),
+//                        verticalAlignment = Alignment.CenterVertically,
+//                        horizontalArrangement = Arrangement.Center
+//                    ) {
+//                        IconButton(
+//                            onClick = {
+//                                nav.navigate(HarvestFormDestination())
+//                            },
+//                            modifier = Modifier
+//                                .width(60.dp)
+//                                .height(60.dp)
+//                        ) {
+//                            Icon(
+//                                imageVector = Icons.Filled.Add,
+//                                contentDescription = "Catalogue",
+//                                tint = Color.Green,
+//                                modifier = Modifier.fillMaxSize(1.0f)
+//                            )
+//                        }
+//                    }
+//                }
             }
         }
     },

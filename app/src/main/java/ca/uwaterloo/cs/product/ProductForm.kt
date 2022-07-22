@@ -508,11 +508,30 @@ fun SendCancelDeleteWidgets(
     useTemplate: Boolean,
     creation: Boolean
     ) {
+
     Row {
         Button(onClick = {
             if (formState.validate() && platformState.validate()) {
-                saveProduct(data, formState.getData() + platformState.getData(), image, context)
-                nav.navigate(MainContentDestination)
+                val newData1: Map<String, String> =formState.getData() + platformState.getData()
+                var actualAmount:Long=0
+                if(newData1["platform1"].toBoolean()){
+                    actualAmount+=newData1["platform1_amount"]!!.toLong()
+                }
+                if(newData1["platform2"].toBoolean()){
+                    actualAmount+=newData1["platform2_amount"]!!.toLong()
+                }
+                if((newData1["platform1"].toBoolean() or newData1["platform2"].toBoolean())==false){
+                    AlertDialog.Builder(context)
+                        .setMessage("Please select at least one platform").show()
+                }
+                else if(newData1["Amount"]!!.toLong()<actualAmount){
+                        AlertDialog.Builder(context)
+                            .setMessage("Please make sure the sum of platform number is smaller than product amount").show()
+                }
+                else{
+                    saveProduct(data, formState.getData() + platformState.getData(), image, context)
+                    nav.navigate(MainContentDestination)
+                }
             }
         }) {
             Icon(
