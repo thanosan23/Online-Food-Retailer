@@ -52,7 +52,13 @@ class DBClient {
                 val stringData = it.value as String
                 val data = Json.decodeFromString<T>(stringData)
                 if (data is HasOneImage){
-                        data.image = getImage(data.image).toString()
+                        val result = getImage(data.image)
+                        if (result == null){
+                            data.image = ""
+                        }
+                        else{
+                            data.image = result.toString()
+                        }
                 }
                 listener.activate(data!!)
             }
@@ -84,6 +90,9 @@ class DBClient {
 
     fun storeImage(file: Uri){
         println(file.toString())
+        if (file.toString() == ""){
+            return
+        }
         val ref: StorageReference = storage.child(file.toString())
         try {
             ref.putFile(file).addOnFailureListener {
@@ -96,6 +105,9 @@ class DBClient {
     }
 
     fun getImage(imageName: String): Uri?{
+        if (imageName == ""){
+            return null
+        }
         val ref: StorageReference = storage.child(imageName)
         val timeStamp = SimpleDateFormat.getDateTimeInstance().format(Date())
         val localFile = File(context!!.filesDir, "JPEG_$timeStamp.jpg")

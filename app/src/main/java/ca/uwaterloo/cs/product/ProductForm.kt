@@ -444,16 +444,17 @@ fun ShowProductForm(
                 context = context,
                 useTemplate = useTemplate
             )
-            Button(
-                onClick = {
-                    nav.navigate(simulateTransactionDestination(data))
-                          },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
 
-            ) {
-                Text(text = "Simulate Transaction")
-            }
-            Spacer(modifier = Modifier.height(20.dp))
+//            Button(
+//                onClick = {
+//                    nav.navigate(simulateTransactionDestination(data))
+//                          },
+//                modifier = Modifier.align(Alignment.CenterHorizontally)
+//
+//            ) {
+//                Text(text = "Simulate Transaction")
+//            }
+//            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }
