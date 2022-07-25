@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import ca.uwaterloo.cs.Singleton
 import ca.uwaterloo.cs.bemodels.SignUpWorker
+import ca.uwaterloo.cs.bemodels.UserProfile
 import ca.uwaterloo.cs.db.DBManager
 import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
@@ -163,6 +164,15 @@ fun SignupAsWorker(
                             farmerUserId
                         )
                         DBManager(null).storeSignUpWorker(signUpWorker)
+                        val userProfile = UserProfile(
+                            firstName,
+                            familyName,
+                            "",
+                            Singleton.userId.dropLast(9) + "@gmail.com",
+                            null,
+                            ""
+                        )
+                        userProfile.exportData(context)
                         navigator.navigate(MainContentDestination)
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
