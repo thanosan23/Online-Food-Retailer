@@ -20,10 +20,7 @@ import androidx.compose.ui.unit.sp
 import ca.uwaterloo.cs.NavigationBar
 import ca.uwaterloo.cs.destinations.Destination
 import ca.uwaterloo.cs.destinations.AccountSettingListScreenDestination
-import ca.uwaterloo.cs.ui.theme.Divider
-import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
-import ca.uwaterloo.cs.ui.theme.Spacer
-import ca.uwaterloo.cs.ui.theme.TextPrimary
+import ca.uwaterloo.cs.ui.theme.*
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 
@@ -136,7 +133,7 @@ fun ProfileListItem(
 fun ProfileList(nav: DestinationsNavigator) {
     Box(
         Modifier
-            .background(Color.White)
+            .background(Color.BG)
             .fillMaxSize()
     ) {
         Column(
@@ -149,14 +146,14 @@ fun ProfileList(nav: DestinationsNavigator) {
                 Modifier
                     .background(Color.Spacer)
                     .fillMaxWidth()
-                    .height(8.dp)
+                    .height(18.dp)
             )
-            ProfileListItem(ca.uwaterloo.cs.R.drawable.settings, "Account Setting",nav)
+            /*ProfileListItem(ca.uwaterloo.cs.R.drawable.settings, "Account Setting",nav)
             Divider(startIndent = 56.dp, color = Color.Divider, thickness = 0.8f.dp)
             ProfileListItem(ca.uwaterloo.cs.R.drawable.offline, "Offline Mode",nav)
             Divider(startIndent = 56.dp, color = Color.Divider, thickness = 0.8f.dp)
             ProfileListItem(ca.uwaterloo.cs.R.drawable.swap, "Language", nav)
-            Divider(startIndent = 56.dp, color = Color.Divider, thickness = 0.8f.dp)
+            Divider(startIndent = 56.dp, color = Color.Divider, thickness = 0.8f.dp)*/
             ProfileListItem(ca.uwaterloo.cs.R.drawable.logout, "Log out", nav)
         }
     }

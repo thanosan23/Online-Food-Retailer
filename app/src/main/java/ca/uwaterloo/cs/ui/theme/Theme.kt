@@ -18,7 +18,7 @@ fun OnlineFoodRetailTheme(content: @Composable () -> Unit) {
     primary = Color.VeryDarkGray,
   )
   val lightColors = lightColors(
-    primary = Color.White,
+    primary = Color.BG,
     onPrimary = Color.DarkGray,
     surface = Color.DarkGray
   )
@@ -43,3 +43,6 @@ val Color.Companion.VeryDarkGray get() = Color(0xFF121212)
 val Color.Companion.InstagramOrange get() = Color(0xFFFF7A00)
 val Color.Companion.InstagramPeach get() = Color(0xFFFF0069)
 val Color.Companion.InstagramPurple get() = Color(0xFF669933)
+val Color.Companion.Green1 get() = Color(0xFF1BA57B)
+val Color.Companion.BG get() = Color(0xFFEDEDED)
+val Color.Companion.TextSec get() = Color(0xFF4B4F5A)
