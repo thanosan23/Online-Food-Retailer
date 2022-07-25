@@ -26,7 +26,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
-import ca.uwaterloo.cs.*
+import ca.uwaterloo.cs.NavigationBar
+import ca.uwaterloo.cs.Singleton
 import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.harvest.HarvestInformation
@@ -89,7 +90,7 @@ fun MergeScreen(nav: DestinationsNavigator) {
         )
 
 
-        val harvestListFromFiles = remember{
+        val harvestListFromFiles = remember {
             mutableStateOf(ArrayList<HarvestInformation>())
         }
         harvestListFromFiles.value = readHarvestFromFiles(LocalContext.current)
@@ -158,7 +159,11 @@ fun MergeScreen(nav: DestinationsNavigator) {
                 linkedHarvests.add(harvestData.harvestId!!)
             }
 
-            Spacer(Modifier.height(10.dp).fillMaxWidth())
+            Spacer(
+                Modifier
+                    .height(10.dp)
+                    .fillMaxWidth()
+            )
             Row(
                 modifier = Modifier
                     .height(50.dp)
@@ -174,7 +179,11 @@ fun MergeScreen(nav: DestinationsNavigator) {
                 ) {
                     Text(text = harvestData.fromWorker.dropLast(9))
                 }
-                Spacer(modifier = Modifier.width(20.dp).fillMaxHeight())
+                Spacer(
+                    modifier = Modifier
+                        .width(20.dp)
+                        .fillMaxHeight()
+                )
                 Column(
                     modifier = Modifier.fillMaxHeight(),
                     verticalArrangement = Arrangement.Center
@@ -182,17 +191,32 @@ fun MergeScreen(nav: DestinationsNavigator) {
                     Text("Amount:")
                     Text(harvestData.amount.toString())
                 }
-                Spacer(modifier = Modifier.width(20.dp).fillMaxHeight())
+                Spacer(
+                    modifier = Modifier
+                        .width(20.dp)
+                        .fillMaxHeight()
+                )
                 if (Singleton.isFarmer) {
                     IconButton(onClick = {
-                        productData.amount += harvestData.amount
-                        productData.exportData(saveDirProduct)
-                        harvestData.deleteData(saveDirHarvest)
-                        val harvestList = processedData[productData.name]!!.second
-                        val updatedList = harvestList.toMutableList()
-                        updatedList.remove(harvestData)
-                        linkedHarvests.remove(harvestData.harvestId)
-                        processedData[productData.name] = Pair(productData, updatedList)
+                        if (productData.amount + harvestData.amount < productData.platform1_amount + productData.platform2_amount) {
+                            val builder = AlertDialog.Builder(context)
+                            builder.setTitle("Invalid Operation")
+                                .setMessage("Cannot lower stock amount below total sold on platforms. Please update platform amounts before lowering total stock.")
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setPositiveButton(
+                                    android.R.string.yes
+                                ) { _, _ -> }
+                            builder.show()
+                        } else {
+                            productData.amount += harvestData.amount
+                            productData.exportData(saveDirProduct)
+                            harvestData.deleteData(saveDirHarvest)
+                            val harvestList = processedData[productData.name]!!.second
+                            val updatedList = harvestList.toMutableList()
+                            updatedList.remove(harvestData)
+                            linkedHarvests.remove(harvestData.harvestId)
+                            processedData[productData.name] = Pair(productData, updatedList)
+                        }
                     }) {
                         Icon(
                             imageVector = Icons.Filled.Check,
@@ -202,7 +226,11 @@ fun MergeScreen(nav: DestinationsNavigator) {
                         )
                     }
                 }
-                Spacer(modifier = Modifier.width(5.dp).fillMaxHeight())
+                Spacer(
+                    modifier = Modifier
+                        .width(5.dp)
+                        .fillMaxHeight()
+                )
                 IconButton(onClick = {
                     harvestData.deleteData(saveDirHarvest)
                     val harvestList = processedData[productData.name]!!.second
@@ -218,7 +246,11 @@ fun MergeScreen(nav: DestinationsNavigator) {
                         modifier = Modifier
                     )
                 }
-                Spacer(modifier = Modifier.width(5.dp).fillMaxHeight())
+                Spacer(
+                    modifier = Modifier
+                        .width(5.dp)
+                        .fillMaxHeight()
+                )
                 IconButton(onClick = {
                     val options =
                         arrayOf<CharSequence>(
@@ -276,7 +308,11 @@ fun MergeScreen(nav: DestinationsNavigator) {
             if (!unlinkedHarvests.contains(harvestData.harvestId)) {
                 unlinkedHarvests.add(harvestData.harvestId!!)
             }
-            Spacer(Modifier.height(20.dp).fillMaxWidth())
+            Spacer(
+                Modifier
+                    .height(20.dp)
+                    .fillMaxWidth()
+            )
             Row(modifier = Modifier.height(100.dp)) {
                 if (harvestData.image != "") {
                     Image(
@@ -301,7 +337,11 @@ fun MergeScreen(nav: DestinationsNavigator) {
                     Text(text = harvestData.description, fontSize = 16.sp)
                 }
             }
-            Spacer(Modifier.height(10.dp).fillMaxWidth())
+            Spacer(
+                Modifier
+                    .height(10.dp)
+                    .fillMaxWidth()
+            )
             Row(
                 modifier = Modifier
                     .height(50.dp)
@@ -440,7 +480,8 @@ fun MergeScreen(nav: DestinationsNavigator) {
                     title = { Text("Select Product") },
                     text = {
                         Column {
-                            productListFromFiles.map { (_, v) -> Pair(v.name, v) }.sortedBy { (k, _) -> k }
+                            productListFromFiles.map { (_, v) -> Pair(v.name, v) }
+                                .sortedBy { (k, _) -> k }
                                 .forEach { item ->
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
@@ -602,9 +643,9 @@ fun MergeScreen(nav: DestinationsNavigator) {
     }
 }
 
-private fun localCasting1(it: ArrayList<Pair<String, ProductInformation>>): HashMap<String, ProductInformation>{
+private fun localCasting1(it: ArrayList<Pair<String, ProductInformation>>): HashMap<String, ProductInformation> {
     val map1 = mutableMapOf<String, ProductInformation>()
-    for (thing in it){
+    for (thing in it) {
         map1[thing.first] = thing.second
     }
     return HashMap(map1)
@@ -622,7 +663,7 @@ private fun processData(
     }
     processedData[""] = Pair(null, arrayListOf())
     for (harvest in data) {
-        if (processedData[harvest.productId] == null){
+        if (processedData[harvest.productId] == null) {
             println("null pointer exception in processed data")
             println("arguments, $data,  $products")
             continue

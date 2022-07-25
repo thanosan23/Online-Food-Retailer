@@ -48,8 +48,8 @@ fun Login(
     navigator: DestinationsNavigator
 ) {
     OnlineFoodRetailTheme {
-        var video_url = "https://cdn.videvo.net/videvo_files/video/free/2020-05/large_watermarked/3d_ocean_1590675653_preview.mp4"
-        val mediaItem = MediaItem.fromUri(video_url)
+        //var video_url = "https://cdn.videvo.net/videvo_files/video/free/2020-05/large_watermarked/3d_ocean_1590675653_preview.mp4"
+        //val mediaItem = MediaItem.fromUri(video_url)
         val rawId = LocalContext.current.resources.getIdentifier("wheat", "raw", LocalContext.current.packageName)
         val video = "android.resource://$LocalContext.current.packageName/$rawId"
         val videoUri = Uri.parse(video)
