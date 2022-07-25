@@ -31,24 +31,24 @@ data class UserProfile (
         val stringData = Json.encodeToString(this)
         file.writeText(stringData)
     }
+}
 
-    fun readUserProfileFromFiles(context: Context): UserProfile? {
-        // TODO: platform compatibility
-        // TODO: load from platform
-        val dir = File("${context.filesDir}/outUserProfile")
-        if (!dir.exists()) {
-            return null
-        }
-        for (saveFile in dir.walk()) {
-            if (saveFile.isFile && saveFile.canRead() && saveFile.name.contains("UserProfile") && saveFile.exists()) {
-                try {
-                    return Json.decodeFromString<UserProfile>(saveFile.readText())
-                } catch (e: Throwable) {
-                    println("error deserializing the product")
-                }
-                break
-            }
-        }
+fun readUserProfileFromFiles(context: Context): UserProfile? {
+    // TODO: platform compatibility
+    // TODO: load from platform
+    val dir = File("${context.filesDir}/outUserProfile")
+    if (!dir.exists()) {
         return null
     }
+    for (saveFile in dir.walk()) {
+        if (saveFile.isFile && saveFile.canRead() && saveFile.name.contains("UserProfile") && saveFile.exists()) {
+            try {
+                return Json.decodeFromString<UserProfile>(saveFile.readText())
+            } catch (e: Throwable) {
+                println("error deserializing the product")
+            }
+            break
+        }
+    }
+    return null
 }

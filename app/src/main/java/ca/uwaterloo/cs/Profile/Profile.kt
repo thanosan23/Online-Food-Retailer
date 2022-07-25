@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import ca.uwaterloo.cs.NavigationBar
 import ca.uwaterloo.cs.Singleton
 import ca.uwaterloo.cs.bemodels.UserProfile
+import ca.uwaterloo.cs.bemodels.readUserProfileFromFiles
 import ca.uwaterloo.cs.db.DBManager
 import ca.uwaterloo.cs.destinations.Destination
 import ca.uwaterloo.cs.destinations.AccountSettingListScreenDestination
@@ -140,16 +141,7 @@ fun ProfileListItem(
 
 @Composable
 fun ProfileList(nav: DestinationsNavigator, dbManager:DBManager) {
-    val context = LocalContext.current
-    val userProfile = UserProfile(
-        "",
-        "",
-        "",
-        "",
-        null,
-        ""
-    )
-    userProfile.exportData(context)
+    val userProfile = readUserProfileFromFiles(LocalContext.current)
 
     Box(
         Modifier
@@ -161,7 +153,7 @@ fun ProfileList(nav: DestinationsNavigator, dbManager:DBManager) {
                 .background(Color.White)
                 .fillMaxWidth()
         ) {
-            ProfileTopBar(userProfile)
+            ProfileTopBar(userProfile!!)
             Spacer(
                 Modifier
                     .background(Color.Spacer)
