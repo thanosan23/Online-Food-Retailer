@@ -66,6 +66,7 @@ fun MergeScreen(nav: DestinationsNavigator) {
     Column {
         CenterAlignedTopAppBar(
             title = { Text("Harvest Updates", color = Color.White) },
+            modifier = Modifier.systemBarsPadding(),
             navigationIcon = {
                 IconButton(onClick = {
                     nav.navigate(ProductFormDestination())

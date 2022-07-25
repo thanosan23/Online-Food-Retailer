@@ -153,7 +153,221 @@ fun TableScreen(
         }
     }
     Scaffold(content = {
-        if (useTemplate) {
+        Row() {
+            LazyColumn(
+                Modifier
+                    .background(Color.White)
+                    .fillMaxWidth()
+                    .heightIn(0.dp, 640.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Here are all the lines of your table.
+                items(table, key = { it }) {
+                    Spacer(Modifier.height(10.dp))
+
+                    Row(
+                        Modifier
+                            .height(IntrinsicSize.Min)
+                            .clickable { editItem(nav, it.second, useTemplate) },
+                            //.border(BorderStroke(3.dp, Color.InstagramPurple)),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        if (it.second.image == "") {
+                            /*Box(
+                                modifier = Modifier
+                                    .width(200.dp)
+                                    .height(200.dp)
+                                    .clickable { editItem(nav, it.second, useTemplate) },
+                                contentAlignment = Alignment.Center
+                            )
+                            {
+                                Text(
+                                    text = it.second.name,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 32.sp
+                                )
+                            }*/
+                            Card(
+                                shape = Shapes.medium,
+                                backgroundColor = Color.BG,
+                                modifier = Modifier
+                                    .padding(10.dp)
+                                    .width(200.dp)
+                                    .clickable { editItem(nav, it.second, useTemplate) },
+
+                                ) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(10.dp),
+                                ) {
+                                    Image(
+                                        painter = painterResource(ca.uwaterloo.cs.R.drawable.unknown),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(200.dp)
+                                            .clip(RoundedCornerShape(36.dp)),
+                                    )
+                                    Row(modifier = Modifier.padding(top = 20.dp)) {
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            val amount = it.second.amount.toString()
+                                            val name = it.second.name
+                                            Text(
+                                                text = name,
+                                                style = TextStyle(
+                                                    color = Color.TextPrimary,
+                                                    fontSize = 16.sp
+                                                )
+                                            )
+                                            Text(
+                                                text = "Amount: $amount",
+                                                style = TextStyle(
+                                                    color = Color.TextSec,
+                                                    fontSize = 16.sp
+                                                )
+                                            )
+                                        }
+                                        IconButton(
+                                            onClick = {
+                                                editItem(nav, it.second, useTemplate)
+                                            },
+                                            modifier = Modifier
+                                                .background(
+                                                    color = Color.Green1,
+                                                    shape = RoundedCornerShape(10.dp)
+                                                )
+                                                .size(48.dp)
+                                        ) {
+                                            Icon(
+                                                painterResource(ca.uwaterloo.cs.R.drawable.edit),
+                                                tint = Color.White,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(30.dp))
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            /*Image(
+                                painter = rememberImagePainter(it.second.image.toUri()),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .width(200.dp)
+                                    .height(200.dp)
+                                    .clickable { editItem(nav, it.second, useTemplate) }
+                            )*/
+                            Card(
+                                shape = Shapes.medium,
+                                backgroundColor = Color.BG,
+                                modifier = Modifier
+                                    .padding(10.dp)
+                                    .width(200.dp)
+                                    .clickable { editItem(nav, it.second, useTemplate) },
+
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(10.dp),
+                                ) {
+                                    Image(
+                                        painter = rememberImagePainter(it.second.image.toUri()),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(200.dp)
+                                            .clip(RoundedCornerShape(36.dp)),
+                                    )
+                                    Row(modifier = Modifier.padding(top = 20.dp)) {
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            val amount = it.second.amount.toString()
+                                            val name = it.second.name
+                                            Text(
+                                                text = name,
+                                                style = TextStyle(
+                                                    color = Color.TextPrimary,
+                                                    fontSize = 16.sp
+                                                )
+                                            )
+                                            Text(
+                                                text = "Amount: $amount",
+                                                style = TextStyle(
+                                                    color = Color.TextSec,
+                                                    fontSize = 16.sp
+                                                )
+                                            )
+                                        }
+                                        IconButton(
+                                            onClick = {
+                                                editItem(nav, it.second, useTemplate)
+                                            },
+                                            modifier = Modifier
+                                                .background(
+                                                    color = Color.Green1,
+                                                    shape = RoundedCornerShape(10.dp)
+                                                )
+                                                .size(48.dp)
+                                        ) {
+                                            Icon(
+                                                painterResource(ca.uwaterloo.cs.R.drawable.edit),
+                                                tint = Color.White,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(30.dp))
+                                        }
+                                    }
+                                }
+                            }
+                        }
+//                    IconButton(
+//                        onClick = {
+//                            nav.navigate(HarvestFormDestination(it.second))
+//                        },
+//                        modifier = Modifier
+//                            .width(60.dp)
+//                            .height(60.dp)
+//                    ) {
+//                        Icon(
+//                            imageVector = Icons.Filled.Add,
+//                            contentDescription = "Catalogue",
+//                            tint = Color.Green,
+//                            modifier = Modifier.fillMaxSize(1.0f)
+//                        )
+//                    }
+
+                    }
+                }
+//                item() {
+//                    Spacer(Modifier.height(10.dp))
+//
+//                    Row(
+//                        Modifier
+//                            .height(IntrinsicSize.Min)
+//                            .border(BorderStroke(3.dp, Color.InstagramPurple)),
+//                        verticalAlignment = Alignment.CenterVertically,
+//                        horizontalArrangement = Arrangement.Center
+//                    ) {
+//                        IconButton(
+//                            onClick = {
+//                                nav.navigate(HarvestFormDestination())
+//                            },
+//                            modifier = Modifier
+//                                .width(60.dp)
+//                                .height(60.dp)
+//                        ) {
+//                            Icon(
+//                                imageVector = Icons.Filled.Add,
+//                                contentDescription = "Catalogue",
+//                                tint = Color.Green,
+//                                modifier = Modifier.fillMaxSize(1.0f)
+//                            )
+//                        }
+//                    }
+//                }
+            }
+        }
+    },
+        bottomBar = { NavigationBar(nav) },
+        topBar = {        if (useTemplate) {
             CenterAlignedTopAppBar(
                 title = { Text("Catalogue", color = Color.White) },
                 navigationIcon = {
@@ -167,6 +381,7 @@ fun TableScreen(
                         )
                     }
                 },
+                modifier = Modifier.systemBarsPadding(),
                 actions = {
                     val openDialog = remember { mutableStateOf(false) }
                     var text by remember { mutableStateOf(TextFieldValue("")) }
@@ -236,216 +451,7 @@ fun TableScreen(
                 title = { Text("Catalogue", color = Color.White) },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color.InstagramPurple)
             )
-        }
-        Row() {
-            Spacer(Modifier.width(30.dp))
-            LazyColumn(
-                Modifier
-                    .padding(66.dp)
-                    .background(Color.White)
-                    .heightIn(0.dp, 640.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Here are all the lines of your table.
-                items(table, key = { it }) {
-                    Spacer(Modifier.height(10.dp))
-
-                    Row(
-                        Modifier
-                            .height(IntrinsicSize.Min)
-                            .clickable { editItem(nav, it.second, useTemplate) },
-                            //.border(BorderStroke(3.dp, Color.InstagramPurple)),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        if (it.second.image == "") {
-                            /*Box(
-                                modifier = Modifier
-                                    .width(200.dp)
-                                    .height(200.dp)
-                                    .clickable { editItem(nav, it.second, useTemplate) },
-                                contentAlignment = Alignment.Center
-                            )
-                            {
-                                Text(
-                                    text = it.second.name,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 32.sp
-                                )
-                            }*/
-                            Card(
-                                shape = Shapes.medium,
-                                backgroundColor = Color.BG,
-                                modifier = Modifier
-                                    .padding(10.dp)
-                                    .width(200.dp)
-                                    .clickable { editItem(nav, it.second, useTemplate) },
-
-                                ) {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth().padding(10.dp),
-                                ) {
-                                    Image(
-                                        painter = painterResource(ca.uwaterloo.cs.R.drawable.unknown),
-                                        contentDescription = null,
-                                        modifier = Modifier
-                                            .size(200.dp)
-                                            .clip(RoundedCornerShape(36.dp)),
-                                    )
-                                    Row(modifier = Modifier.padding(top = 20.dp)) {
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            val amount = it.second.amount.toString()
-                                            val name = it.second.name
-                                            Text(
-                                                text = name,
-                                                style = TextStyle(
-                                                    color = Color.TextPrimary,
-                                                    fontSize = 16.sp
-                                                )
-                                            )
-                                            Text(
-                                                text = "Amount: $amount",
-                                                style = TextStyle(
-                                                    color = Color.TextSec,
-                                                    fontSize = 16.sp
-                                                )
-                                            )
-                                        }
-                                        IconButton(
-                                            onClick = {
-                                                editItem(nav, it.second, useTemplate)
-                                            },
-                                            modifier = Modifier
-                                                .background(
-                                                    color = Color.Green1,
-                                                    shape = RoundedCornerShape(10.dp))
-                                                .size(48.dp)
-                                        ) {
-                                            Icon(
-                                                painterResource(ca.uwaterloo.cs.R.drawable.edit),
-                                                tint = Color.White,
-                                                contentDescription = null,
-                                                modifier = Modifier.size(30.dp))
-                                        }
-                                    }
-                                }
-                            }
-                        } else {
-                            /*Image(
-                                painter = rememberImagePainter(it.second.image.toUri()),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .width(200.dp)
-                                    .height(200.dp)
-                                    .clickable { editItem(nav, it.second, useTemplate) }
-                            )*/
-                            Card(
-                                shape = Shapes.medium,
-                                backgroundColor = Color.BG,
-                                modifier = Modifier
-                                    .padding(10.dp)
-                                    .width(200.dp)
-                                    .clickable { editItem(nav, it.second, useTemplate) },
-
-                            ) {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth().padding(10.dp),
-                                ) {
-                                    Image(
-                                        painter = rememberImagePainter(it.second.image.toUri()),
-                                        contentDescription = null,
-                                        modifier = Modifier
-                                            .size(200.dp)
-                                            .clip(RoundedCornerShape(36.dp)),
-                                    )
-                                    Row(modifier = Modifier.padding(top = 20.dp)) {
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            val amount = it.second.amount.toString()
-                                            val name = it.second.name
-                                            Text(
-                                                text = name,
-                                                style = TextStyle(
-                                                    color = Color.TextPrimary,
-                                                    fontSize = 16.sp
-                                                )
-                                            )
-                                            Text(
-                                                text = "Amount: $amount",
-                                                style = TextStyle(
-                                                    color = Color.TextSec,
-                                                    fontSize = 16.sp
-                                                )
-                                            )
-                                        }
-                                        IconButton(
-                                            onClick = {
-                                                editItem(nav, it.second, useTemplate)
-                                            },
-                                            modifier = Modifier
-                                                .background(
-                                                color = Color.Green1,
-                                                shape = RoundedCornerShape(10.dp))
-                                                .size(48.dp)
-                                        ) {
-                                            Icon(
-                                                painterResource(ca.uwaterloo.cs.R.drawable.edit),
-                                                tint = Color.White,
-                                                contentDescription = null,
-                                                modifier = Modifier.size(30.dp))
-                                        }
-                                    }
-                                }
-                            }
-                        }
-//                    IconButton(
-//                        onClick = {
-//                            nav.navigate(HarvestFormDestination(it.second))
-//                        },
-//                        modifier = Modifier
-//                            .width(60.dp)
-//                            .height(60.dp)
-//                    ) {
-//                        Icon(
-//                            imageVector = Icons.Filled.Add,
-//                            contentDescription = "Catalogue",
-//                            tint = Color.Green,
-//                            modifier = Modifier.fillMaxSize(1.0f)
-//                        )
-//                    }
-
-                    }
-                }
-//                item() {
-//                    Spacer(Modifier.height(10.dp))
-//
-//                    Row(
-//                        Modifier
-//                            .height(IntrinsicSize.Min)
-//                            .border(BorderStroke(3.dp, Color.InstagramPurple)),
-//                        verticalAlignment = Alignment.CenterVertically,
-//                        horizontalArrangement = Arrangement.Center
-//                    ) {
-//                        IconButton(
-//                            onClick = {
-//                                nav.navigate(HarvestFormDestination())
-//                            },
-//                            modifier = Modifier
-//                                .width(60.dp)
-//                                .height(60.dp)
-//                        ) {
-//                            Icon(
-//                                imageVector = Icons.Filled.Add,
-//                                contentDescription = "Catalogue",
-//                                tint = Color.Green,
-//                                modifier = Modifier.fillMaxSize(1.0f)
-//                            )
-//                        }
-//                    }
-//                }
-            }
-        }
-    },
-        bottomBar = { NavigationBar(nav) },
+        }},
         floatingActionButton = {
             FloatingActionButton(
                 modifier = Modifier

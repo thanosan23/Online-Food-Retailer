@@ -1,6 +1,8 @@
 package ca.uwaterloo.cs
 
+import android.text.Layout
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -9,6 +11,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -43,7 +46,8 @@ fun NavigationBar(nav: DestinationsNavigator) {
     val context = LocalContext.current
 
     BottomNavigation(
-        backgroundColor = Color.InstagramPurple
+        backgroundColor = Color.InstagramPurple,
+        modifier = Modifier.systemBarsPadding()
     ) {
         items.forEach { item ->
             BottomNavigationItem(
