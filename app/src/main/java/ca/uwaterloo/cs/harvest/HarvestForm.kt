@@ -204,7 +204,8 @@ private fun saveHarvestRequestWithProduct(
         HarvestInformation(
             fromWorker = Singleton.userId,
             product = data,
-            amount = newData["Amount"]!!.toInt()
+            amount = newData["Amount"]!!.toInt(),
+            "no description",
         )
     harvestInformation.exportData(saveDir)
 }
@@ -220,7 +221,8 @@ private fun saveHarvestRequestNoProduct(
             name = newData["Name"]!!,
             description = newData["Description"]!!,
             image = image,
-            amount = newData["Amount"]!!.toInt()
+            amount = newData["Amount"]!!.toInt(),
+            harvestDescription = newData["Harvest Description"]!!,
         )
     harvestInformation.exportData(saveDir)
 }
