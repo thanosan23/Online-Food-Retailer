@@ -35,8 +35,6 @@ fun simulateTransaction(
     val platformState by remember { mutableStateOf(PlatformState(data)) }
     var reductionAmount by remember { mutableStateOf("") }
     var reductionAmountIsError by remember { mutableStateOf(false) }
-
-
     OnlineFoodRetailTheme {
 
 
@@ -56,7 +54,7 @@ fun simulateTransaction(
             Spacer(modifier = Modifier.height(20.dp))
 
             //select which platform by which to simulate transaction
-            platformState.platformsUI.PlatformsDropDown()
+            platformState.platformsUI.PlatformsDropDown1()
             Spacer(modifier = Modifier.height(20.dp))
 
             TextField(

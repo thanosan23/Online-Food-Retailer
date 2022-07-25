@@ -172,7 +172,153 @@ class PlatformsUI(data: ProductInformation) {
                 )
             }
         }
+    }
 
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun PlatformsDropDown1() {
+        val formState1 by remember { mutableStateOf(FormState()) }
+        val formState2 by remember { mutableStateOf(FormState()) }
 
+        Column(
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Spacer(Modifier.width(10.dp))
+                Image(
+                    painter = painterResource(id = R.drawable.socleo),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .width(120.dp)
+                        .height(100.dp)
+                        .border(BorderStroke(1.dp, Color.Black))
+                )
+                Checkbox(
+                    checked = platform1CheckBoxState,
+                    onCheckedChange = { platform1CheckBoxState = it }
+                )
+                Form(
+                    state = formState1,
+                    fields = listOf(
+                        Field(
+                            name = "platformamount1",
+                            initValue = formState1.getData()
+                                .getOrDefault("platformamount1", platform1AmountState)
+                                .toString(),
+                            prompt = "amount",
+                            label = "amount",
+                            validators = listOf(Required(), IsNumber()),
+                            inputType = KeyboardType.Number,
+                            formatter = NumberTransformation(),
+                            onChange = { value ->
+                                platform1AmountState = try {
+                                    value.toLong()
+                                } catch (e: Exception) {
+                                    0
+                                }
+                            },
+                            readOnly = true
+
+                        ),
+                        Field(
+                            name = "platformprice1",
+                            initValue = formState1.getData()
+                                .getOrDefault("platformprice1", if (platform1PriceState == 0) "0.00" else (platform1PriceState / 100.0))
+                                .toString(),
+                            prompt = "price",
+                            label = "price",
+                            validators = listOf(Required(), IsNumber()),
+                            inputType = KeyboardType.Number,
+                            formatter = NumberTransformation(),
+                            onChange = { value ->
+                                platform1PriceState = try {
+                                    (value.toDouble() * 100).toInt()
+                                } catch (e: Exception) {
+                                    0
+                                }
+                            },
+                            readOnly = true
+                        )
+                    )
+                )
+
+                //Text(text = "what")
+                //TextField(value = "platform1AmountState", onValueChange ={platform1AmountState} )
+//                Column(
+//                    horizontalAlignment = Alignment.CenterHorizontally,
+//                ) {
+//                    TextField(value = platform1AmountState.toString(), onValueChange ={if(it!=""){platform1AmountState=it.toLong()}} )
+//                    TextField(value = "platform1AmountState", onValueChange ={it} )
+//                }
+
+            }
+
+            Spacer(Modifier.height(10.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Spacer(Modifier.width(5.dp))
+
+                Image(
+                    painter = painterResource(id = R.drawable.loblaws),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .width(130.dp)
+                        .height(120.dp)
+                        .border(BorderStroke(5.dp, Color.White))
+                )
+                Checkbox(
+                    checked = platform2CheckBoxState,
+                    onCheckedChange = { platform2CheckBoxState = it }
+                )
+                Form(
+                    state = formState2,
+                    fields = listOf(
+                        Field(
+                            name = "platformamount2",
+                            initValue = formState2.getData()
+                                .getOrDefault("platformamount2", platform2AmountState)
+                                .toString(),
+                            prompt = "amount",
+                            label = "amount",
+                            validators = listOf(Required(), IsNumber()),
+                            inputType = KeyboardType.Number,
+                            formatter = NumberTransformation(),
+                            onChange = { value ->
+                                platform2AmountState = try {
+                                    value.toLong()
+                                } catch (e: Exception) {
+                                    0
+                                }
+                            },
+                            readOnly = true
+                        ),
+                        Field(
+                            name = "platformprice2",
+                            initValue = formState2.getData()
+                                .getOrDefault("platformprice2", if (platform2PriceState == 0) "0.00" else (platform2PriceState / 100.0))
+                                .toString(),
+                            prompt = "price",
+                            label = "price",
+                            validators = listOf(Required(), IsNumber()),
+                            inputType = KeyboardType.Number,
+                            formatter = NumberTransformation(),
+                            onChange = { value ->
+                                platform2PriceState = try {
+                                    (value.toDouble() * 100).toInt()
+                                } catch (e: Exception) {
+                                    0
+                                }
+                            },
+                            readOnly = true
+                        )
+                    )
+                )
+            }
+        }
     }
 }
+
+
