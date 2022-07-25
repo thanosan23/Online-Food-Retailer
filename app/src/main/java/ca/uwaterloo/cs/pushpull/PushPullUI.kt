@@ -43,29 +43,6 @@ fun checkConnection(context: Context): Boolean {
 }
 
 @Composable
-fun sync() {
-    val context = LocalContext.current
-    val pushPullFarmer = PushPullFarmer(context)
-    val pushWorker = PushWorker(context)
-    val pullWorker = PullWorker(context)
-    val synchInProgress = remember { mutableStateOf(false) }
-    Singleton.syncInProgress = true
-    synchInProgress.value = true
-    Thread {
-        if (Singleton.isFarmer) {
-            pushPullFarmer.harvestResolver()
-            pushPullFarmer.productResolver()
-        } else {
-            pullWorker.run()
-            pushWorker.run()
-        }
-        Thread.sleep(5000)
-        Singleton.syncInProgress = false
-        synchInProgress.value = false
-    }.start()
-}
-
-@Composable
 fun toSynchUI(){
     val context = LocalContext.current
     val pushPullFarmer = PushPullFarmer(context)
