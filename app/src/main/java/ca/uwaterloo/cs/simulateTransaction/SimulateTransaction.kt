@@ -71,7 +71,11 @@ fun simulateTransaction(
 
             Button(
                 onClick = {
-                    reductionAmountIsError = updateProductAfterTransactionIsError(data, reductionAmount)
+                    reductionAmountIsError = updateProductAfterTransactionIsError(
+                        data,
+                        platformState,
+                        reductionAmount
+                    )
                     if (!reductionAmountIsError) {
                         nav.navigate(ProductFormDestination(data))
                     }
@@ -85,7 +89,11 @@ fun simulateTransaction(
     }
 }
 
-private fun updateProductAfterTransactionIsError(data: ProductInformation, reductionAmountInput: String): Boolean
+private fun updateProductAfterTransactionIsError(
+    data: ProductInformation,
+    platformsState: PlatformState,
+    reductionAmountInput: String
+): Boolean
 {
     var reductionAmount = 0
     try {
@@ -94,14 +102,15 @@ private fun updateProductAfterTransactionIsError(data: ProductInformation, reduc
     catch (e: NumberFormatException) {
         return true
     }
-    if (data.platform1) {
+    if (data.platform1 && platformsState.platformsUI.platform1CheckBoxState) {
         if (data.platform1_amount < reductionAmount) { return true }
         data.platform1_amount -= reductionAmount
+        data.amount -= reductionAmount
     }
-    if (data.platform2) {
+    if (data.platform2 && platformsState.platformsUI.platform2CheckBoxState) {
         if (data.platform2_amount < reductionAmount) { return true }
         data.platform2_amount -= reductionAmount
+        data.amount -= reductionAmount
     }
-    data.amount -= reductionAmount
     return false
 }
