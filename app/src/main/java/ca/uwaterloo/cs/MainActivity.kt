@@ -194,13 +194,8 @@ fun TableScreen(
                                     onClick = {
                                         val tmpTable = ArrayList<Pair<String, ProductInformation>>()
                                         for (item in table) {
-//                                        Log.d("item", item.second.name)
-//                                        Log.d("text", text.text)
-                                            if (item.second.name.indexOf(text.text) != -1) {
-//                                            Log.d("", "HI")
+                                            if (item.second.name.startsWith(text.text, ignoreCase = true)) {
                                                 tmpTable.add(item)
-                                                //tableData.remove(item)
-                                                //editItem(nav, item.second, useTemplate)
                                             }
                                         }
                                         table.clear()
@@ -218,7 +213,7 @@ fun TableScreen(
                                 Button(
                                     onClick = {
                                         table.clear()
-                                        for (item in table) {
+                                        for (item in tableData.value) {
                                             table.add(item)
                                         }
                                         openDialog.value = false
