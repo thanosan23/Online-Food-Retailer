@@ -140,7 +140,7 @@ fun ProfileListItem(
 }
 
 @Composable
-fun ProfileList(nav: DestinationsNavigator, dbManager:DBManager) {
+fun ProfileList(nav: DestinationsNavigator) {
     val userProfile = readUserProfileFromFiles(LocalContext.current)
 
     Box(
@@ -175,9 +175,8 @@ fun ProfileList(nav: DestinationsNavigator, dbManager:DBManager) {
 @com.ramcosta.composedestinations.annotation.Destination
 fun ProfileContent(nav: DestinationsNavigator) {
     val useTemplate: Boolean = true //farmer:true,worker:false
-    val dbManager = DBManager(null)
     Scaffold(
-        content = { ProfileList(nav, dbManager) },
+        content = { ProfileList(nav) },
         bottomBar = { NavigationBar(nav) })
 }
 
