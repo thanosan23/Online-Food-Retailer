@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import ca.uwaterloo.cs.NavigationBar
 import ca.uwaterloo.cs.Singleton
-import ca.uwaterloo.cs.destinations.MainContentDestination
+import ca.uwaterloo.cs.destinations .MainContentDestination
 import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.harvest.HarvestInformation
 import ca.uwaterloo.cs.product.ProductInformation
@@ -164,6 +164,7 @@ fun MergeScreen(nav: DestinationsNavigator) {
                     .height(10.dp)
                     .fillMaxWidth()
             )
+            Column(){
             Row(
                 modifier = Modifier
                     .height(50.dp)
@@ -287,6 +288,8 @@ fun MergeScreen(nav: DestinationsNavigator) {
                     )
                 }
             }
+            }
+            Text(harvestData.harvestDescription)
         }
 
         @Composable
@@ -342,81 +345,84 @@ fun MergeScreen(nav: DestinationsNavigator) {
                     .height(10.dp)
                     .fillMaxWidth()
             )
-            Row(
-                modifier = Modifier
-                    .height(50.dp)
-                    .fillMaxWidth()
-                    .background(Color.LightGray),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxHeight(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+            Column() {
+                Row(
+                    modifier = Modifier
+                        .height(50.dp)
+                        .fillMaxWidth()
+                        .background(Color.LightGray),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = harvestData.fromWorker.dropLast(9))
-                }
-                Spacer(modifier = Modifier.width(20.dp))
-                Column(
-                    modifier = Modifier.fillMaxHeight(),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text("Amount:")
-                    Text(harvestData.amount.toString())
-                }
-                Spacer(modifier = Modifier.width(20.dp))
-                IconButton(onClick = {
-                    val options =
-                        arrayOf<CharSequence>(
-                            "Change Amount",
-                            "Change Product Association",
-                            "Cancel"
-                        )
-                    val builder = AlertDialog.Builder(context)
-                    builder.setTitle("Add Photo")
-                    builder.setItems(options) { dialog, item ->
-                        if (options[item] == "Change Amount") {
-                            dialog.dismiss()
-                            selectedEntry =
-                                Pair("", processedData[""]!!)
-                            selectedHarvest = harvestData
-                            numberChangeVisible = true
-                        } else if (options[item] == "Change Product Association") {
-                            dialog.dismiss()
-                            selectedEntry =
-                                Pair("", processedData[""]!!)
-                            selectedHarvest = harvestData
-                            associationChangeVisible = true
-                        } else if (options[item] == "Cancel") {
-                            dialog.dismiss()
-                        }
+                    Column(
+                        modifier = Modifier.fillMaxHeight(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(text = harvestData.fromWorker.dropLast(9))
                     }
-                    builder.show()
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.Edit,
-                        contentDescription = "Edit change",
-                        tint = Color.Black,
-                        modifier = Modifier
-                    )
+                    Spacer(modifier = Modifier.width(20.dp))
+                    Column(
+                        modifier = Modifier.fillMaxHeight(),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text("Amount:")
+                        Text(harvestData.amount.toString())
+                    }
+                    Spacer(modifier = Modifier.width(20.dp))
+                    IconButton(onClick = {
+                        val options =
+                            arrayOf<CharSequence>(
+                                "Change Amount",
+                                "Change Product Association",
+                                "Cancel"
+                            )
+                        val builder = AlertDialog.Builder(context)
+                        builder.setTitle("Add Photo")
+                        builder.setItems(options) { dialog, item ->
+                            if (options[item] == "Change Amount") {
+                                dialog.dismiss()
+                                selectedEntry =
+                                    Pair("", processedData[""]!!)
+                                selectedHarvest = harvestData
+                                numberChangeVisible = true
+                            } else if (options[item] == "Change Product Association") {
+                                dialog.dismiss()
+                                selectedEntry =
+                                    Pair("", processedData[""]!!)
+                                selectedHarvest = harvestData
+                                associationChangeVisible = true
+                            } else if (options[item] == "Cancel") {
+                                dialog.dismiss()
+                            }
+                        }
+                        builder.show()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Edit,
+                            contentDescription = "Edit change",
+                            tint = Color.Black,
+                            modifier = Modifier
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(5.dp))
+                    IconButton(onClick = {
+                        harvestData.deleteData(saveDirHarvest)
+                        val harvestList = processedData[""]!!.second
+                        val updatedList = harvestList.toMutableList()
+                        updatedList.remove(harvestData)
+                        unlinkedHarvests.remove(harvestData.harvestId)
+                        processedData[""] = Pair(null, updatedList)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Clear,
+                            contentDescription = "Remove change",
+                            tint = Color.Red,
+                            modifier = Modifier
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(5.dp))
                 }
-                Spacer(modifier = Modifier.width(5.dp))
-                IconButton(onClick = {
-                    harvestData.deleteData(saveDirHarvest)
-                    val harvestList = processedData[""]!!.second
-                    val updatedList = harvestList.toMutableList()
-                    updatedList.remove(harvestData)
-                    unlinkedHarvests.remove(harvestData.harvestId)
-                    processedData[""] = Pair(null, updatedList)
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.Clear,
-                        contentDescription = "Remove change",
-                        tint = Color.Red,
-                        modifier = Modifier
-                    )
-                }
-                Spacer(modifier = Modifier.width(5.dp))
+                Text(harvestData.harvestDescription)
             }
         }
 

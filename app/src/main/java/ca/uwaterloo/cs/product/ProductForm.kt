@@ -405,6 +405,12 @@ fun ShowProductForm(
                             validators = listOf(Required(), IsNumber(), NonZero()),
                             inputType = KeyboardType.Number,
                             formatter = NumberTransformation()
+                        ),
+                        Field(
+                                name = "Harvest Description",
+                                initValue = "no description",
+                                prompt = "Enter Harvest Description",
+                                validators = listOf()
                         )
                     )
                 )
@@ -643,7 +649,8 @@ private fun addProductNumber(
     val harvestRequest = HarvestInformation(
         fromWorker = Singleton.userId,
         product = data,
-        amount = newData["Amount Editor"]!!.toInt()
+        amount = newData["Amount Editor"]!!.toInt(),
+        harvestDescription = newData["Harvest Description"]!!
     )
     harvestRequest.exportData("${context.filesDir}/outharvest")
     nav.navigate(MainContentDestination)
@@ -665,7 +672,8 @@ private fun removeProductNumber(
             val harvestRequest = HarvestInformation(
                 fromWorker = Singleton.userId,
                 product = data,
-                amount = -newData["Amount Editor"]!!.toInt()
+                amount = -newData["Amount Editor"]!!.toInt(),
+                harvestDescription = newData["Harvest Description"]!!
             )
             AlertDialog.Builder(context)
                 .setMessage("Request has been sent").show()

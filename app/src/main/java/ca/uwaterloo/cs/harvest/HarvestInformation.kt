@@ -16,6 +16,7 @@ import java.util.*
 @kotlinx.serialization.Serializable
 data class HarvestInformation (
     var harvestId: String,
+    var harvestDescription: String = "no description",
     val fromWorker: String,
     var productId: String?,
     val name: String,
@@ -30,11 +31,13 @@ data class HarvestInformation (
         parcel.readString()!!,
         parcel.readString()!!,
         parcel.readString()!!,
+        parcel.readString()!!,
         parcel.readInt()
     )
 
-    constructor(fromWorker: String, product: ProductInformation, amount: Int): this (
+    constructor(fromWorker: String, product: ProductInformation, amount: Int, harvestDescription: String): this (
         UUID.randomUUID().toString(),
+        harvestDescription,
         fromWorker,
         product.productId,
         product.name,
@@ -43,8 +46,9 @@ data class HarvestInformation (
         amount
     )
 
-    constructor(fromWorker: String, name: String, description: String, image: String, amount: Int): this (
+    constructor(fromWorker: String, name: String, description: String, image: String, amount: Int, harvestDescription: String): this (
         UUID.randomUUID().toString(),
+        harvestDescription,
         fromWorker,
         "",
         name,
@@ -58,6 +62,7 @@ data class HarvestInformation (
         parcel.writeString(fromWorker)
         parcel.writeString(productId)
         parcel.writeString(name)
+        parcel.writeString(harvestDescription)
         parcel.writeString(description)
         parcel.writeString(image)
         parcel.writeInt(amount)
