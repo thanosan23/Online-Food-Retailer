@@ -68,6 +68,7 @@ fun SignupAsManager(
             }
         }
         ProvideWindowInsets {
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -79,6 +80,7 @@ fun SignupAsManager(
                         })
                     }
             )  {
+                Spacer(modifier = Modifier.height(200.dp))
                 Text(
                     text = "Sign up as a manager",
                     fontWeight = FontWeight.Bold,

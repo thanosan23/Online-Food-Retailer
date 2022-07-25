@@ -76,12 +76,12 @@ fun Login(
                 verticalArrangement = Arrangement.spacedBy(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(360.dp))
+                Spacer(modifier = Modifier.height(300.dp))
                 Text(
                     text = "Online Food Retailer",
                     fontWeight = FontWeight.Bold,
                     fontSize = 36.sp,
-                    color = Color.White
+                    color = Color.Black
                 )
                 Spacer(modifier = Modifier.height(21.dp))
 
