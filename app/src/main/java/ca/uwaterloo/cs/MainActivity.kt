@@ -12,7 +12,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -32,14 +34,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import ca.uwaterloo.cs.db.DBManager
-import ca.uwaterloo.cs.destinations.HarvestFormDestination
 import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.product.ProductInformation
 import ca.uwaterloo.cs.pushpull.readProductFromFiles
@@ -130,7 +130,7 @@ fun TableScreen(
                 results?.get(0) ?: ""
             }
         val tmpTable = ArrayList<Pair<String, ProductInformation>>()
-        for (item in table.filter { entry -> entry.second.name.indexOf(spokenText) != -1 }) {
+        for (item in tableData.value.filter { entry -> entry.second.name.startsWith(spokenText, ignoreCase = true)}) {
                 tmpTable.add(item)
         }
         table.clear()
