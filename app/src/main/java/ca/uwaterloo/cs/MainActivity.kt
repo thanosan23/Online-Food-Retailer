@@ -16,6 +16,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -26,8 +27,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -39,8 +43,7 @@ import ca.uwaterloo.cs.destinations.HarvestFormDestination
 import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.product.ProductInformation
 import ca.uwaterloo.cs.pushpull.readProductFromFiles
-import ca.uwaterloo.cs.ui.theme.InstagramPurple
-import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
+import ca.uwaterloo.cs.ui.theme.*
 import coil.compose.rememberImagePainter
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
@@ -250,13 +253,13 @@ fun TableScreen(
                     Row(
                         Modifier
                             .height(IntrinsicSize.Min)
-                            .clickable { editItem(nav, it.second, useTemplate) }
-                            .border(BorderStroke(3.dp, Color.InstagramPurple)),
+                            .clickable { editItem(nav, it.second, useTemplate) },
+                            //.border(BorderStroke(3.dp, Color.InstagramPurple)),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
                         if (it.second.image == "") {
-                            Box(
+                            /*Box(
                                 modifier = Modifier
                                     .width(200.dp)
                                     .height(200.dp)
@@ -269,16 +272,130 @@ fun TableScreen(
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 32.sp
                                 )
+                            }*/
+                            Card(
+                                shape = Shapes.medium,
+                                backgroundColor = Color.BG,
+                                modifier = Modifier
+                                    .padding(10.dp)
+                                    .width(200.dp)
+                                    .clickable { editItem(nav, it.second, useTemplate) },
+
+                                ) {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth().padding(10.dp),
+                                ) {
+                                    Image(
+                                        painter = painterResource(ca.uwaterloo.cs.R.drawable.unknown),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(200.dp)
+                                            .clip(RoundedCornerShape(36.dp)),
+                                    )
+                                    Row(modifier = Modifier.padding(top = 20.dp)) {
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            val amount = it.second.amount.toString()
+                                            val name = it.second.name
+                                            Text(
+                                                text = name,
+                                                style = TextStyle(
+                                                    color = Color.TextPrimary,
+                                                    fontSize = 16.sp
+                                                )
+                                            )
+                                            Text(
+                                                text = "Amount: $amount",
+                                                style = TextStyle(
+                                                    color = Color.TextSec,
+                                                    fontSize = 16.sp
+                                                )
+                                            )
+                                        }
+                                        IconButton(
+                                            onClick = {
+                                                editItem(nav, it.second, useTemplate)
+                                            },
+                                            modifier = Modifier
+                                                .background(
+                                                    color = Color.Green1,
+                                                    shape = RoundedCornerShape(10.dp))
+                                                .size(48.dp)
+                                        ) {
+                                            Icon(
+                                                painterResource(ca.uwaterloo.cs.R.drawable.edit),
+                                                tint = Color.White,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(30.dp))
+                                        }
+                                    }
+                                }
                             }
                         } else {
-                            Image(
+                            /*Image(
                                 painter = rememberImagePainter(it.second.image.toUri()),
                                 contentDescription = null,
                                 modifier = Modifier
                                     .width(200.dp)
                                     .height(200.dp)
                                     .clickable { editItem(nav, it.second, useTemplate) }
-                            )
+                            )*/
+                            Card(
+                                shape = Shapes.medium,
+                                backgroundColor = Color.BG,
+                                modifier = Modifier
+                                    .padding(10.dp)
+                                    .width(200.dp)
+                                    .clickable { editItem(nav, it.second, useTemplate) },
+
+                            ) {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth().padding(10.dp),
+                                ) {
+                                    Image(
+                                        painter = rememberImagePainter(it.second.image.toUri()),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(200.dp)
+                                            .clip(RoundedCornerShape(36.dp)),
+                                    )
+                                    Row(modifier = Modifier.padding(top = 20.dp)) {
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            val amount = it.second.amount.toString()
+                                            val name = it.second.name
+                                            Text(
+                                                text = name,
+                                                style = TextStyle(
+                                                    color = Color.TextPrimary,
+                                                    fontSize = 16.sp
+                                                )
+                                            )
+                                            Text(
+                                                text = "Amount: $amount",
+                                                style = TextStyle(
+                                                    color = Color.TextSec,
+                                                    fontSize = 16.sp
+                                                )
+                                            )
+                                        }
+                                        IconButton(
+                                            onClick = {
+                                                editItem(nav, it.second, useTemplate)
+                                            },
+                                            modifier = Modifier
+                                                .background(
+                                                color = Color.Green1,
+                                                shape = RoundedCornerShape(10.dp))
+                                                .size(48.dp)
+                                        ) {
+                                            Icon(
+                                                painterResource(ca.uwaterloo.cs.R.drawable.edit),
+                                                tint = Color.White,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(30.dp))
+                                        }
+                                    }
+                                }
+                            }
                         }
 //                    IconButton(
 //                        onClick = {
