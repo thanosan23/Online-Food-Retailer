@@ -12,19 +12,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.uwaterloo.cs.NavigationBar
+import ca.uwaterloo.cs.Singleton
+import ca.uwaterloo.cs.bemodels.UserProfile
+import ca.uwaterloo.cs.bemodels.readUserProfileFromFiles
+import ca.uwaterloo.cs.db.DBManager
 import ca.uwaterloo.cs.destinations.Destination
 import ca.uwaterloo.cs.destinations.AccountSettingListScreenDestination
 import ca.uwaterloo.cs.ui.theme.*
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 
-class User(
+/*class User(
     val email: String,
     val name: String,
     @DrawableRes val avatar: Int
@@ -32,10 +37,15 @@ class User(
     companion object {
         val Me: User = User("Test", "Test", ca.uwaterloo.cs.R.drawable.ic_pumpkin)
     }
-}
+}*/
 
 @Composable
-fun ProfileTopBar() {
+fun ProfileTopBar(userProfile:UserProfile) {
+    val firstName = userProfile.firstName
+    val familyName = userProfile.familyName
+    val name = "$firstName $familyName"
+    val email = userProfile.email
+
     Row(
         Modifier
             .background(Color.White)
@@ -43,7 +53,7 @@ fun ProfileTopBar() {
             .height(224.dp)
     ) {
         Image(
-            painterResource(id = User.Me.avatar), contentDescription = "Profile picture",
+            painterResource(id = ca.uwaterloo.cs.R.drawable.anonymous), contentDescription = "Profile picture",
             Modifier
                 .align(Alignment.CenterVertically)
                 .padding(start = 24.dp)
@@ -56,14 +66,14 @@ fun ProfileTopBar() {
                 .padding(start = 20.dp)
         ) {
             Text(
-                User.Me.name,
+                name,
                 Modifier.padding(top = 64.dp),
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 color = androidx.compose.ui.graphics.Color.Companion.TextPrimary,
             )
             Text(
-                "Test：${User.Me.email}",
+                "Email：${email}",
                 Modifier.padding(top = 16.dp),
                 fontSize = 14.sp,
                 color = androidx.compose.ui.graphics.Color.Companion.TextPrimary
@@ -131,6 +141,8 @@ fun ProfileListItem(
 
 @Composable
 fun ProfileList(nav: DestinationsNavigator) {
+    val userProfile = readUserProfileFromFiles(LocalContext.current)
+
     Box(
         Modifier
             .background(Color.BG)
@@ -141,7 +153,7 @@ fun ProfileList(nav: DestinationsNavigator) {
                 .background(Color.White)
                 .fillMaxWidth()
         ) {
-            ProfileTopBar()
+            ProfileTopBar(userProfile!!)
             Spacer(
                 Modifier
                     .background(Color.Spacer)
