@@ -4,9 +4,11 @@ import android.content.Context
 import ca.uwaterloo.cs.Listener
 import ca.uwaterloo.cs.Singleton
 import ca.uwaterloo.cs.bemodels.SignUpFarmer
+import ca.uwaterloo.cs.bemodels.UserProfile
 import ca.uwaterloo.cs.dbmodels.CompleteUserProfile
 import ca.uwaterloo.cs.harvest.HarvestInformation
 import ca.uwaterloo.cs.product.ProductInformation
+import com.google.firebase.firestore.auth.User
 
 class DBGetInternal(context: Context?) {
     private val dbClient = DBClient()
@@ -54,7 +56,7 @@ class DBGetInternal(context: Context?) {
         )
     }
 
-    fun getUserProfile(userIdString: String, listener: Listener<CompleteUserProfile>){
+    private fun getCompleteUserProfile(userIdString: String, listener: Listener<CompleteUserProfile>){
         val id = Id(userIdString, IdType.CompleteUserProfileId)
         class ListenerImpl1() : Listener<CompleteUserProfile>() {
             override fun activate(input: CompleteUserProfile) {
@@ -66,6 +68,25 @@ class DBGetInternal(context: Context?) {
             id.getPath(),
             listener1
         )
+    }
+
+   fun getUserProfile(userIdString: String, listener: Listener<UserProfile>){
+        class ListenerImpl1() : Listener<CompleteUserProfile>() {
+            override fun activate(input: CompleteUserProfile) {
+                val userProfile =
+                    UserProfile(
+                        input.firstName,
+                        input.familyName,
+                        "",
+                        userIdString.dropLast(9)+ "@gmail.com",
+                        input.address,
+                        ""
+                    )
+                listener.activate(userProfile)
+            }
+        }
+        val listener1 = ListenerImpl1()
+        getCompleteUserProfile(userIdString, listener1)
     }
 
     fun getProductInformationFromFarmer(farmerUserIdString: String, beListener: Listener<List<ProductInformation>>){
@@ -117,7 +138,7 @@ class DBGetInternal(context: Context?) {
             }
         }
         val listener1 = ListenerImpl1()
-        getUserProfile(workerIdString, listener1)
+        getCompleteUserProfile(workerIdString, listener1)
     }
 
     fun getHarvestInformation(workerId: String, beListener: Listener<List<HarvestInformation>>){

@@ -5,7 +5,7 @@ import ca.uwaterloo.cs.Listener
 import ca.uwaterloo.cs.Singleton
 import ca.uwaterloo.cs.bemodels.SignUpFarmer
 import ca.uwaterloo.cs.bemodels.SignUpWorker
-import ca.uwaterloo.cs.bemodels.UserProfileFarmer
+import ca.uwaterloo.cs.bemodels.UserProfile
 import ca.uwaterloo.cs.harvest.HarvestInformation
 import ca.uwaterloo.cs.product.ProductInformation
 import java.util.*
@@ -110,10 +110,12 @@ class DBManager(context: Context?) {
         dbGetInternal.getHarvestInformationFromFarmer(farmerUserId, beListener)
     }
 
-    fun storeUserProfile(userProfileFarmer: UserProfileFarmer){
+    fun storeUserProfile(userProfile: UserProfile){
+
     }
 
-    fun getUserProfile(userName: String, listener: Listener<UserProfileFarmer>){
+    fun getUserProfile(userName: String, listener: Listener<UserProfile>){
+        dbGetInternal.getUserProfile(userName, listener)
     }
 
 }

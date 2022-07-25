@@ -146,6 +146,10 @@ class DBStoreInternal(context: Context?) {
         )
     }
 
+    fun storeUserProfile(){
+
+    }
+
     fun newRemoveHarvestFromWorker(workerIdString: String, harvestToBeKeepIdString: List<String>){
         val userId = Id(workerIdString, IdType.CompleteUserProfileId)
         class ListenerImpl() : Listener<CompleteUserProfile>() {
