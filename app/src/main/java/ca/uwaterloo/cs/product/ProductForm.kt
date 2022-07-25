@@ -67,7 +67,7 @@ fun ProductForm(
                             detectTapGestures(onTap = {
                                 focusManager.clearFocus()
                             })
-                        },
+                        }.systemBarsPadding(),
                 ) {
                     Text(if (data == null) "ADD PRODUCT" else "EDIT PRODUCT")
                     ShowProductForm(navigator,
