@@ -10,7 +10,7 @@
         "@type": "dfc-b:Person",
         "dfc-b:familyName": "Doe",
         "dfc-b:firtsName": "Jhon",
-        "dfc-b:hasAdress": {
+        "dfc-b:hasAddress": {
           "@type": "dfc-b:Address",
           "dfc-b:city": "",
           "dfc-b:country": "",

@@ -19,7 +19,7 @@ class DFCContentIngestion {
 
     fun getOffer(productInformation: ProductInformation, platform1: Boolean): DFCOffer {
         return DFCOffer(
-            "offerId/${IdResolver().standardResolver(null, IdType.DFCOfferId)}",
+            "offer/${IdResolver().standardResolver(null, IdType.DFCOfferId)}",
             stockLimitation = if (platform1){
                 productInformation.platform1_amount.toString()
             }
@@ -39,7 +39,7 @@ class DFCContentIngestion {
 
     fun getCatalogItem(productInformation: ProductInformation, platform1: Boolean): DFCCatalogItem {
         return DFCCatalogItem(
-            "catalogItemId/${IdResolver().standardResolver(null, IdType.DFCCatalogItemId)}",
+            "catalogItem/${IdResolver().standardResolver(null, IdType.DFCCatalogItemId)}",
             stockLimitation = if (platform1){
                 productInformation.platform1_amount.toString()
             }
@@ -57,6 +57,12 @@ class DFCContentIngestion {
             familyName = completeUserProfile.familyName,
             hasAddress = completeUserProfile.address,
             affiliates = listOf("enterprise/" + completeUserProfile.enterpriseName)
+        )
+    }
+
+    fun getDFCEnterprise(): DFCEnterprise{
+        return DFCEnterprise(
+            "enterprise/${IdResolver().standardResolver(null, IdType.DFCEnterpriseId)}",
         )
     }
 }

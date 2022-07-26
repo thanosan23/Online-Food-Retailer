@@ -1,0 +1,5 @@
+[{"dfc-b:affiliates":["enterprise/ca.uwaterloo.cs.db.Id@812a390"],"dfc-b:familyName":"Jordan","dfc-b:firstName":"micahel","@id":"person/davisena145@gmailcom","@type":"dfc-b:Person"},
+ {"@id":"enterprise/ca.uwaterloo.cs.db.Id@812a390","manages":["catalogItem/ca.uwaterloo.cs.db.Id@df10e42"],"supplies":["suppliedProduct/0e0eb6d2-d4ca-4dc7-9678-e235c98fef55"],"@type":"dfc-b:Enterprise"},
+ {"dfc-b:description":"very good apples","dfc-p:hasType":"apple","dfc-p:hasUnit":"dfc-u:u","@id":"suppliedProduct/0e0eb6d2-d4ca-4dc7-9678-e235c98fef55","image":"","dfc-b:lifeTime":"20 days","referencedBy":["catalogItem/ca.uwaterloo.cs.db.Id@df10e42"],"dfc-b:totalTheoreticalStock":900,"@type":"dfc-b:SuppliedProduct"},
+  {"@id":"catalogItem/ca.uwaterloo.cs.db.Id@df10e42","dfc-b:offeredThrough":["offer/ca.uwaterloo.cs.db.Id@b075e53"],"sku":"catalog item gtin or sku","dfc-b:stockLimitation":"23","@type":"dfc-b:CatalogItem"},
+ {"@id":"offer/ca.uwaterloo.cs.db.Id@b075e53","offeres":["catalogItem/ca.uwaterloo.cs.db.Id@df10e42"],"dfc-b:price":"23","dfc-b:stockLimitation":"23","@type":"dfc-b:Offer"}]

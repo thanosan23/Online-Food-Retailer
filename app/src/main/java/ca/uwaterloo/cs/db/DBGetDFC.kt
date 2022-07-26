@@ -15,6 +15,7 @@ class DBGetDFC(context: Context?, val userIdString: String, val platform1: Boole
     private val dfcSuppliedProductsAndProductInformation: MutableList<Pair<DFCSuppliedProduct, ProductInformation>> = mutableListOf()
     private val dfcCatalogItems: MutableList<DFCCatalogItem> = mutableListOf()
     private val dfcOffers: MutableList<DFCOffer> = mutableListOf()
+    private var dfcEnterprise: DFCEnterprise? = null
     init {
         dbClient.context = context
     }
@@ -61,6 +62,16 @@ class DBGetDFC(context: Context?, val userIdString: String, val platform1: Boole
 
     private fun step3(){
         generateCatalogueItemAndOfferForSuppliedProduct()
+        step4()
+    }
+
+    private fun step4(){
+        createEnterpriseWithLinkage()
+        step5()
+    }
+
+    private fun step5(){
+        dfcModelsToJSON()
     }
 
     private fun generateCatalogueItemAndOfferForSuppliedProduct(){
@@ -83,13 +94,27 @@ class DBGetDFC(context: Context?, val userIdString: String, val platform1: Boole
         dfcOffer.offeres.add(dfcCatalogItem.id)
     }
 
+    private fun createEnterpriseWithLinkage(){
+        dfcEnterprise = dfcContentIngestion.getDFCEnterprise()
+        for (x in dfcSuppliedProductsAndProductInformation){
+            dfcEnterprise!!.supplies.add(x.first.id)
+        }
+        for (x in dfcCatalogItems){
+            dfcEnterprise!!.manages.add(x.id)
+        }
+        dfcPerson!!.affiliates = listOf(dfcEnterprise!!.id)
+    }
+
     private fun dfcModelsToJSON(){
         val gson = Gson()
+
+        @kotlinx.serialization.Serializable
         data class Graph(
             val graph: List<String>
         )
         val graphString: MutableList<String> = mutableListOf()
         graphString.add(gson.toJson(dfcPerson))
+        graphString.add(gson.toJson(dfcEnterprise))
         for (x in dfcSuppliedProductsAndProductInformation){
             graphString.add(gson.toJson(x.first))
         }
@@ -108,7 +133,32 @@ class DBGetDFC(context: Context?, val userIdString: String, val platform1: Boole
         else{
             Id("$userIdString,platform2", IdType.DFCStandardId)
         }
+        val result = contextResolver(graph.graph.toString())
         dbClient.store(dfcId.getPath(),
-        graph)
+        result)
+    }
+
+
+    private fun contextResolver(dfc2String: String): String{
+        // this is not good practice because there is a chance that some of the
+        // values on this json string that for for example type or id as a substring
+        // so the correct practice is to replace only on the json fields and not on
+        // on the json values too
+        var dfcString = dfc2String
+        dfcString = dfcString.replace("type", "@type")
+        dfcString = dfcString.replace("id", "@id")
+        dfcString = dfcString.replace("familyName", "dfc-b:familyName")
+        dfcString = dfcString.replace("firstName", "dfc-b:firstName")
+        dfcString = dfcString.replace("hasType", "dfc-p:hasType")
+        dfcString = dfcString.replace("hasAddress", "dfc-b:hasAddress")
+        dfcString = dfcString.replace("affiliates", "dfc-b:affiliates")
+        dfcString = dfcString.replace("description", "dfc-b:description")
+        dfcString = dfcString.replace("hasUnit", "dfc-p:hasUnit")
+        dfcString = dfcString.replace("lifeTime", "dfc-b:lifeTime")
+        dfcString = dfcString.replace("price", "dfc-b:price")
+        dfcString = dfcString.replace("stockLimitation", "dfc-b:stockLimitation")
+        dfcString = dfcString.replace("totalTheoreticalStock", "dfc-b:totalTheoreticalStock")
+        dfcString = dfcString.replace("offeredThrough", "dfc-b:offeredThrough")
+        return dfcString
     }
 }

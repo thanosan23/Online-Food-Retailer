@@ -40,7 +40,10 @@ class DBClient {
                 storeImage(data.image.toUri())
                     println("attempt to store JPEG image, can't do that")
         }
-        val stringData = Json.encodeToString(data)
+        var stringData = Json.encodeToString(data)
+        if (data is String){
+            stringData = data
+        }
         db.child(key).setValue(stringData).addOnFailureListener{
             println("failure storing data $it")
         }

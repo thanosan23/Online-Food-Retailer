@@ -6,5 +6,5 @@ data class DFCPerson (
     val firstName: String,
     val familyName: String,
     val hasAddress: Address?,
-    val affiliates: List<String>,
+    var affiliates: List<String>,
     )
