@@ -98,16 +98,6 @@ class PlatformsUI(data: ProductInformation) {
                         )
                     )
                 )
-
-                //Text(text = "what")
-                //TextField(value = "platform1AmountState", onValueChange ={platform1AmountState} )
-//                Column(
-//                    horizontalAlignment = Alignment.CenterHorizontally,
-//                ) {
-//                    TextField(value = platform1AmountState.toString(), onValueChange ={if(it!=""){platform1AmountState=it.toLong()}} )
-//                    TextField(value = "platform1AmountState", onValueChange ={it} )
-//                }
-
             }
 
             Spacer(Modifier.height(10.dp))
@@ -242,16 +232,6 @@ class PlatformsUI(data: ProductInformation) {
                         )
                     )
                 )
-
-                //Text(text = "what")
-                //TextField(value = "platform1AmountState", onValueChange ={platform1AmountState} )
-//                Column(
-//                    horizontalAlignment = Alignment.CenterHorizontally,
-//                ) {
-//                    TextField(value = platform1AmountState.toString(), onValueChange ={if(it!=""){platform1AmountState=it.toLong()}} )
-//                    TextField(value = "platform1AmountState", onValueChange ={it} )
-//                }
-
             }
 
             Spacer(Modifier.height(10.dp))

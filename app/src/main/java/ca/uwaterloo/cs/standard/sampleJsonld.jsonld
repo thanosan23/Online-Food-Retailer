@@ -10,7 +10,7 @@
         "@type": "dfc-b:Person",
         "dfc-b:familyName": "Doe",
         "dfc-b:firtsName": "Jhon",
-        "dfc-b:hasAdress": {
+        "dfc-b:hasAddress": {
           "@type": "dfc-b:Address",
           "dfc-b:city": "",
           "dfc-b:country": "",
@@ -135,7 +135,7 @@
         "dfc-b:quantity": "1",
         "dfc-p:hasType": "dfc-pt:strawberry",
         "dfc-b:description": "supply description 2",
-        "dfc-b:totalTheoriticalStock": "999",
+        "dfc-b:totalTheoreticalStock": "999",
         "dfc-b:brand": "supply brand",
         "dfc-b:claim": "supply claim",
         "dfc-b:image": "supply image url",

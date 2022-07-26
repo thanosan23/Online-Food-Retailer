@@ -29,6 +29,7 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import ca.uwaterloo.cs.NavigationBar
 import ca.uwaterloo.cs.Singleton
+import ca.uwaterloo.cs.ValidFoodNames
 import ca.uwaterloo.cs.db.DBClient
 import ca.uwaterloo.cs.db.DBManager
 import ca.uwaterloo.cs.destinations.simulateTransactionDestination
@@ -164,7 +165,7 @@ fun ShowProductForm(
                             prompt = "Enter product name",
                             label = "Product Name",
                             validators = listOf(Required()),
-                            dropdownList = listOf("Apple", "Banana", "Carrot")
+                            dropdownList = ValidFoodNames().getValidFoodNames()
                         ),
                         Field(
                             name = "Description",

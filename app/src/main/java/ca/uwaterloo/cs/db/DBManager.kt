@@ -10,10 +10,9 @@ import ca.uwaterloo.cs.harvest.HarvestInformation
 import ca.uwaterloo.cs.product.ProductInformation
 import java.util.*
 
-class DBManager(context: Context?) {
+class DBManager(val context: Context?) {
     // it is important to pass the context if you are getting images
     private val idResolver = IdResolver()
-    private val dbStoreDFCManager = DBStoreDFC()
     private val dbStoreInternal = DBStoreInternal(context)
     private val dbGetInternal = DBGetInternal(context)
 
@@ -49,11 +48,6 @@ class DBManager(context: Context?) {
         if (!Singleton.isFarmer){
             return
         }
-
-        // DFC storage
-//        val DFCSuppliedProductId = idResolver.standardResolver(productIdString, IdType.DFCSuppliedProductId)
-//        dbStoreDFCManager.storeProductInformation(true, DFCSuppliedProductId, productInformation)
-
         // Internal storage
         dbStoreInternal.storeProductsInformation(userId, productsInformation)
     }
@@ -100,6 +94,11 @@ class DBManager(context: Context?) {
             harvestId,
             harvestInformation
         )
+    }
+
+    fun syncDFC(userIdString: String, platform1: Boolean){
+        val dbGetDFC = DBGetDFC(context, userIdString, platform1)
+        dbGetDFC.step1()
     }
 
     fun getHarvestInformationFromWorker(workerUserId: String, beListener: Listener<List<HarvestInformation>>){

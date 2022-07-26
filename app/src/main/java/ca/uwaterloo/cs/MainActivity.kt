@@ -174,20 +174,6 @@ fun TableScreen(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         if (it.second.image == "") {
-                            /*Box(
-                                modifier = Modifier
-                                    .width(200.dp)
-                                    .height(200.dp)
-                                    .clickable { editItem(nav, it.second, useTemplate) },
-                                contentAlignment = Alignment.Center
-                            )
-                            {
-                                Text(
-                                    text = it.second.name,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 32.sp
-                                )
-                            }*/
                             Card(
                                 shape = Shapes.medium,
                                 backgroundColor = Color.BG,
@@ -318,51 +304,9 @@ fun TableScreen(
                                 }
                             }
                         }
-//                    IconButton(
-//                        onClick = {
-//                            nav.navigate(HarvestFormDestination(it.second))
-//                        },
-//                        modifier = Modifier
-//                            .width(60.dp)
-//                            .height(60.dp)
-//                    ) {
-//                        Icon(
-//                            imageVector = Icons.Filled.Add,
-//                            contentDescription = "Catalogue",
-//                            tint = Color.Green,
-//                            modifier = Modifier.fillMaxSize(1.0f)
-//                        )
-//                    }
 
                     }
                 }
-//                item() {
-//                    Spacer(Modifier.height(10.dp))
-//
-//                    Row(
-//                        Modifier
-//                            .height(IntrinsicSize.Min)
-//                            .border(BorderStroke(3.dp, Color.InstagramPurple)),
-//                        verticalAlignment = Alignment.CenterVertically,
-//                        horizontalArrangement = Arrangement.Center
-//                    ) {
-//                        IconButton(
-//                            onClick = {
-//                                nav.navigate(HarvestFormDestination())
-//                            },
-//                            modifier = Modifier
-//                                .width(60.dp)
-//                                .height(60.dp)
-//                        ) {
-//                            Icon(
-//                                imageVector = Icons.Filled.Add,
-//                                contentDescription = "Catalogue",
-//                                tint = Color.Green,
-//                                modifier = Modifier.fillMaxSize(1.0f)
-//                            )
-//                        }
-//                    }
-//                }
             }
         }
     },

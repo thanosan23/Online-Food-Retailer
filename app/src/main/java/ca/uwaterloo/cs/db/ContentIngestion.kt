@@ -6,38 +6,6 @@ import ca.uwaterloo.cs.dbmodels.*
 import ca.uwaterloo.cs.product.ProductInformation
 
 class ContentIngestion {
-    fun getSuppliedProduct(productId: String, productInformation: ProductInformation, catalogItemId: List<String>): SuppliedProduct{
-        return SuppliedProduct(
-            productId,
-            productInformation.description,
-            getQuantity(productInformation),
-            referencedBy = catalogItemId,
-            platform1 = productInformation.platform1,
-            platform2 = productInformation.platform2
-        )
-    }
-
-    fun getOffer(offerId: String, productInformation: ProductInformation): Offer {
-        return Offer(
-            offerId,
-            productInformation.price.toString()
-        )
-    }
-
-    fun getCatalogItem(catalogItemId: String, productInformation: ProductInformation, offerId: Id): CatalogItem{
-        return CatalogItem(
-            catalogItemId,
-            productInformation.amount.toString(),
-            listOf(offerId.idValue)
-        )
-    }
-
-    private fun getQuantity(productInformation: ProductInformation): Quantity{
-        return Quantity(
-            "u",
-            productInformation.amount.toString()
-        )
-    }
 
     fun getCompleteUserProfile(signUpFarmer: SignUpFarmer): CompleteUserProfile{
         return CompleteUserProfile(
@@ -46,6 +14,7 @@ class ContentIngestion {
             "",
             null,
             "",
+            signUpFarmer.enterpriseName,
             true,
             "",
             mutableListOf(),
@@ -60,6 +29,7 @@ class ContentIngestion {
             signUpWorker.familyName,
             "",
             null,
+            "",
             "",
             false,
             signUpWorker.farmerUserId,
