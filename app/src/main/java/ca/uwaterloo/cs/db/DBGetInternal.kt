@@ -56,7 +56,7 @@ class DBGetInternal(context: Context?) {
         )
     }
 
-    private fun getCompleteUserProfile(userIdString: String, listener: Listener<CompleteUserProfile>){
+    fun getCompleteUserProfile(userIdString: String, listener: Listener<CompleteUserProfile>){
         val id = Id(userIdString, IdType.CompleteUserProfileId)
         class ListenerImpl1() : Listener<CompleteUserProfile>() {
             override fun activate(input: CompleteUserProfile) {

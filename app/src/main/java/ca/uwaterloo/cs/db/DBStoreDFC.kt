@@ -1,6 +1,6 @@
 package ca.uwaterloo.cs.db
 
-import ca.uwaterloo.cs.dbmodels.Offer
+import ca.uwaterloo.cs.dbmodels.DFCOffer
 import ca.uwaterloo.cs.product.ProductInformation
 
 class DBStoreDFC {
@@ -44,7 +44,7 @@ class DBStoreDFC {
         )
     }
 
-    private fun storeOfferGivenProductInformation(offerIdString: String?, productInformation: ProductInformation): Pair<Offer, Id>{
+    private fun storeOfferGivenProductInformation(offerIdString: String?, productInformation: ProductInformation): Pair<DFCOffer, Id>{
         val DFCOfferId = idResolver.standardResolver(offerIdString, IdType.DFCOfferId)
 
         val offer = contentIngestion.getOffer(DFCOfferId.idValue, productInformation)

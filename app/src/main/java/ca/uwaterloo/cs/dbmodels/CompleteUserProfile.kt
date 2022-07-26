@@ -7,7 +7,7 @@ data class CompleteUserProfile (
     val email: String,
     val address: Address?,
     val imageURI: String,
-
+    val enterpriseName: String,
     val isFarmer: Boolean,
 
     // parentFarmer should be empty if isFarmer is true

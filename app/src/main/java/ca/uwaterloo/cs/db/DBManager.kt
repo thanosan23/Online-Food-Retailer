@@ -13,7 +13,6 @@ import java.util.*
 class DBManager(context: Context?) {
     // it is important to pass the context if you are getting images
     private val idResolver = IdResolver()
-    private val dbStoreDFCManager = DBStoreDFC()
     private val dbStoreInternal = DBStoreInternal(context)
     private val dbGetInternal = DBGetInternal(context)
 

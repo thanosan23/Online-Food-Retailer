@@ -12,6 +12,7 @@ enum class IdType{
     ProductId,
     HarvestId,
     FarmCodeId,
+    DFCStandardId
 }
 class Id(
     val idValue: String,
