@@ -19,10 +19,6 @@ can be shared between platforms seamlessly.
 This project is to create an app specifically for farmers, that interfaces with the Data Food
 Consortium API and will enable farmers to upload their produce ready to be sold through any
 platform on the network.
-Successful projects have the potential to be maintained and supported in an ongoing way.
-The project that best meets the requirements may be chosen for continued development
-with support to raise funds for maintenance and future development.
-Requirements
 - The primary user group will be those directly producing food products and wanting to
 access direct retail. These might be farmers, bakers, growers, butchers, jam makers etc etc.
 We’ll call these users Producers.
@@ -44,13 +40,7 @@ This means that:
 ﹣ Producers will need to be able to view platforms that are available via the app
 ﹣ Producers will be able to connect specific products to different platforms and set
 stock and price levels on the different platforms.
-More technical detail, including how to access our testing server, will be shared on selection
-of this project.
-- Students will be able to access support via Slack. There will be an opportunity for technical
-support in integrating with the API and for feedback on UI/UX mocks. More information on
-how to access this support will be shared upon choosing this project.
-- All code will be open source, made available in an ongoing open repository for the benefit
-of all.
+
 User Interview
 The below is an excerpt from an interview with a food producer and potential user of the app.
 What do you produce?
