@@ -14,6 +14,7 @@ volume in comparison to conventional supermarkets and routes to market. This mea
 farmers want to benefit from these sales platforms, they need to upload their produce and
 maintain their stock levels on more than one of them, often 4 or 5. This is time consuming for
 farmers and unwanted admin.
+
 The Data Food Consortium is working to solve this problem. Working for dozens of food
 retail platforms they are building a data infrastructure that means that product and stock data
 can be shared between platforms seamlessly.
