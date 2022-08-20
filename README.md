@@ -7,6 +7,7 @@ aligns with their values. It enables farmers that farm sustainably to find shopp
 price, which makes sustainable farming worthwhile. Agriculture is one of the biggest
 contributors to ecological degradation globally, so it is crucially important that we find ways to
 bring more farmers into sustainable food production.
+
 Since the pandemic the number of online platforms to sell locally produced or sustainable
 food has exploded. There is a huge competition in online platforms, each with relatively low
 volume in comparison to conventional supermarkets and routes to market. This means that if
