@@ -48,7 +48,7 @@ User Interview:
 The below is an excerpt from an interview with a food producer and potential user of the app.
 What do you produce?
 
-I farm on 200acres in (wherever). I produce mostly salad, lettuce and field scale veg for a
+I farm on 200 acres in (wherever). I produce mostly salad, lettuce and field scale veg for a
 local wholesaler.
 
 Tell me about how you sell food at the moment?
