@@ -1,6 +1,5 @@
 
-Background:
-
+# Product Description
 Online food retail can be hugely beneficial for farmers, offering a much higher share of the
 retail price and giving shoppers more transparency so they can choose food that better
 aligns with their values. It enables farmers that farm sustainably to find shoppers and a fair
@@ -43,7 +42,7 @@ This means that:
 ﹣ Producers will be able to connect specific products to different platforms and set
 stock and price levels on the different platforms.
 
-User Interview:
+# User Interview:
 
 The below is an excerpt from an interview with a food producer and potential user of the app.
 What do you produce?
