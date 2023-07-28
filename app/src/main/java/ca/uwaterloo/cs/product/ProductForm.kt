@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Paint.Align
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -23,6 +24,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -37,6 +39,7 @@ import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.form.*
 import ca.uwaterloo.cs.harvest.HarvestInformation
 import ca.uwaterloo.cs.platform.PlatformState
+import ca.uwaterloo.cs.pushpull.sync
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import coil.compose.rememberImagePainter
@@ -68,7 +71,8 @@ fun ProductForm(
                             detectTapGestures(onTap = {
                                 focusManager.clearFocus()
                             })
-                        }.systemBarsPadding(),
+                        }
+                        .systemBarsPadding(),
                 ) {
                     Text(if (data == null) "ADD PRODUCT" else "EDIT PRODUCT")
                     ShowProductForm(navigator,
@@ -144,13 +148,13 @@ fun ShowProductForm(
             .padding(20.dp),
     ) {
         if (useTemplate) {
-            Row(verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                platformState.platformsUI.PlatformsDropDown()
-
-            }
+//            Row(verticalAlignment = Alignment.CenterVertically,
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//            ) {
+//                platformState.platformsUI.PlatformsDropDown()
+//
+//            }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -200,6 +204,18 @@ fun ShowProductForm(
                             validators = listOf(Required(), IsNumber(), NonZero()),
                             inputType = KeyboardType.Number,
                             dropdownList = listOf("0.50", "1.00", "2.00", "5.00")
+                        ),
+                        Field(
+                            name = "Unit",
+                            initValue = formState.getData().getOrDefault(
+                                "Unit",
+                                if (data.unit == "kg") "kg" else data.unit
+                            ),
+                            prompt = "Enter Unit",
+                            label = "Unit",
+                            validators = listOf(Required()),
+                            inputType = KeyboardType.Text,
+                            dropdownList = listOf("kg", "lbs")
                         ),
                     )
                 )
@@ -321,15 +337,18 @@ fun ShowProductForm(
                         }
                     }
                 }
-                SendCancelDeleteWidgets(
-                    formState = formState,
-                    platformState = platformState,
-                    data = data,
-                    image = image,
-                    nav = nav,
-                    context = context,
-                    useTemplate = useTemplate,
-                    creation = creation)
+                Column() {
+                    SendCancelDeleteWidgets(
+                        formState = formState,
+                        platformState = platformState,
+                        data = data,
+                        image = image,
+                        nav = nav,
+                        context = context,
+                        useTemplate = useTemplate,
+                        creation = creation
+                    )
+                }
             }
             Button(
                 onClick = {
@@ -341,56 +360,56 @@ fun ShowProductForm(
             }
             Spacer(modifier = Modifier.height(20.dp))
         } else {
-            Form(
-                state = formState,
-                fields = listOf(
-                    Field(
-                        name = "Name",
-                        initValue = formState.getData()
-                            .getOrDefault("Name", if (data.name == "") "" else data.name),
-                        prompt = "Enter product name",
-                        label = "Product Name",
-                        validators = listOf(Required()),
-                        readOnly = true
-                    ),
-                    Field(
-                        name = "Description",
-                        initValue = formState.getData().getOrDefault(
-                            "Description",
-                            if (data.description == "") "" else data.description
-                        ),
-                        prompt = "Enter description",
-                        label = "Product Description",
-                        validators = listOf(Required()),
-                        readOnly = true
-                    ),
-                    Field(
-                        name = "Amount",
-                        initValue = formState.getData().getOrDefault(
-                            "Amount",
-                            if (data.amount == 0L) "0" else data.amount.toString()
-                        ),
-                        prompt = "Enter amount available",
-                        label = "Product Amount",
-                        validators = listOf(Required(), IsNumber()),
-                        inputType = KeyboardType.Number,
-                        formatter = NumberTransformation(),
-                        readOnly = true
-                    ),
-                    Field(
-                        name = "Price",
-                        initValue = formState.getData().getOrDefault(
-                            "Price",
-                            if (data.price == 0) "0.00" else (data.price / 100.0).toString()
-                        ),
-                        prompt = "Enter price",
-                        label = "Product Price",
-                        validators = listOf(Required(), IsNumber(), NonZero()),
-                        inputType = KeyboardType.Number,
-                        readOnly = true
-                    ),
-                )
-            )
+//            Form(
+//                state = formState,
+//                fields = listOf(
+//                    Field(
+//                        name = "Name",
+//                        initValue = formState.getData()
+//                            .getOrDefault("Name", if (data.name == "") "" else data.name),
+//                        prompt = "Enter product name",
+//                        label = "Product Name",
+//                        validators = listOf(Required()),
+//                        readOnly = true
+//                    ),
+//                    Field(
+//                        name = "Description",
+//                        initValue = formState.getData().getOrDefault(
+//                            "Description",
+//                            if (data.description == "") "" else data.description
+//                        ),
+//                        prompt = "Enter description",
+//                        label = "Product Description",
+//                        validators = listOf(Required()),
+//                        readOnly = true
+//                    ),
+//                    Field(
+//                        name = "Amount",
+//                        initValue = formState.getData().getOrDefault(
+//                            "Amount",
+//                            if (data.amount == 0L) "0" else data.amount.toString()
+//                        ),
+//                        prompt = "Enter amount available",
+//                        label = "Product Amount",
+//                        validators = listOf(Required(), IsNumber()),
+//                        inputType = KeyboardType.Number,
+//                        formatter = NumberTransformation(),
+//                        readOnly = true
+//                    ),
+//                    Field(
+//                        name = "Price",
+//                        initValue = formState.getData().getOrDefault(
+//                            "Price",
+//                            if (data.price == 0) "0.00" else (data.price / 100.0).toString()
+//                        ),
+//                        prompt = "Enter price",
+//                        label = "Product Price",
+//                        validators = listOf(Required(), IsNumber(), NonZero()),
+//                        inputType = KeyboardType.Number,
+//                        readOnly = true
+//                    ),
+//                )
+//            )
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -412,15 +431,28 @@ fun ShowProductForm(
                                 initValue = "no description",
                                 prompt = "Enter Harvest Description",
                                 validators = listOf()
+                        ),
+                        Field(
+                            name = "Unit",
+                            initValue = formState.getData().getOrDefault(
+                                "Unit",
+                                if (data?.unit == "kg") "kg" else data!!.unit
+                            ),
+                            prompt = "Enter Unit",
+                            label = "Unit",
+                            validators = listOf(Required()),
+                            inputType = KeyboardType.Text,
+                            dropdownList = listOf("kg", "lbs")
                         )
                     )
                 )
+                // 86cb170d-683a-4167-8898-88997fc208a2
                 @Composable
                 fun numberButton(size: Int) {
                     val button = Button(
                         onClick = {
                             formState.fields.first().setValue(
-                                (formState.fields.first().getValue().toInt()+size).toString()
+                                ((formState.fields.first().getValue().toInt())+size).toString()
                             )
                         },
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
@@ -476,30 +508,38 @@ fun AddOrRemove(
     context: Context,
     useTemplate: Boolean
 ) {
-    Row {
-        Button(onClick = {
-            if (formState.validate()) {
-                addProductNumber(data, formState.getData(), context, nav)
-                nav.navigate(MainContentDestination)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+    Row(
+        horizontalArrangement = Arrangement.Center,
+    ) {
+            Button(onClick = {
+                if (formState.validate()) {
+                    addProductNumber(data, formState.getData(), context, nav);
+                    sync(context);
+                    nav.navigate(MainContentDestination)
+                }
+            }, modifier = Modifier.size(Dp(100f), Dp(100f))) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Catalogue",
+                    tint = Color.InstagramPurple
+                )
             }
-        }) {
-            Icon(
-                imageVector = Icons.Filled.Add,
-                contentDescription = "Catalogue",
-                tint = Color.InstagramPurple
-            )
-        }
-        Spacer(Modifier.weight(1f))
-        Button(onClick = {
-            if (formState.validate()) {
-                removeProductNumber(data, formState.getData(), context, nav)
-            }
-        }) {
-            Icon(
-                imageVector = Icons.Filled.Remove,
-                contentDescription = "Catalogue",
-                tint = Color.InstagramPurple
-            )
+    //        Spacer(Modifier.weight(1f))
+    //        Button(onClick = {
+    //            if (formState.validate()) {
+    //                removeProductNumber(data, formState.getData(), context, nav)
+    //            }
+    //        }, modifier = Modifier.size(Dp(100f), Dp(100f))) {
+    //            Icon(
+    //                imageVector = Icons.Filled.Remove,
+    //                contentDescription = "Catalogue",
+    //                tint = Color.InstagramPurple
+    //            )
+    //        }
         }
     }
 }
@@ -527,18 +567,22 @@ fun SendCancelDeleteWidgets(
                 if(newData1["platform2"].toBoolean()){
                     actualAmount+=newData1["platform2_amount"]!!.toLong()
                 }
-                if((newData1["platform1"].toBoolean() or newData1["platform2"].toBoolean())==false){
-                    AlertDialog.Builder(context)
-                        .setMessage("Please select at least one platform").show()
-                }
-                else if(newData1["Amount"]!!.toLong()<actualAmount){
-                        AlertDialog.Builder(context)
-                            .setMessage("Please make sure the sum of platform number is smaller than product amount").show()
-                }
-                else{
-                    saveProduct(data, formState.getData() + platformState.getData(), image, context)
-                    nav.navigate(MainContentDestination)
-                }
+//                if((newData1["platform1"].toBoolean() or newData1["platform2"].toBoolean())==false){
+//                    AlertDialog.Builder(context)
+//                        .setMessage("Please select at least one platform").show()
+//                }
+//                else if(newData1["Amount"]!!.toLong()<actualAmount){
+//                        AlertDialog.Builder(context)
+//                            .setMessage("Please make sure the sum of platform number is smaller than product amount").show()
+//                }
+//                else{
+//                    saveProduct(data, formState.getData() + platformState.getData(), image, context)
+//                    nav.navigate(MainContentDestination)
+//                }
+
+                saveProduct(data, formState.getData(), image, context)
+                sync(context);
+                nav.navigate(MainContentDestination)
             }
         }) {
             Icon(
@@ -590,6 +634,7 @@ private fun saveProduct(
     data.description = newData["Description"]!!
     data.price = (newData["Price"]!!.toDouble() * 100).toInt()
     data.amount = newData["Amount"]!!.toLong()
+    data.unit = newData["Unit"]!!
     data.image = newImage
     data.platform1 = newData["platform1"].toBoolean()
     data.platform2 = newData["platform2"].toBoolean()
@@ -614,6 +659,7 @@ private fun saveProductToDB(
     data.description = newData["Description"]!!
     data.price = (newData["Price"]!!.toDouble() * 100).toInt()
     data.amount = newData["Amount"]!!.toLong()
+    data.unit = newData["Unit"]!!
     data.image = newImage
     data.platform1 = newData["platform1"].toBoolean()
     data.platform2 = newData["platform2"].toBoolean()
@@ -636,6 +682,7 @@ private fun deleteProduct(data: ProductInformation, context: Context, nav: Desti
             android.R.string.yes
         ) { _, _ ->
             data.deleteData("${context.filesDir}/out2")
+            sync(context);
             nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()
@@ -651,7 +698,8 @@ private fun addProductNumber(
         fromWorker = Singleton.userId,
         product = data,
         amount = newData["Amount Editor"]!!.toInt(),
-        harvestDescription = newData["Harvest Description"]!!
+        harvestDescription = newData["Harvest Description"]!!,
+        unit = newData["Unit"]!!
     )
     harvestRequest.exportData("${context.filesDir}/outharvest")
     nav.navigate(MainContentDestination)
@@ -674,11 +722,13 @@ private fun removeProductNumber(
                 fromWorker = Singleton.userId,
                 product = data,
                 amount = -newData["Amount Editor"]!!.toInt(),
-                harvestDescription = newData["Harvest Description"]!!
+                harvestDescription = newData["Harvest Description"]!!,
+                unit = newData["Unit"]!!
             )
             AlertDialog.Builder(context)
                 .setMessage("Request has been sent").show()
             harvestRequest.exportData("${context.filesDir}/outharvest")
+            sync(context);
             nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()

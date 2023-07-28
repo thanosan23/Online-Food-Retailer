@@ -13,7 +13,8 @@ enum class IdType{
     ProductId,
     HarvestId,
     FarmCodeId,
-    DFCStandardId
+    DFCStandardId,
+    StoreId
 }
 class Id(
     val idValue: String,
@@ -56,6 +57,9 @@ fun dataBasePathResolver(idType: IdType): String{
         }
         IdType.DFCStandardId -> {
             "DFCUserData/"
+        }
+        IdType.StoreId -> {
+            "Store/"
         }
         else -> ""
     }

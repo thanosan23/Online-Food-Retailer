@@ -1,5 +1,9 @@
 package ca.uwaterloo.cs.Profile
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.layout.R
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -18,6 +22,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ca.uwaterloo.cs.MainActivity
+import ca.uwaterloo.cs.MainActivity.*
+import ca.uwaterloo.cs.MainContent
 import ca.uwaterloo.cs.NavigationBar
 import ca.uwaterloo.cs.Singleton
 import ca.uwaterloo.cs.bemodels.UserProfile
@@ -25,9 +32,20 @@ import ca.uwaterloo.cs.bemodels.readUserProfileFromFiles
 import ca.uwaterloo.cs.db.DBManager
 import ca.uwaterloo.cs.destinations.Destination
 import ca.uwaterloo.cs.destinations.AccountSettingListScreenDestination
+import ca.uwaterloo.cs.destinations.LoginDestination
+import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.ui.theme.*
+import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.AuthUI.getApplicationContext
+import com.google.android.gms.auth.api.Auth
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.ktx.app
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-
 
 /*class User(
     val email: String,
@@ -90,15 +108,15 @@ fun ProfileTopBar(userProfile:UserProfile) {
     }
 }
 
-
 @Composable
 fun ProfileListItem(
     @DrawableRes icon: Int,
     title: String,
     nav: DestinationsNavigator,
     badge: @Composable (() -> Unit)? = null,
-    endBadge: @Composable (() -> Unit)? = null
+    endBadge: @Composable (() -> Unit)? = null,
 ) {
+    val context = LocalContext.current;
     Row(
         Modifier
             .fillMaxWidth(),
@@ -120,7 +138,9 @@ fun ProfileListItem(
         endBadge?.invoke()
         IconButton(
             onClick = {
-                nav.navigate(AccountSettingListScreenDestination) }) {
+                context.startActivity(Intent(context, MainActivity::class.java));
+                MainActivity.logout();
+            }) {
             Icon(
                 painterResource(ca.uwaterloo.cs.R.drawable.ic_arrow_more), contentDescription = "More",
                 Modifier
@@ -142,7 +162,6 @@ fun ProfileListItem(
 @Composable
 fun ProfileList(nav: DestinationsNavigator) {
     val userProfile = readUserProfileFromFiles(LocalContext.current)
-
     Box(
         Modifier
             .background(Color.BG)
@@ -187,3 +206,13 @@ fun ProfileListPreview() {
         ProfileList()
     }
 }*/
+
+fun signOut(context: Context, mGoogleSignInClient: GoogleSignInClient) {
+    mGoogleSignInClient.signOut()
+        .addOnCompleteListener(
+            //context.mainExecutor
+        ) {
+            Toast.makeText(context, "Signed out successfully", Toast.LENGTH_SHORT)
+                .show()
+        }
+}

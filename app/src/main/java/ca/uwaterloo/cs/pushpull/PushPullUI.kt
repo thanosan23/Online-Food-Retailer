@@ -48,6 +48,41 @@ fun checkConnection(context: Context): Boolean {
     return false
 }
 
+fun sync(context: Context) {
+    val pushPullFarmer = PushPullFarmer(context)
+    val pushWorker = PushWorker(context)
+    val pullWorker = PullWorker(context)
+    if (!Singleton.syncInProgress) {
+        val connected = checkConnection(context)
+        if (connected) {
+            Singleton.syncInProgress = true
+            // syncInProgress.value = true
+            Thread {
+                if (Singleton.isFarmer) {
+                    pushPullFarmer.harvestResolver();
+                    pushPullFarmer.resolver();
+                } else {
+                    pullWorker.run()
+                    pushWorker.run()
+                }
+                Thread.sleep(5000)
+                Singleton.syncInProgress = false
+                // syncInProgress.value = false
+            }.start()
+        } else {
+            val builder = android.app.AlertDialog.Builder(context)
+            builder.setMessage("No network connection")
+                .setCancelable(true)
+                .setPositiveButton("OK", DialogInterface.OnClickListener { dialog, id ->
+                    dialog.cancel()
+                })
+            val alert = builder.create()
+            alert.setTitle("Warning")
+            alert.show()
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun toSynchUI(){
@@ -80,8 +115,10 @@ fun toSynchUI(){
                         syncInProgress.value = true
                         Thread {
                             if (Singleton.isFarmer) {
-                                pushPullFarmer.harvestResolver()
-                                pushPullFarmer.productResolver()
+                                pushPullFarmer.harvestResolver();
+//                                pushPullFarmer.productResolver();
+//                                pushPullFarmer.storeResolver();
+                                pushPullFarmer.resolver();
                             } else {
                                 pullWorker.run()
                                 pushWorker.run()
@@ -106,69 +143,69 @@ fun toSynchUI(){
                 Text(text = "Sync")
             }
             if (Singleton.isFarmer) {
-                Button(onClick = {
-                    val connected = checkConnection(context)
-                    if (connected) {
-                        Singleton.syncInProgress = true
-                        syncInProgress.value = true
-                        Thread {
-                            if (Singleton.isFarmer) {
-                                val dbManager = DBManager(context)
-                                if (platform1CheckBoxState.value) {
-                                    dbManager.syncDFC(Singleton.userId, true)
-                                }
-                                if (platform2CheckBoxState.value) {
-                                    dbManager.syncDFC(Singleton.userId, false)
-                                }
-                                Thread.sleep(5000)
-                                Singleton.syncInProgress = false
-                                syncInProgress.value = false
-                            }
-                        }.start()
-                    } else {
-                        val builder = android.app.AlertDialog.Builder(context)
-                        builder.setMessage("No network connection")
-                            .setCancelable(true)
-                            .setPositiveButton(
-                                "OK",
-                                DialogInterface.OnClickListener { dialog, id ->
-                                    dialog.cancel()
-                                })
-                        val alert = builder.create()
-                        alert.setTitle("Warning")
-                        alert.show()
-                    }
-                }) {
-                    Text(text = "DFC Sync")
-                }
+//                Button(onClick = {
+//                    val connected = checkConnection(context)
+//                    if (connected) {
+//                        Singleton.syncInProgress = true
+//                        syncInProgress.value = true
+//                        Thread {
+//                            if (Singleton.isFarmer) {
+//                                val dbManager = DBManager(context)
+//                                if (platform1CheckBoxState.value) {
+//                                    dbManager.syncDFC(Singleton.userId, true)
+//                                }
+//                                if (platform2CheckBoxState.value) {
+//                                    dbManager.syncDFC(Singleton.userId, false)
+//                                }
+//                                Thread.sleep(5000)
+//                                Singleton.syncInProgress = false
+//                                syncInProgress.value = false
+//                            }
+//                        }.start()
+//                    } else {
+//                        val builder = android.app.AlertDialog.Builder(context)
+//                        builder.setMessage("No network connection")
+//                            .setCancelable(true)
+//                            .setPositiveButton(
+//                                "OK",
+//                                DialogInterface.OnClickListener { dialog, id ->
+//                                    dialog.cancel()
+//                                })
+//                        val alert = builder.create()
+//                        alert.setTitle("Warning")
+//                        alert.show()
+//                    }
+//                }) {
+//                    Text(text = "DFC Sync")
+//                }
                 Row() {
                     Column() {
-                        Image(
-                            painter = painterResource(id = R.drawable.socleo),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .width(120.dp)
-                                .height(100.dp)
-                                .border(BorderStroke(1.dp, Color.Black))
-                        )
-                        androidx.compose.material3.Checkbox(
-                            checked = platform1CheckBoxState.value,
-                            onCheckedChange = { platform1CheckBoxState.value = it }
-                        )
+//                        Image(
+//                            painter = painterResource(id = R.drawable.socleo),
+//                            contentDescription = null,
+//                            modifier = Modifier
+//                                .width(120.dp)
+//                                .height(100.dp)
+//                                .border(BorderStroke(1.dp, Color.Black))
+//                        )
+//                        androidx.compose.material3.Checkbox(
+//                            checked = platform1CheckBoxState.value,
+//                            onCheckedChange = { platform1CheckBoxState.value = it }
+//                        )
                     }
                     Column() {
-                        Image(
-                            painter = painterResource(id = R.drawable.loblaws),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .width(120.dp)
-                                .height(100.dp)
-                                .border(BorderStroke(1.dp, Color.Black))
-                        )
-                        androidx.compose.material3.Checkbox(
-                            checked = platform2CheckBoxState.value,
-                            onCheckedChange = { platform2CheckBoxState.value = it }
-                        )
+//                        Image(
+//                            painter = painterResource(id = R.drawable.loblaws),
+//                            contentDescription = null,
+//                            modifier = Modifier
+//                                .width(120.dp)
+//                                .height(100.dp)
+//                                .border(BorderStroke(1.dp, Color.Black))
+//                        )
+//                        androidx.compose.material3.Checkbox(
+//                            checked = platform2CheckBoxState.value,
+//                            onCheckedChange = { platform2CheckBoxState.value = it }
+//                        )
                     }
                 }
             }

@@ -19,15 +19,17 @@ import com.google.firebase.storage.StorageReference
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.json.JSONObject
 import java.io.File
 import java.security.AccessController.getContext
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.HashMap
 
 
 class DBClient {
-    val db = Firebase.database.reference
-    private val storage = FirebaseStorage.getInstance().reference
+    val db = Firebase.database.reference;
+    private val storage = FirebaseStorage.getInstance().reference;
     var context: Context? = null
 
     fun clearStorage(){
@@ -50,10 +52,12 @@ class DBClient {
     }
 
     inline fun <reified T> get(key: String, listener: Listener<T>){
+        println(key);
         db.child(key).get().addOnSuccessListener {
             if (it.exists()){
                 val stringData = it.value as String
-                val data = Json.decodeFromString<T>(stringData)
+                var data = Json.decodeFromString<T>(stringData)
+
                 if (data is HasOneImage){
                         val result = getImage(data.image)
                         if (result == null){
@@ -125,7 +129,6 @@ class DBClient {
         )
     }
 }
-
 
 class DBClientTest(){
     @Composable

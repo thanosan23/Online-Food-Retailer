@@ -7,7 +7,7 @@ import ca.uwaterloo.cs.product.ProductInformation
 
 class ContentIngestion {
 
-    fun getCompleteUserProfile(signUpFarmer: SignUpFarmer): CompleteUserProfile{
+    fun getCompleteUserProfile(signUpFarmer: SignUpFarmer):CompleteUserProfile{
         return CompleteUserProfile(
             signUpFarmer.firstName,
             signUpFarmer.familyName,
@@ -20,6 +20,7 @@ class ContentIngestion {
             mutableListOf(),
             mutableListOf(),
             mutableListOf(),
+            mutableListOf()
         )
     }
 
@@ -36,6 +37,7 @@ class ContentIngestion {
             mutableListOf(),
             mutableListOf(),
             mutableListOf(),
-        )
+            mutableListOf(),
+            )
     }
 }

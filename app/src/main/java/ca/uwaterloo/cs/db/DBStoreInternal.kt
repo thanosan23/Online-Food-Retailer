@@ -2,6 +2,7 @@ package ca.uwaterloo.cs.db
 
 import android.content.Context
 import ca.uwaterloo.cs.Listener
+import ca.uwaterloo.cs.StoreInformation
 import ca.uwaterloo.cs.bemodels.SignUpFarmer
 import ca.uwaterloo.cs.bemodels.SignUpWorker
 import ca.uwaterloo.cs.dbmodels.CompleteUserProfile
@@ -15,9 +16,28 @@ class DBStoreInternal(context: Context?) {
         dbClient.context = context
     }
 
+    fun storeInformation(userId: String, productsInformation: List<ProductInformation>, storesInformation: List<StoreInformation>) {
+        addToFarmer(userId, productsInformation, storesInformation);
+        for (product in productsInformation) {
+            val id = Id(product.productId, IdType.ProductId)
+            dbClient.store(
+                id.getPath(),
+                product
+            )
+        }
+        for (store in storesInformation) {
+            val id = Id(store.storeId, IdType.StoreId)
+            dbClient.store(
+                id.getPath(),
+                store
+            )
+        }
+    }
+
     fun storeProductsInformation(userId: String,
                                 productsInformation: List<ProductInformation>){
-            addProductsToFarmer(userId, productsInformation)
+        System.out.println("Stored!");
+        addProductsToFarmer(userId, productsInformation)
         for (product in productsInformation) {
             val id = Id(product.productId, IdType.ProductId)
             dbClient.store(
@@ -26,6 +46,19 @@ class DBStoreInternal(context: Context?) {
             )
         }
     }
+
+    fun storeStoreInformation(userId: String,
+                              storeInformation: List<StoreInformation>){
+        addStoreToFarmer(userId, storeInformation)
+        for (store in storeInformation) {
+            val id = Id(store.storeId, IdType.StoreId)
+            dbClient.store(
+                id.getPath(),
+                store
+            )
+        }
+    }
+
 
     fun storeHarvestInformation(harvestCreation: Boolean,
                                 workerId: String,
@@ -56,7 +89,7 @@ class DBStoreInternal(context: Context?) {
     }
 
     fun storeSignUpWorker(signUpWorker: SignUpWorker){
-        signUpWorker.farmerUserId = signUpWorker.farmerUserId.replace("\"", "")
+            signUpWorker.farmerUserId = signUpWorker.farmerUserId.replace("\"", "")
         val completeFarmerProfile = contentIngestion.getCompleteUserProfile(signUpWorker)
         val completeFarmerProfileId = Id(signUpWorker.workerUserId, IdType.CompleteUserProfileId)
         dbClient.store(
@@ -68,8 +101,38 @@ class DBStoreInternal(context: Context?) {
         attachWorkerToFarmer(workerId, farmerId)
     }
 
+    private fun addToFarmer(farmerIdString: String, products: List<ProductInformation>, stores: List<StoreInformation>) {
+        val userId = Id(farmerIdString, IdType.CompleteUserProfileId);
+        val productsIds = mutableListOf<String>()
+        for (product in products){
+            productsIds.add(product.productId)
+        }
+        val storeIds = mutableListOf<String>()
+        for (store in stores){
+            storeIds.add(store.storeId)
+        }
+        class ListenerImpl() : Listener<CompleteUserProfile>() {
+            override fun activate(input: CompleteUserProfile) {
+                input.productIds = productsIds
+                input.storeIds = storeIds
+                dbClient.store(
+                    userId.getPath(),
+                    input
+                )
+            }
+        }
+        val listener = ListenerImpl()
+        dbClient.get(
+            userId.getPath(),
+            listener
+        )
+
+
+
+    }
+
     private fun addProductsToFarmer(farmerIdString: String, products: List<ProductInformation>){
-        val userId = Id(farmerIdString, IdType.CompleteUserProfileId)
+        val userId = Id(farmerIdString, IdType.CompleteUserProfileId);
         val productsIds = mutableListOf<String>()
         for (product in products){
             productsIds.add(product.productId)
@@ -90,9 +153,33 @@ class DBStoreInternal(context: Context?) {
         )
     }
 
+
+    private fun addStoreToFarmer(farmerIdString: String, stores: List<StoreInformation>){
+        val userId = Id(farmerIdString, IdType.CompleteUserProfileId)
+        val storeIds = mutableListOf<String>()
+        for (store in stores){
+            storeIds.add(store.storeId)
+        }
+        class ListenerImpl() : Listener<CompleteUserProfile>() {
+            override fun activate(input: CompleteUserProfile) {
+                input.storeIds = storeIds
+                dbClient.store(
+                    userId.getPath(),
+                    input
+                )
+            }
+        }
+        val listener = ListenerImpl()
+        dbClient.get(
+            userId.getPath(),
+            listener
+        )
+    }
+
     fun removeProductFromFarmer(farmerIdString: String, productIdString: String){
         val userId = Id(farmerIdString, IdType.CompleteUserProfileId)
         val productId = Id(productIdString, IdType.ProductId)
+        System.out.println("Removed...");
         class ListenerImpl() : Listener<CompleteUserProfile>() {
             override fun activate(input: CompleteUserProfile) {
                 input.productIds.remove(productId.idValue)
@@ -109,7 +196,27 @@ class DBStoreInternal(context: Context?) {
         )
     }
 
+    fun removeStoreFromFarmer(farmerIdString: String, storeIdString: String){
+        val userId = Id(farmerIdString, IdType.CompleteUserProfileId)
+        val storeId = Id(storeIdString, IdType.StoreId)
+        class ListenerImpl() : Listener<CompleteUserProfile>() {
+            override fun activate(input: CompleteUserProfile) {
+                input.storeIds.remove(storeId.idValue)
+                dbClient.store(
+                    userId.getPath(),
+                    input
+                )
+            }
+        }
+        val listener = ListenerImpl()
+        dbClient.get(
+            userId.getPath(),
+            listener
+        )
+    }
+
     fun newRemoveProductFromFarmer(farmerIdString: String, productsToKeepIdString: List<String>){
+        System.out.println("Removed2");
         val userId = Id(farmerIdString, IdType.CompleteUserProfileId)
         class ListenerImpl() : Listener<CompleteUserProfile>() {
             override fun activate(input: CompleteUserProfile) {
@@ -146,9 +253,6 @@ class DBStoreInternal(context: Context?) {
         )
     }
 
-    fun storeUserProfile(){
-
-    }
 
     fun newRemoveHarvestFromWorker(workerIdString: String, harvestToBeKeepIdString: List<String>){
         val userId = Id(workerIdString, IdType.CompleteUserProfileId)

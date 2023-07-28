@@ -1,42 +1,33 @@
 {
   "project_info": {
-    "project_number": "666256052588",
-    "firebase_url": "https://cs446-project-2-default-rtdb.firebaseio.com",
-    "project_id": "cs446-project-2",
-    "storage_bucket": "cs446-project-2.appspot.com"
+    "project_number": "867046677413",
+    "project_id": "online-food-retailer-6dbad",
+    "storage_bucket": "online-food-retailer-6dbad.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:666256052588:android:596a6e6e82f4535c9c2349",
+        "mobilesdk_app_id": "1:867046677413:android:d1aead0a8146f82cf7a64c",
         "android_client_info": {
           "package_name": "ca.uwaterloo.cs"
         }
       },
       "oauth_client": [
         {
-          "client_id": "666256052588-6cmhri67v4obbu12v87a9ujmkpdft60v.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "ca.uwaterloo.cs",
-            "certificate_hash": "c8b457cd365ec12d6df9524a4f9498b6b8c931ed"
-          }
-        },
-        {
-          "client_id": "666256052588-63b1v98pgn8501oebf0snuk697171jq1.apps.googleusercontent.com",
+          "client_id": "867046677413-4sv6fsvs0lunlsfktih5a4rkij5lva84.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyC8zx8cYvT2hqsVE8Xk79yq1UVrch6A5Dc"
+          "current_key": "AIzaSyB_FzGT2koCjQAqWmPRf2De-ZyWSZQVu70"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "666256052588-63b1v98pgn8501oebf0snuk697171jq1.apps.googleusercontent.com",
+              "client_id": "867046677413-4sv6fsvs0lunlsfktih5a4rkij5lva84.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

@@ -3,6 +3,7 @@ package ca.uwaterloo.cs.db
 import android.content.Context
 import ca.uwaterloo.cs.Listener
 import ca.uwaterloo.cs.Singleton
+import ca.uwaterloo.cs.StoreInformation
 import ca.uwaterloo.cs.bemodels.SignUpFarmer
 import ca.uwaterloo.cs.bemodels.SignUpWorker
 import ca.uwaterloo.cs.bemodels.UserProfile
@@ -43,6 +44,13 @@ class DBManager(val context: Context?) {
         dbStoreInternal.storeSignUpWorker(signUpWorker)
     }
 
+    fun store(userId: String, productsInformation: List<ProductInformation>, storesInformation: List<StoreInformation>) {
+
+        if (!Singleton.isFarmer){
+            return
+        }
+        dbStoreInternal.storeInformation(userId, productsInformation, storesInformation);
+    }
     // if the product is being created for the first time add productIdString to be null
     fun storeProductsInformation(userId: String, productsInformation: List<ProductInformation>){
         if (!Singleton.isFarmer){
@@ -50,6 +58,14 @@ class DBManager(val context: Context?) {
         }
         // Internal storage
         dbStoreInternal.storeProductsInformation(userId, productsInformation)
+    }
+
+    fun storeStoreInformation(userId: String, storeInformation: List<StoreInformation>){
+        if (!Singleton.isFarmer){
+            return
+        }
+        // Internal storage
+        dbStoreInternal.storeStoreInformation(userId, storeInformation)
     }
 
     fun deleteProductInformation(farmerId: String, productIdString: String){
@@ -76,6 +92,7 @@ class DBManager(val context: Context?) {
     fun getProductsInformationFromFarmer(farmerId: String, beListener: Listener<List<ProductInformation>>){
         dbGetInternal.getProductInformationFromFarmer(farmerId, beListener)
     }
+
 
     fun getProductsInformationFromWorker(workerId: String, beListener: Listener<List<ProductInformation>>){
         dbGetInternal.getProductsInformationFromWorker(workerId, beListener)

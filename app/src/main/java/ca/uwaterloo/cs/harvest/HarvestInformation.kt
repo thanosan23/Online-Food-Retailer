@@ -23,6 +23,7 @@ data class HarvestInformation (
     val description: String,
     override var image: String,
     var amount: Int,
+    var unit : String
 ) : Serializable, Parcelable, HasOneImage {
     constructor(parcel: Parcel) : this(
         parcel.readString()!!,
@@ -32,10 +33,11 @@ data class HarvestInformation (
         parcel.readString()!!,
         parcel.readString()!!,
         parcel.readString()!!,
-        parcel.readInt()
+        parcel.readInt(),
+        parcel.readString()!!
     )
 
-    constructor(fromWorker: String, product: ProductInformation, amount: Int, harvestDescription: String): this (
+    constructor(fromWorker: String, product: ProductInformation, amount: Int, harvestDescription: String, unit : String): this (
         UUID.randomUUID().toString(),
         harvestDescription,
         fromWorker,
@@ -43,10 +45,13 @@ data class HarvestInformation (
         product.name,
         product.description,
         product.image,
-        amount
-    )
+        amount,
+        unit
+    ) {
+        convert(product);
+    }
 
-    constructor(fromWorker: String, name: String, description: String, image: String, amount: Int, harvestDescription: String): this (
+    constructor(fromWorker: String, name: String, description: String, image: String, amount: Int, harvestDescription: String, unit : String): this (
         UUID.randomUUID().toString(),
         harvestDescription,
         fromWorker,
@@ -54,8 +59,21 @@ data class HarvestInformation (
         name,
         description,
         image,
-        amount
+        amount,
+        unit
     )
+
+    private fun convert(product : ProductInformation ) {
+        if(this.unit != product.unit) {
+            if(this.unit == "kg" && product.unit == "lbs") {
+                this.amount = (amount * 2.20462).toInt();
+                this.unit = "lbs";
+            } else if(this.unit == "lbs" && product.unit == "kg") {
+                this.amount = (amount * 0.453592).toInt();
+                this.unit = "kg";
+            }
+        }
+    }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(harvestId)
@@ -66,6 +84,7 @@ data class HarvestInformation (
         parcel.writeString(description)
         parcel.writeString(image)
         parcel.writeInt(amount)
+        parcel.writeString(unit)
     }
 
     override fun describeContents(): Int {

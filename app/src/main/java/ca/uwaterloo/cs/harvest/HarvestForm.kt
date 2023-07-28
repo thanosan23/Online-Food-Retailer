@@ -24,6 +24,7 @@ import ca.uwaterloo.cs.Singleton
 import ca.uwaterloo.cs.destinations.MainContentDestination
 import ca.uwaterloo.cs.form.*
 import ca.uwaterloo.cs.product.ProductInformation
+import ca.uwaterloo.cs.pushpull.sync
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import com.ramcosta.composedestinations.annotation.Destination
@@ -66,6 +67,8 @@ fun HarvestForm(
                         inputType = KeyboardType.Number,
                         formatter = NumberTransformation()
                     )
+
+
 
                     @Composable
                     fun numberButton(size: Int) {
@@ -120,7 +123,19 @@ fun HarvestForm(
                                     validators = listOf(Required()),
                                     readOnly = data != null
                                 ),
-                                amountField
+                                amountField,
+                                Field(
+                                    name = "Unit",
+                                    initValue = formState.getData().getOrDefault(
+                                        "Unit",
+                                        if (data?.unit == "kg") "kg" else data!!.unit
+                                    ),
+                                    prompt = "Enter Unit",
+                                    label = "Unit",
+                                    validators = listOf(Required()),
+                                    inputType = KeyboardType.Text,
+                                    dropdownList = listOf("kg", "lbs")
+                                )
                             )
                         )
                         Row(
@@ -172,6 +187,7 @@ fun SendCancelDeleteWidgets(
                 } else {
                     saveHarvestRequestNoProduct(formState.getData(), "", saveDir)
                 }
+                sync(context);
                 nav.navigate(MainContentDestination)
             }
         }) {
@@ -206,6 +222,7 @@ private fun saveHarvestRequestWithProduct(
             product = data,
             amount = newData["Amount"]!!.toInt(),
             "no description",
+            unit = newData["Unit"]!!
         )
     harvestInformation.exportData(saveDir)
 }
@@ -223,6 +240,7 @@ private fun saveHarvestRequestNoProduct(
             image = image,
             amount = newData["Amount"]!!.toInt(),
             harvestDescription = newData["Harvest Description"]!!,
+            unit = newData["Unit"]!!
         )
     harvestInformation.exportData(saveDir)
 }
@@ -235,6 +253,7 @@ private fun deleteHarvestRequest(context: Context, nav: DestinationsNavigator) {
         .setPositiveButton(
             android.R.string.yes
         ) { _, _ ->
+            sync(context);
             nav.navigate(MainContentDestination)
         }
         .setNegativeButton(android.R.string.no, null).show()

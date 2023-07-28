@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.speech.RecognizerIntent
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -38,8 +39,13 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import androidx.core.net.toUri
+import androidx.core.widget.AutoScrollHelper
+import ca.uwaterloo.cs.bemodels.UserProfile
 import ca.uwaterloo.cs.db.DBManager
+import ca.uwaterloo.cs.dbmodels.CompleteUserProfile
+import ca.uwaterloo.cs.destinations.AccountSettingListScreenDestination
 import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.product.ProductInformation
 import ca.uwaterloo.cs.pushpull.readProductFromFiles
@@ -47,18 +53,26 @@ import ca.uwaterloo.cs.ui.theme.*
 import coil.compose.rememberImagePainter
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
+import com.google.android.gms.auth.api.Auth
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import java.util.*
 
 
 class MainActivity : ComponentActivity() {
-    val dbManager = DBManager(null)
-    fun logout() {
-        AuthUI.getInstance().signOut(this)
-    }
+    private val dbManager = DBManager(null);
 
+    private lateinit var mGoogleSignInClient : GoogleSignInClient;
     // See: https://developer.android.com/training/basics/intents/result
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
@@ -67,7 +81,26 @@ class MainActivity : ComponentActivity() {
         println("first time $userId")
         Singleton.userId = userId
         Singleton.isNewUser = res.idpResponse?.isNewUser!!
-        dbManager.getUserType(Singleton.userId)
+        dbManager.getUserType(Singleton.userId);
+
+        // extract the data from the database if user is not new
+        if(!Singleton.isNewUser) {
+            val database = Firebase.database.reference;
+            val user = database.child("CompleteUserProfile").child("${userId}").get().addOnCompleteListener() {
+                val data : String = (it.result.value as String?)!!;
+                val profile = Json.decodeFromString<CompleteUserProfile>(data);
+                val userProfile = UserProfile(
+                    profile.firstName,
+                    profile.familyName,
+                    "",
+                    Singleton.userId.dropLast(9) + "@gmail.com",
+                    null,
+                    ""
+                )
+                userProfile.exportData(this);
+            }
+        }
+
         setContent {
             OnlineFoodRetailTheme {
                 val context = LocalContext.current
@@ -89,11 +122,29 @@ class MainActivity : ComponentActivity() {
         .createSignInIntentBuilder()
         .setAvailableProviders(providers)
         .build()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        logout()
+
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken("867046677413-rr6ds5ics077kookfvbjcagnei4odl6t")
+            .requestEmail()
+            .build()
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        var auth  = FirebaseAuth.getInstance();
+        auth.signOut();
+        AuthUI.getInstance().signOut(this);
+        mGoogleSignInClient.signOut();
         signInLauncher.launch(signInIntent)
+    }
+    fun logout() {
+        var auth  = FirebaseAuth.getInstance();
+        auth.signOut();
+        this.finish();
+    }
+    companion object {
+        fun logout(){
+            MainActivity().logout();
+        }
     }
 }
 

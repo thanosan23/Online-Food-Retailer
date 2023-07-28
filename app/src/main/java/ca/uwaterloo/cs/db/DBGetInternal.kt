@@ -3,6 +3,7 @@ package ca.uwaterloo.cs.db
 import android.content.Context
 import ca.uwaterloo.cs.Listener
 import ca.uwaterloo.cs.Singleton
+import ca.uwaterloo.cs.StoreInformation
 import ca.uwaterloo.cs.bemodels.SignUpFarmer
 import ca.uwaterloo.cs.bemodels.UserProfile
 import ca.uwaterloo.cs.dbmodels.CompleteUserProfile
@@ -131,10 +132,64 @@ class DBGetInternal(context: Context?) {
         dbClient.get(id.getPath(), listener2)
     }
 
+
+    fun getStoreInformationFromFarmer(farmerUserIdString: String, beListener: Listener<List<StoreInformation>>){
+        val storeInformation = mutableListOf<StoreInformation>()
+        var counter = 0
+        var amount = 0
+
+        class ListenerImpl1() : Listener<StoreInformation>() {
+            override fun activate(input: StoreInformation) {
+                storeInformation.add(input)
+                counter += 1
+                println("counter $counter")
+                println("$amount")
+                if (counter == amount){
+                    beListener.activate(storeInformation)
+                }
+            }
+        }
+        val listener1 = ListenerImpl1()
+
+        class ListenerImpl2() : Listener<CompleteUserProfile>() {
+            override fun activate(input: CompleteUserProfile) {
+                val storeIds = input.storeIds
+                amount = input.storeIds.size
+                if (amount == 0){
+                    beListener.activate(listOf())
+                }
+                if (amount == 0){
+                    Singleton.storeReadFromDB += 1
+                }
+                for (storeId in storeIds){
+                    val id = Id(storeId, IdType.StoreId)
+                    dbClient.get(id.getPath(), listener1)
+                }
+            }
+        }
+
+        val listener2 = ListenerImpl2()
+
+        val id = Id(farmerUserIdString, IdType.CompleteUserProfileId)
+
+        dbClient.get(id.getPath(), listener2)
+    }
+
+
     fun getProductsInformationFromWorker(workerIdString: String, beListener: Listener<List<ProductInformation>>){
         class ListenerImpl1() : Listener<CompleteUserProfile>() {
             override fun activate(input: CompleteUserProfile) {
                 getProductInformationFromFarmer(input.parentFarmerId, beListener)
+            }
+        }
+        val listener1 = ListenerImpl1()
+        getCompleteUserProfile(workerIdString, listener1)
+    }
+
+    fun getStoreInformationFromWorker(workerIdString: String, beListener: Listener<List<StoreInformation>>){
+        class ListenerImpl1() : Listener<CompleteUserProfile>() {
+            override fun activate(input: CompleteUserProfile) {
+                getStoreInformationFromFarmer(input.parentFarmerId, beListener)
             }
         }
         val listener1 = ListenerImpl1()

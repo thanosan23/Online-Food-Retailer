@@ -4,6 +4,7 @@ import ca.uwaterloo.cs.product.ProductInformation
 import android.content.Context
 import ca.uwaterloo.cs.Listener
 import ca.uwaterloo.cs.Singleton
+import ca.uwaterloo.cs.StoreInformation
 import ca.uwaterloo.cs.db.DBManager
 import ca.uwaterloo.cs.harvest.HarvestInformation
 import kotlinx.serialization.decodeFromString
@@ -34,11 +35,26 @@ class PushPullFarmer(val context: Context) {
         dbManager.getAllHarvestsFromFarmer(Singleton.userId, listener)
     }
 
+    fun resolver() {
+        pushData(context, dbManager);
+    }
+
     fun productResolver(){
         pushProductData(context, dbManager)
     }
+
+    fun storeResolver() {
+        pushStoreData(context, dbManager);
+    }
 }
 
+fun pushData(context: Context, dbManager: DBManager) {
+    val productList = localCasting(readProductFromFiles(context))
+    val storeList = localCastingStore(readStoreFromFiles(context));
+    if(Singleton.isFarmer) {
+        dbManager.store(Singleton.userId, productList, storeList);
+    }
+}
 fun pushProductData(context: Context, dbManager: DBManager){
     val productList = localCasting(readProductFromFiles(context))
     if (Singleton.isFarmer){
@@ -47,10 +63,27 @@ fun pushProductData(context: Context, dbManager: DBManager){
     }
 }
 
+fun pushStoreData(context: Context, dbManager: DBManager){
+    val storeList = localCastingStore(readStoreFromFiles(context));
+    if (Singleton.isFarmer){
+        dbManager.storeStoreInformation(Singleton.userId, storeList);
+    }
+}
+
+
 private fun localCasting(products: ArrayList<Pair<String, ProductInformation>>): List<ProductInformation>{
     val avs = mutableListOf<ProductInformation>()
     for (product in products){
         avs.add(product.second)
+    }
+    return avs
+
+}
+
+private fun localCastingStore(stores: ArrayList<Pair<String, StoreInformation>>): List<StoreInformation>{
+    val avs = mutableListOf<StoreInformation>()
+    for (store in stores){
+        avs.add(store.second)
     }
     return avs
 
@@ -111,6 +144,29 @@ fun readHarvestFromFiles(context: Context): ArrayList<HarvestInformation>{
                 val harvestInformation =
                     Json.decodeFromString<HarvestInformation>(saveFile.readText())
                 list.add(harvestInformation)
+            }
+            catch (e: Throwable){
+                println("error deserializing the product")
+            }
+        }
+    }
+    return list
+}
+
+fun readStoreFromFiles(context: Context): ArrayList<Pair<String, StoreInformation>>{
+    // TODO: platform compatibility
+    // TODO: load from platform
+    val dir = File("${context.filesDir}/outstore")
+    if (!dir.exists()) {
+        return ArrayList()
+    }
+    val list = ArrayList<Pair<String, StoreInformation>>()
+    for (saveFile in dir.walk()) {
+        if (saveFile.isFile && saveFile.canRead() && saveFile.name.contains("Store-")) {
+            try {
+                val storeInformation =
+                    Json.decodeFromString<StoreInformation>(saveFile.readText())
+                list.add(Pair(storeInformation.storeId, storeInformation))
             }
             catch (e: Throwable){
                 println("error deserializing the product")
