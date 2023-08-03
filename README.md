@@ -1,5 +1,7 @@
+# Online-Food-Retailer
 
-# Product Description
+
+## Product Description
 Online food retail can be hugely beneficial for farmers, offering a much higher share of the
 retail price and giving shoppers more transparency so they can choose food that better
 aligns with their values. It enables farmers that farm sustainably to find shoppers and a fair
@@ -42,7 +44,35 @@ This means that:
 ﹣ Producers will be able to connect specific products to different platforms and set
 stock and price levels on the different platforms.
 
-# User Interview:
+
+
+## Build/Compile Instructions
+
+Build/Compile Instructions
+
+1. Install Android Studio (https://developer.android.com/studio) 
+
+2. Please clone this GitHub repository at https://github.com/thanosan23/Online-Food-Retailer and open up the project on Android Studio.
+
+3. Create a FireBase database on Firebase console. Click add project, and name the project. Be sure to enable the “Android” option when creating the project to let Firebase know that the app is an Android application
+
+4. After you select Android, you will come across a form to set up the application. In the Android package name, write “ca.uwaterloo.cs”.
+
+5. For Debug Signing Certificate SHA-1, on Android Studio, click on Gradle at the right-most menu bar on Android Studio. Click on the Gradle icon (looks like an elephant). A screen will pop up. Type “gradle signingreport”. This will open up a screen with a SHA-1 Key. Copy and paste the key and enter it into the Firebase form.
+
+6. As instructed by Firebase, download “google-services.json” and move the file into the app folder.
+
+7. You can skip adding the Firebase SDK instructions as the GitHub repository has already set up the Firebase SDK.
+
+8. When you are on Firebase, go to project categories, then build, and select authentication. Click “Get Started” and then toggle the Enable bar, and click “Save”.
+
+9. Go back to the console and go to project categories, then build, and select a realtime database. Click “Create Database”, and then click “Start in test mode”. Click “Enable”.
+
+10. Now that Firebase is set up, click the play button on Android Studio and the emulator should start up and the app should open!
+
+11. To test out the application on an Android app, on the immediate left of the play button, there is a drop down menu. Click the drop down menu and select  “Pair Devices using Wi-Fi”. Follow the instructions given by Android Studio to pair your device.
+
+## User Interview:
 
 The below is an excerpt from an interview with a food producer and potential user of the app.
 What do you produce?
