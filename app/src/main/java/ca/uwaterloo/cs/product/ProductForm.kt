@@ -446,14 +446,19 @@ fun ShowProductForm(
                         )
                     )
                 )
-                // 86cb170d-683a-4167-8898-88997fc208a2
+
                 @Composable
                 fun numberButton(size: Int) {
                     val button = Button(
                         onClick = {
-                            formState.fields.first().setValue(
-                                ((formState.fields.first().getValue().toInt())+size).toString()
-                            )
+                            try {
+                                formState.fields.first().setValue(
+                                    ((formState.fields.first().getValue().toInt())+size).toString()
+                                )
+                            } catch (e : java.lang.NumberFormatException) {
+                                AlertDialog.Builder(context)
+                                    .setMessage("An empty value is not a number!").show()
+                            }
                         },
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                     ) {

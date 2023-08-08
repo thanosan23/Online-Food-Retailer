@@ -45,10 +45,7 @@ This means that:
 stock and price levels on the different platforms.
 
 
-
 ## Build/Compile Instructions
-
-Build/Compile Instructions
 
 1. Install Android Studio (https://developer.android.com/studio) 
 
@@ -58,7 +55,7 @@ Build/Compile Instructions
 
 4. After you select Android, you will come across a form to set up the application. In the Android package name, write “ca.uwaterloo.cs”.
 
-5. For Debug Signing Certificate SHA-1, on Android Studio, click on Gradle at the right-most menu bar on Android Studio. Click on the Gradle icon (looks like an elephant). A screen will pop up. Type “gradle signingreport”. This will open up a screen with a SHA-1 Key. Copy and paste the key and enter it into the Firebase form.
+5. For Debug Signing Certificate SHA-1 and SHA-256, on Android Studio, click on Gradle at the right-most menu bar on Android Studio. Click on the Gradle icon (looks like an elephant). A screen will pop up. Type “gradle signingreport”. This will open up a screen with a SHA-1 Key and a SHA-256 Key. Copy and paste both keys and enter it into the Firebase form.
 
 6. As instructed by Firebase, download “google-services.json” and move the file into the app folder.
 
@@ -68,11 +65,34 @@ Build/Compile Instructions
 
 9. Go back to the console and go to project categories, then build, and select a realtime database. Click “Create Database”, and then click “Start in test mode”. Click “Enable”.
 
-10. Now that Firebase is set up, click the play button on Android Studio and the emulator should start up and the app should open!
+11. On the realtime database, go to the "rules" section. Paste in the following:
+```json
+{
+  "rules": {
+    ".read": "auth.uid !== null",
+    ".write": "auth.uid !== null"
+  }
+}
+```
+This only allows authenticated users to be able to add their products, add harvests, and add stores to the database.
 
-11. To test out the application on an Android app, on the immediate left of the play button, there is a drop down menu. Click the drop down menu and select  “Pair Devices using Wi-Fi”. Follow the instructions given by Android Studio to pair your device.
+12. Now that Firebase is set up, click the play button on Android Studio and the emulator should start up and the app should open!
 
-## User Interview:
+13. To test out the application on an Android app, on the immediate left of the play button, there is a drop down menu. Click the drop down menu and select  “Pair Devices using Wi-Fi”. Follow the instructions given by Android Studio to pair your device.
+
+Note: When creating a signed APK, a keystore will be generated. We need to add the keystore's SHA fingerprints to Firebase! This can be done using keytool: `keytool -list -v -keystore <location of keystore> -alias <name of key alias>`. Keep in mind that to use `keytool`, you do need Java installed in your system. After you run the command, you need to add the provided SHA-1 and SHA-256 fingerprints to your Firebase app in the Firebase console!
+
+## Installation Instructions
+
+1. To download the app, please go to this GitHub repository, click `app/release/app-release.apk` and download the APK file to your android device (this can be done by clicking view raw).
+
+2. Go to the “Files” app on your android device and click the downloaded APK file. This should download the apk file to your device.
+
+3. If you do get a warning saying that the app is unsafe, click “Install Anyway”.
+
+4. Once the installation process is done, the app should be downloaded to your phone!
+
+## User Interview
 
 The below is an excerpt from an interview with a food producer and potential user of the app.
 What do you produce?

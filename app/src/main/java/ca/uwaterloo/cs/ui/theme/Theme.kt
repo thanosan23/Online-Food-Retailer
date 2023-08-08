@@ -1,5 +1,6 @@
 package ca.uwaterloo.cs.ui.theme
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
@@ -13,7 +14,7 @@ import androidx.compose.ui.graphics.colorspace.ColorSpaces
 @Composable
 fun OnlineFoodRetailTheme(content: @Composable () -> Unit) {
   val darkColors = darkColors(
-    background = Color.VeryDarkGray,
+    background = Color.BG,
     surface = Color.VeryDarkGray,
     primary = Color.VeryDarkGray,
   )
@@ -24,7 +25,8 @@ fun OnlineFoodRetailTheme(content: @Composable () -> Unit) {
   )
 
   MaterialTheme(
-    colors = if (isSystemInDarkTheme()) darkColors else lightColors,
+//    colors = if (isSystemInDarkTheme()) darkColors else lightColors,
+    colors = lightColors,
     content = {
       val defaultTextStyle = LocalTextStyle.current.copy(
         color = MaterialTheme.colors.onBackground

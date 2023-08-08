@@ -34,6 +34,7 @@ import ca.uwaterloo.cs.harvest.HarvestInformation
 import ca.uwaterloo.cs.product.ProductInformation
 import ca.uwaterloo.cs.pushpull.readHarvestFromFiles
 import ca.uwaterloo.cs.pushpull.readProductFromFiles
+import ca.uwaterloo.cs.pushpull.sync
 import ca.uwaterloo.cs.ui.theme.InstagramPurple
 import ca.uwaterloo.cs.ui.theme.OnlineFoodRetailTheme
 import coil.compose.rememberImagePainter
@@ -67,17 +68,6 @@ fun MergeScreen(nav: DestinationsNavigator) {
         CenterAlignedTopAppBar(
             title = { Text("Harvest Updates", color = Color.White) },
             modifier = Modifier.systemBarsPadding(),
-            navigationIcon = {
-                IconButton(onClick = {
-                    nav.navigate(ProductFormDestination())
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = "Catalogue",
-                        tint = Color.White
-                    )
-                }
-            },
             actions = {
                 IconButton(onClick = { nav.navigate(MainContentDestination) }) {
                     Icon(
@@ -198,55 +188,57 @@ fun MergeScreen(nav: DestinationsNavigator) {
                         .width(20.dp)
                         .fillMaxHeight()
                 )
-                IconButton(onClick = {
-                    if (productData.amount + harvestData.amount < productData.platform1_amount + productData.platform2_amount) {
-                        val builder = AlertDialog.Builder(context)
-                        builder.setTitle("Invalid Operation")
-                            .setMessage("Cannot lower stock amount below total sold on platforms. Please update platform amounts before lowering total stock.")
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .setPositiveButton(
-                                android.R.string.yes
-                            ) { _, _ -> }
-                        builder.show()
-                    } else {
-                        productData.amount += harvestData.amount
-                        productData.exportData(saveDirProduct)
-                        harvestData.deleteData(saveDirHarvest)
-                        val harvestList = processedData[productData.name]!!.second
-                        val updatedList = harvestList.toMutableList()
-                        updatedList.remove(harvestData)
-                        linkedHarvests.remove(harvestData.harvestId)
-                        processedData[productData.name] = Pair(productData, updatedList)
+                if(Singleton.isFarmer) {
+                    IconButton(onClick = {
+                        if (productData.amount + harvestData.amount < productData.platform1_amount + productData.platform2_amount) {
+                            val builder = AlertDialog.Builder(context)
+                            builder.setTitle("Invalid Operation")
+                                .setMessage("Cannot lower stock amount below total sold on platforms. Please update platform amounts before lowering total stock.")
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setPositiveButton(
+                                    android.R.string.yes
+                                ) { _, _ -> }
+                            builder.show()
+                        } else {
+                            productData.amount += harvestData.amount
+                            productData.exportData(saveDirProduct)
+                            harvestData.deleteData(saveDirHarvest)
+                            val harvestList = processedData[productData.name]!!.second
+                            val updatedList = harvestList.toMutableList()
+                            updatedList.remove(harvestData)
+                            linkedHarvests.remove(harvestData.harvestId)
+                            processedData[productData.name] = Pair(productData, updatedList);
+                            sync(context);
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = "Accept change",
+                            tint = Color.Green,
+                            modifier = Modifier
+                        )
                     }
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.Check,
-                        contentDescription = "Accept change",
-                        tint = Color.Green,
-                        modifier = Modifier
-                    )
                 }
                 Spacer(
                     modifier = Modifier
                         .width(5.dp)
                         .fillMaxHeight()
                 )
-                if(Singleton.isFarmer) {
-                    IconButton(onClick = {
-                        harvestData.deleteData(saveDirHarvest)
-                        val harvestList = processedData[productData.name]!!.second
-                        val updatedList = harvestList.toMutableList()
-                        updatedList.remove(harvestData)
-                        linkedHarvests.remove(harvestData.harvestId)
-                        processedData[productData.name] = Pair(productData, updatedList)
-                    }) {
-                        Icon(
-                            imageVector = Icons.Filled.Clear,
-                            contentDescription = "Remove change",
-                            tint = Color.Red,
-                            modifier = Modifier
-                        )
-                    }
+                IconButton(onClick = {
+                    harvestData.deleteData(saveDirHarvest)
+                    val harvestList = processedData[productData.name]!!.second
+                    val updatedList = harvestList.toMutableList()
+                    updatedList.remove(harvestData)
+                    linkedHarvests.remove(harvestData.harvestId)
+                    processedData[productData.name] = Pair(productData, updatedList)
+                    sync(context);
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Clear,
+                        contentDescription = "Remove change",
+                        tint = Color.Red,
+                        modifier = Modifier
+                    )
                     Spacer(
                         modifier = Modifier
                             .width(5.dp)
@@ -379,7 +371,7 @@ fun MergeScreen(nav: DestinationsNavigator) {
                                 "Cancel"
                             )
                         val builder = AlertDialog.Builder(context)
-                        builder.setTitle("Add Photo")
+                        builder.setTitle("Options")
                         builder.setItems(options) { dialog, item ->
                             if (options[item] == "Change Amount") {
                                 dialog.dismiss()

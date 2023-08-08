@@ -3,16 +3,22 @@ package ca.uwaterloo.cs
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.speech.RecognizerIntent
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,6 +54,9 @@ import ca.uwaterloo.cs.dbmodels.CompleteUserProfile
 import ca.uwaterloo.cs.destinations.AccountSettingListScreenDestination
 import ca.uwaterloo.cs.destinations.ProductFormDestination
 import ca.uwaterloo.cs.product.ProductInformation
+import ca.uwaterloo.cs.pushpull.PullWorker
+import ca.uwaterloo.cs.pushpull.PushPullFarmer
+import ca.uwaterloo.cs.pushpull.PushWorker
 import ca.uwaterloo.cs.pushpull.readProductFromFiles
 import ca.uwaterloo.cs.ui.theme.*
 import coil.compose.rememberImagePainter
@@ -67,7 +76,6 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.util.*
-
 
 class MainActivity : ComponentActivity() {
     private val dbManager = DBManager(null);
@@ -124,6 +132,7 @@ class MainActivity : ComponentActivity() {
         .build()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken("867046677413-rr6ds5ics077kookfvbjcagnei4odl6t")

@@ -46,25 +46,6 @@ android {
   composeOptions {
     kotlinCompilerExtensionVersion '1.1.1'
   }
-  buildTypes {
-    release {
-      // Enables code shrinking, obfuscation, and optimization for only
-      // your project's release build type. Make sure to use a build
-      // variant with `debuggable false`.
-      minifyEnabled true
-
-      // Enables resource shrinking, which is performed by the
-      // Android Gradle plugin.
-      shrinkResources true
-
-      // Includes the default ProGuard rules files that are packaged with
-      // the Android Gradle plugin. To learn more, go to the section about
-      // R8 configuration files.
-      proguardFiles getDefaultProguardFile(
-              'proguard-android-optimize.txt'),
-              'proguard-rules.pro'
-    }
-  }
 }
 
 dependencies {
@@ -90,7 +71,7 @@ dependencies {
   implementation 'androidx.appcompat:appcompat:1.4.2'
   implementation 'com.google.firebase:firebase-database-ktx:20.0.0'
   implementation 'com.google.firebase:firebase-firestore-ktx:23.0.2'
-    implementation 'com.google.firebase:firebase-storage:19.1.1'
+  implementation 'com.google.firebase:firebase-storage:19.1.1'
 //  implementation 'androidx.core:core-ktx:+'
   ksp 'io.github.raamcosta.compose-destinations:ksp:1.1.2-beta'
   implementation 'androidx.compose.runtime:runtime-livedata:1.0.0-beta01'
